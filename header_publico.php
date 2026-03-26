@@ -16,7 +16,7 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
 <header class="portal-header-banner public-banner">
     <div class="container-fluid container-custom-padding">
         <div class="d-flex justify-content-between align-items-start top-utility-bar">
-            <div class="accessibility-bar-header d-flex align-items-center mb-3">
+            <div class="accessibility-bar-header d-flex align-items-center mb-1">
                 <span class="me-2 d-none d-lg-inline text-white small opacity-75">ACESSIBILIDADE</span>
                 <button id="font-increase" class="btn btn-xs btn-outline-light me-1" title="Aumentar Fonte">A+</button>
                 <button id="font-reset" class="btn btn-xs btn-outline-light me-1" title="Fonte Padrão">A</button>
@@ -30,7 +30,7 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
 
         <div class="banner-content text-center py-1">
             <?php if ($logo_src): ?>
-                <img src="<?php echo htmlspecialchars($logo_src); ?>" alt="Brasão Prefeitura" class="prefeitura-logo-header mb-3">
+                <img src="<?php echo htmlspecialchars($logo_src); ?>" alt="Brasão Prefeitura" class="prefeitura-logo-header mb-1">
             <?php endif; ?>
             <h2 class="portal-main-title"><?php echo htmlspecialchars($prefeitura_titulo); ?></h2>
             <p class="portal-subtitle">Acesso rápido e transparente às publicações municipais</p>
