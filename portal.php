@@ -51,7 +51,6 @@ $stmt_registros->execute($params_paginados);
 $registros_ids = $stmt_registros->fetchAll(PDO::FETCH_COLUMN);
 
 // --- Lógica para montar a tabela de resultados ---
-// ATUALIZAÇÃO: Busca apenas os campos que NÃO SÃO 'detalhes_apenas' para as colunas da tabela
 $stmt_campos_todos = $pdo->prepare("SELECT id, nome_campo, tipo_campo FROM campos_portal WHERE id_portal = ? AND detalhes_apenas = 0 ORDER BY ordem, id");
 $stmt_campos_todos->execute([$id_portal]);
 $campos_tabela = $stmt_campos_todos->fetchAll();
@@ -66,7 +65,6 @@ if (!empty($registros_ids)) {
     foreach ($registros_ids as $id_registro) {
         $linha_ordenada = ['id_registro_para_link' => $id_registro];
         $valores_do_registro_atual = $valores_por_registro[$id_registro] ?? [];
-        // Monta a linha apenas com os campos visíveis na tabela
         foreach ($id_campos_ordenados as $id_campo) { 
             $linha_ordenada[] = $valores_do_registro_atual[$id_campo] ?? ''; 
         }
@@ -80,52 +78,64 @@ if (!empty($registros_ids)) {
     <meta charset="UTF-8">
     <title><?php echo htmlspecialchars($secao['nome']); ?> - Portal da Transparência</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
     <style>
-        .table-custom tbody tr:hover { background-color: #f5f5f5; cursor: pointer; }
+        .table-custom tbody tr:hover { background-color: #f8f9fa; cursor: pointer; }
+        .table-custom thead th { border-bottom: 2px solid #dee2e6; }
     </style>
 </head>
-<body>
+<body class="bg-light">
 
-<?php include 'header_publico.php'; ?>
+<?php 
+$page_title = $secao['nome']; 
+include 'header_publico.php'; 
+?>
 
 <div class="container-fluid">
     <div class="row">
         <?php include 'menu.php'; ?>
         <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
+            
+            <h2 class="mb-4 fw-bold"><?php echo htmlspecialchars($secao['nome']); ?></h2>
+
             <?php if (!empty($campos_pesquisaveis)): ?>
-            <div class="card mb-4">
-                <div class="card-header"><i class="bi bi-funnel-fill"></i> Filtros de Pesquisa</div>
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white py-3"><h4><i class="bi bi-funnel-fill text-primary me-2"></i>Filtros de Pesquisa</h4></div>
                 <div class="card-body">
                     <form method="GET" action="portal.php">
                         <input type="hidden" name="slug" value="<?php echo htmlspecialchars($slug_portal); ?>">
                         <div class="row">
                             <?php foreach ($campos_pesquisaveis as $campo): ?>
                                 <div class="col-md-4 mb-3">
-                                    <label for="filtro_<?php echo $campo['id']; ?>" class="form-label"><?php echo htmlspecialchars($campo['nome_campo']); ?></label>
+                                    <label class="form-label fw-bold"><?php echo htmlspecialchars($campo['nome_campo']); ?></label>
                                     <?php
                                         $valor_filtro_atual = $filtros_ativos[$campo['id']] ?? '';
-                                        // A lógica para criar select, date, etc. foi mantida do seu código original
                                         $tipo_input = 'text';
                                         if ($campo['tipo_campo'] == 'data') $tipo_input = 'date';
                                         if ($campo['tipo_campo'] == 'numero' || $campo['tipo_campo'] == 'moeda') $tipo_input = 'number';
-                                        echo '<input type="'. $tipo_input .'" class="form-control" name="filtros['. $campo['id'] .']" id="filtro_'. $campo['id'] .'" value="'. htmlspecialchars($valor_filtro_atual) .'">';
+                                        echo '<input type="'. $tipo_input .'" class="form-control" name="filtros['. $campo['id'] .']" value="'. htmlspecialchars($valor_filtro_atual) .'">';
                                     ?>
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Filtrar</button>
-                            <a href="portal.php?slug=<?php echo htmlspecialchars($slug_portal); ?>" class="btn btn-secondary ms-2"><i class="bi bi-eraser-fill"></i> Limpar Filtros</a>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i> Filtrar</button>
+                            <a href="portal.php?slug=<?php echo htmlspecialchars($slug_portal); ?>" class="btn btn-outline-secondary"><i class="bi bi-eraser-fill"></i> Limpar</a>
+                            
                             <div class="dropdown ms-auto">
-                                <button class="btn btn-success dropdown-toggle" type="button" id="dropdownExport" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-download"></i> Exportar Dados</button>
+                                <button class="btn btn-dynamic-primary dropdown-toggle" type="button" id="dropdownExport" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-download me-1"></i> Exportar Dados</button>
                                 <?php $export_params = http_build_query($_GET); ?>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownExport">
-                                    <li><a class="dropdown-item" href="exportar_dados.php?<?php echo $export_params; ?>&formato=csv">CSV</a></li>
-                                    <li><a class="dropdown-item" href="exportar_dados.php?<?php echo $export_params; ?>&formato=xls">XLS (Excel)</a></li>
-                                    <li><a class="dropdown-item" href="exportar_dados.php?<?php echo $export_params; ?>&formato=json">JSON</a></li>
-                                    <li><a class="dropdown-item" href="exportar_dados.php?<?php echo $export_params; ?>&formato=xml">XML</a></li>
-                                    <li><a class="dropdown-item" href="exportar_dados.php?<?php echo $export_params; ?>&formato=txt">TXT</a></li>
+                                <ul class="dropdown-menu shadow border-0" aria-labelledby="dropdownExport">
+                                    <li><a class="dropdown-item" href="exportar_dados.php?<?php echo $export_params; ?>&formato=csv"><i class="bi bi-filetype-csv me-2"></i>CSV</a></li>
+                                    <li><a class="dropdown-item" href="exportar_dados.php?<?php echo $export_params; ?>&formato=xls"><i class="bi bi-file-earmark-excel me-2"></i>Excel</a></li>
+                                    <li><a class="dropdown-item" href="exportar_dados.php?<?php echo $export_params; ?>&formato=json"><i class="bi bi-filetype-json me-2"></i>JSON</a></li>
+                                    <li><a class="dropdown-item" href="exportar_dados.php?<?php echo $export_params; ?>&formato=xml"><i class="bi bi-filetype-xml me-2"></i>XML</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -134,8 +144,10 @@ if (!empty($registros_ids)) {
             </div>
             <?php endif; ?>
             
-            <div class="card shadow-sm">
-                <div class="card-header"><?php echo $total_itens; ?> Registros Encontrados</div>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Registros Encontrados: <span class="badge bg-light text-dark border"><?php echo $total_itens; ?></span></h5>
+                </div>
                 <div class="table-responsive">
                     <table class="table-custom table-hover align-middle mb-0 w-100">
                         <thead>
@@ -147,10 +159,10 @@ if (!empty($registros_ids)) {
                         </thead>
                         <tbody>
                             <?php if (empty($dados_tabela)): ?>
-                                <tr><td colspan="<?php echo count($campos_tabela); ?>" class="text-center p-4">Nenhum registro encontrado.</td></tr>
+                                <tr><td colspan="<?php echo count($campos_tabela); ?>" class="text-center p-5 text-muted">Ainda não há dados cadastrados nesta seção.</td></tr>
                             <?php else: ?>
                                 <?php foreach ($dados_tabela as $linha): ?>
-                                    <tr style="cursor: pointer;" onclick="window.location='detalhes.php?id=<?php echo $linha['id_registro_para_link']; ?>';">
+                                    <tr onclick="window.location='detalhes.php?id=<?php echo $linha['id_registro_para_link']; ?>';">
                                         <?php 
                                         $id_registro_atual = $linha['id_registro_para_link'];
                                         unset($linha['id_registro_para_link']);
@@ -160,11 +172,12 @@ if (!empty($registros_ids)) {
                                                 <?php
                                                 $tipo_do_campo_atual = $campos_tabela[$coluna_index]['tipo_campo'];
                                                 if ($tipo_do_campo_atual == 'anexo') {
-                                                    if (!empty($valor)) echo '<i class="bi bi-paperclip"></i> Sim'; else echo 'Não';
+                                                    if (!empty($valor)) echo '<i class="bi bi-paperclip text-primary"></i> Sim'; else echo '-';
                                                 } elseif ($tipo_do_campo_atual == 'data' && !empty($valor)) {
                                                     $data_objeto = date_create($valor);
-                                                    if ($data_objeto) { echo date_format($data_objeto, 'd/m/Y'); } 
-                                                    else { echo htmlspecialchars($valor); }
+                                                    echo ($data_objeto) ? date_format($data_objeto, 'd/m/Y') : htmlspecialchars($valor);
+                                                } elseif ($tipo_do_campo_atual == 'moeda' && !empty($valor)) {
+                                                    echo 'R$ ' . number_format($valor, 2, ',', '.');
                                                 } else {
                                                     echo htmlspecialchars(mb_strtoupper($valor));
                                                 }
@@ -181,13 +194,32 @@ if (!empty($registros_ids)) {
             
             <?php if ($total_paginas > 1): ?>
             <nav aria-label="Navegação das páginas" class="mt-4 d-flex justify-content-center">
-                </nav>
+                <ul class="pagination">
+                    <?php $query_params_page = $_GET; ?>
+                    <li class="page-item <?php if($pagina_atual <= 1){ echo 'disabled'; } ?>">
+                        <?php $query_params_page['page'] = $pagina_atual - 1; ?>
+                        <a class="page-link" href="?<?php echo http_build_query($query_params_page); ?>">Anterior</a>
+                    </li>
+                    <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                        <?php $query_params_page['page'] = $i; ?>
+                        <li class="page-item <?php if($pagina_atual == $i) { echo 'active-dynamic'; } ?>">
+                            <a class="page-link" href="?<?php echo http_build_query($query_params_page); ?>"><?php echo $i; ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    <li class="page-item <?php if($pagina_atual >= $total_paginas) { echo 'disabled'; } ?>">
+                        <?php $query_params_page['page'] = $pagina_atual + 1; ?>
+                        <a class="page-link" href="?<?php echo http_build_query($query_params_page); ?>">Próximo</a>
+                    </li>
+                </ul>
+            </nav>
             <?php endif; ?>
         </main>
     </div>
 </div>
 
-<footer class="p-3 mt-4"></footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<?php 
+$custom_container_class = "container-custom-padding";
+include 'footer_publico.php'; 
+?>
 </body>
 </html>
