@@ -16,6 +16,7 @@ $stmt_portal->execute([$slug_portal]);
 $secao = $stmt_portal->fetch();
 if (!$secao) { die("Seção não encontrada."); }
 $id_portal = $secao['id'];
+$page_title = $secao['nome'];
 $_GET['id'] = $secao['id_categoria'];
 
 // --- LÓGICA DOS FILTROS ---
@@ -86,29 +87,7 @@ if (!empty($registros_ids)) {
 </head>
 <body>
 
-<header class="page-header">
-    <div class="container-fluid container-custom-padding">
-        <div class="d-flex justify-content-between align-items-start">
-            <div>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.php">Início</a></li>
-                        <li class="breadcrumb-item"><a href="index.php">Transparência</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($secao['nome']); ?></li>
-                    </ol>
-                </nav>
-                <h1><?php echo htmlspecialchars($secao['nome']); ?></h1>
-            </div>
-            <div class="accessibility-bar-header d-flex align-items-center pt-2">
-                <span class="me-2 d-none d-lg-inline text-white" style="font-size: 0.8rem;">ACESSIBILIDADE</span>
-                <button id="font-increase" class="btn btn-sm btn-outline-light me-1" title="Aumentar Fonte">A+</button>
-                <button id="font-reset" class="btn btn-sm btn-outline-light me-1" title="Fonte Padrão">A</button>
-                <button id="font-decrease" class="btn btn-sm btn-outline-light me-2" title="Diminuir Fonte">A-</button>
-                <button id="contrast-toggle" class="btn btn-sm btn-outline-light" title="Alto Contraste"><i class="bi bi-circle-half"></i></button>
-            </div>
-        </div>
-    </div>
-</header>
+<?php include 'header_publico.php'; ?>
 
 <div class="container-fluid">
     <div class="row">

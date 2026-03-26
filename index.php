@@ -3,25 +3,6 @@
 // Teste de Deploy Hostinger - Webhook
 require_once 'conexao.php';
 
-// --- CÓDIGO CORRIGIDO PARA BUSCAR O TÍTULO DA PREFEITURA ---
-$prefeitura_titulo = ''; // Define um valor padrão
-try {
-    // A consulta agora busca na coluna 'valor' ONDE a coluna 'chave' é 'prefeitura_titulo'
-    $stmt_pref = $pdo->prepare("SELECT valor FROM configuracoes WHERE chave = ? LIMIT 1");
-    $stmt_pref->execute(['prefeitura_titulo']);
-    
-    $config = $stmt_pref->fetch(PDO::FETCH_ASSOC);
-
-    // Verificamos e usamos a coluna 'valor'
-    if ($config && !empty($config['valor'])) {
-        $prefeitura_titulo = $config['valor'];
-    }
-} catch (PDOException $e) {
-    // Em um ambiente de produção, é melhor registrar o erro do que exibi-lo na tela.
-    error_log("Erro ao buscar configuração da prefeitura: " . $e->getMessage());
-}
-// --- FIM DO CÓDIGO CORRIGIDO ---
-
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -106,30 +87,7 @@ if ($categoria_id) {
 </head>
 <body>
 
-<header class="page-header">
-    <div class="container-fluid container-custom-padding">
-        <div class="d-flex justify-content-between align-items-start">
-            <div>
-                <h2 class="h4 fw-bold text-white mb-2 font-poppins"><?php echo htmlspecialchars($prefeitura_titulo); ?></h2>
-                
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.php">Início</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($page_title); ?></li>
-                    </ol>
-                </nav>
-                <h1><?php echo htmlspecialchars($page_title); ?></h1>
-            </div>
-            <div class="accessibility-bar-header d-flex align-items-center pt-2">
-                <span class="me-2 d-none d-lg-inline text-white" style="font-size: 0.8rem;">ACESSIBILIDADE</span>
-                <button id="font-increase" class="btn btn-sm btn-outline-light me-1" title="Aumentar Fonte">A+</button>
-                <button id="font-reset" class="btn btn-sm btn-outline-light me-1" title="Fonte Padrão">A</button>
-                <button id="font-decrease" class="btn btn-sm btn-outline-light me-2" title="Diminuir Fonte">A-</button>
-                <button id="contrast-toggle" class="btn btn-sm btn-outline-light" title="Alto Contraste"><i class="bi bi-circle-half"></i></button>
-            </div>
-        </div>
-    </div>
-</header>
+<?php include 'header_publico.php'; ?>
 
 <div class="container-fluid">
     <div class="row">

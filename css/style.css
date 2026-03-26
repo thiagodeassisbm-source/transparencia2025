@@ -30,33 +30,75 @@
 
 /* --- 2. LAYOUT PRINCIPAL (CABEÇALHO E MENU) --- */
 
-/* Cabeçalho Azul da Página */
-.page-header {
-    background-color: #2ca444; /* CABEÇALHO QUE ESTA COM A COR VERDE */
-    color: #ffffff;
-    padding: 1.5rem 0;
+/* Cabeçalho Verde da Página (Banner Anexo 2) */
+.portal-header-banner.public-banner {
+    background-color: #28a745;
+    background-image: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: #fff;
+    padding: 2rem 0 4rem;
+    position: relative;
+    box-shadow: inset 0 -10px 25px rgba(0,0,0,0.05);
 }
-.page-header .breadcrumb {
+
+.top-utility-bar {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 2rem;
+    padding-bottom: 0.5rem;
+}
+
+.banner-content .prefeitura-logo-header {
+    max-height: 110px;
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.15));
+}
+
+.banner-content h2.portal-main-title {
+    font-size: 2rem;
+    font-weight: 700;
     margin-bottom: 0.5rem;
+    color: #fff !important;
 }
-.page-header .breadcrumb-item {
-    font-size: 0.9rem;
+
+.banner-content .portal-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin-bottom: 2rem;
+    font-weight: 400;
 }
-.page-header .breadcrumb-item a {
-    color: #ffffff; /* Caminho dos link da parte superior */
-    text-decoration: none;
+
+.banner-content h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-top: 1.5rem;
+    letter-spacing: -0.02em;
+    color: #fff !important;
 }
-.page-header .breadcrumb-item a:hover {
-    color: #ffffff;
+
+.banner-content .breadcrumb {
+    background: rgba(0,0,0,0.1);
+    display: inline-flex;
+    padding: 0.6rem 1.75rem;
+    border-radius: 50px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
 }
-.page-header .breadcrumb-item.active {
-    color: #ffffff;
-    font-weight: 500;
+
+.banner-content .breadcrumb-item, 
+.banner-content .breadcrumb-item a {
+    color: #fff !important;
+    font-size: 0.85rem;
 }
-.page-header h1 {
-    margin: 0;
-    font-size: 2.5rem;
-    font-weight: bold;
+
+.banner-content .breadcrumb-item.active {
+    font-weight: 700;
+    opacity: 1;
+}
+
+/* Utilitários Pequenos */
+.btn-xs {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
 }
 
 /* Menu Lateral (Sidebar) */
