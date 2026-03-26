@@ -1,57 +1,77 @@
 <?php
+// /index.php (Página Inicial Pública)
 require_once 'conexao.php';
 
-// --- CONFIGURAÇÕES DA PAGINAÇÃO ---
+// --- 1. CONFIGURAÇÕES DA PAGINAÇÃO ---
 $itens_por_pagina = 12;
 $pagina_atual = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT) ?: 1;
 if ($pagina_atual < 1) { $pagina_atual = 1; }
 $offset = ($pagina_atual - 1) * $itens_por_pagina;
 
-$ordem_atual = filter_input(INPUT_GET, 'sort', FILTER_SANITIZE_SPECIAL_CHARS) ?: 'padrao';
+// --- 2. LÓGICA DE FILTROS, ORDENAÇÃO E FAVORITOS ---
+$ip_usuario = $_SERVER['REMOTE_ADDR'];
 $categoria_id = filter_input(INPUT_GET, 'categoria_id', FILTER_VALIDATE_INT);
+$categoria_slug = filter_input(INPUT_GET, 'categoria_slug', FILTER_DEFAULT);
 
-// --- LÓGICA DE BUSCA ---
-$params = [];
-$sql_where = " WHERE 1=1";
+// Se tivermos apenas o slug, buscamos o ID correspondente
+if (empty($categoria_id) && !empty($categoria_slug)) {
+    $stmt_slug = $pdo->prepare("SELECT id FROM categorias WHERE slug = ? LIMIT 1");
+    $stmt_slug->execute([$categoria_slug]);
+    $categoria_id = $stmt_slug->fetchColumn();
+}
+
+$ordem_atual = $_GET['sort'] ?? 'padrao';
+
+$sql_base = "FROM cards_informativos c LEFT JOIN portais p ON c.id_secao = p.id";
+$sql_where = "";
+$params_where = [];
+
 if ($categoria_id) {
-    $sql_where .= " AND id_categoria = ?";
-    $params[] = $categoria_id;
+    $sql_where = " WHERE c.id_categoria = ?";
+    $params_where[] = $categoria_id;
 }
 
-$sql_order = " ORDER BY acessos DESC";
-if ($ordem_atual === 'alpha') {
-    $sql_order = " ORDER BY titulo ASC";
-}
-
-$sql_count = "SELECT COUNT(id) FROM categorias_cards $sql_where";
-$stmt_total = $pdo->prepare($sql_count);
-$stmt_total->execute($params);
+// --- 3. CONTAGEM TOTAL DE ITENS PARA A PAGINAÇÃO ---
+$stmt_total = $pdo->prepare("SELECT COUNT(c.id) " . $sql_base . $sql_where);
+$stmt_total->execute($params_where);
 $total_itens = $stmt_total->fetchColumn();
 $total_paginas = ceil($total_itens / $itens_por_pagina);
 
-$sql_cards = "SELECT * FROM categorias_cards $sql_where $sql_order LIMIT ? OFFSET ?";
-$stmt_cards = $pdo->prepare($sql_cards);
-$stmt_cards->bindValue(1, $itens_por_pagina, PDO::PARAM_INT);
-$stmt_cards->bindValue(2, $offset, PDO::PARAM_INT);
-if ($categoria_id) {
-    $stmt_cards = $pdo->prepare("SELECT * FROM categorias_cards $sql_where $sql_order LIMIT $itens_por_pagina OFFSET $offset");
-    $stmt_cards->execute($params);
-} else {
-    $stmt_cards->execute();
-}
-$cards = $stmt_cards->fetchAll();
+// --- 4. BUSCA DOS ITENS DA PÁGINA ATUAL ---
+// ATUALIZAÇÃO: Favoritos são baseados em cookie ou na tabela favoritos_usuarios se desejar. 
+// Mantendo a lógica de favoritos_usuarios via IP para consistência com o anterior.
+$sql_select = "SELECT c.id, c.titulo, c.subtitulo, c.caminho_icone, c.link_url, p.slug,
+               (SELECT COUNT(*) FROM favoritos_usuarios fu WHERE fu.id_card = c.id AND fu.ip_usuario = ?) as favorito ";
 
-// Busca favoritos (simulação - futuramente pode ser via cookie ou sessão)
-$favoritos = isset($_COOKIE['portal_favoritos']) ? json_decode($_COOKIE['portal_favoritos'], true) : [];
-foreach ($cards as &$card) {
-    $card['favorito'] = in_array($card['id'], $favoritos);
+$sql_order = "";
+if ($ordem_atual === 'alpha') {
+    $sql_order = " ORDER BY favorito DESC, c.titulo ASC";
+} else {
+    $sql_order = " ORDER BY favorito DESC, c.ordem ASC";
+}
+$sql_limit = " LIMIT ? OFFSET ?";
+$stmt = $pdo->prepare($sql_select . $sql_base . $sql_where . $sql_order . $sql_limit);
+$params_final = array_merge([$ip_usuario], $params_where);
+$params_final[] = $itens_por_pagina;
+$params_final[] = $offset;
+
+$stmt->execute($params_final);
+$cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// --- Lógica para o título da página ---
+$page_title = 'Início';
+if ($categoria_id) {
+    $stmt_cat = $pdo->prepare("SELECT nome FROM categorias WHERE id = ?");
+    $stmt_cat->execute([$categoria_id]);
+    $categoria_atual = $stmt_cat->fetch();
+    if ($categoria_atual) { $page_title = $categoria_atual['nome']; }
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Portal da Transparência - Início</title>
+    <title><?php echo htmlspecialchars($page_title); ?> - Portal da Transparência</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
@@ -64,17 +84,20 @@ foreach ($cards as &$card) {
 <body class="bg-light">
 
 <?php 
-$page_title = "Início"; 
 include 'header_publico.php'; 
 ?>
 
 <div class="container-fluid">
     <div class="row">
-        <?php include 'menu.php'; ?>
+        <?php 
+        // Passa o ID da categoria ativa para o menu.php
+        $_GET['categoria_id'] = $categoria_id; 
+        include 'menu.php'; 
+        ?>
         <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
             
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0 fw-bold">Serviços e Informações</h2>
+                <h2 class="mb-0 fw-bold"><?php echo htmlspecialchars($page_title); ?></h2>
                 <div class="btn-group shadow-sm">
                     <?php 
                         $query_params_sort = $_GET;
@@ -88,7 +111,7 @@ include 'header_publico.php';
 
             <div class="info-card-list">
                 <?php if (empty($cards)): ?>
-                    <div class="alert alert-light border shadow-sm">Nenhum serviço disponível no momento para esta categoria.</div>
+                    <div class="alert alert-light border shadow-sm"><i class="bi bi-info-circle me-2"></i>Nenhum serviço disponível no momento para esta categoria.</div>
                 <?php else: ?>
                     <?php foreach ($cards as $card): ?>
                         <?php
