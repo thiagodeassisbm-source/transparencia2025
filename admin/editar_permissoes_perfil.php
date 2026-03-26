@@ -75,52 +75,6 @@ include 'admin_header.php';
                         <div class="row">
                             <!-- MENUS E RECURSOS GLOBAIS -->
                             <div class="col-lg-6">
-                                <h5 class="fw-bold mb-4 pb-2 border-bottom">Módulos do Sistema</h5>
-                                
-                                <div class="table-responsive">
-                                    <table class="table align-middle">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Recurso / Módulo</th>
-                                                <th class="text-center">Ver</th>
-                                                <th class="text-center">Criar</th>
-                                                <th class="text-center">Editar</th>
-                                                <th class="text-center">Excluir</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            $modulos = [
-                                                'dashboard' => 'Dashboard (Início)',
-                                                'usuarios' => 'Gestão de Usuários',
-                                                'configuracoes' => 'Configurações da Prefeitura',
-                                                'ouvidoria' => 'Ouvidoria',
-                                                'sic' => 'SIC (e-SIC Inbox)',
-                                                'secoes' => 'Estrutura do Portal (Portais)'
-                                            ];
-                                            foreach ($modulos as $key => $nome):
-                                                $p = $permissoes[$key] ?? ['p_ver'=>0,'p_lancar'=>0,'p_editar'=>0,'p_excluir'=>0];
-                                            ?>
-                                            <tr>
-                                                <td><span class="fw-bold"><?php echo $nome; ?></span></td>
-                                                <td class="text-center">
-                                                    <div class="form-check form-check-inline m-0"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $key; ?>][ver]" value="1" <?php if($p['p_ver']){ echo 'checked'; } ?>></div>
-                                                </td>
-                                                <td class="text-center">
-                                                    <div class="form-check form-check-inline m-0"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $key; ?>][lancar]" value="1" <?php if($p['p_lancar']){ echo 'checked'; } ?>></div>
-                                                </td>
-                                                <td class="text-center">
-                                                    <div class="form-check form-check-inline m-0"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $key; ?>][editar]" value="1" <?php if($p['p_editar']){ echo 'checked'; } ?>></div>
-                                                </td>
-                                                <td class="text-center">
-                                                    <div class="form-check form-check-inline m-0"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $key; ?>][excluir]" value="1" <?php if($p['p_excluir']){ echo 'checked'; } ?>></div>
-                                                </td>
-                                            </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
 
                             <!-- FORMULÁRIOS DINÂMICOS (SEÇÕES) -->
                             <div class="col-lg-6 border-start ps-lg-4">

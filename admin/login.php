@@ -13,15 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $usuario = $_POST['usuario'];
     $senha   = $_POST['senha'];
 
-    $stmt = $pdo->prepare("SELECT id, usuario, nome, senha, perfil FROM usuarios_admin WHERE usuario = ?");
+    $stmt = $pdo->prepare("SELECT id, usuario, nome, senha, perfil, id_perfil FROM usuarios_admin WHERE usuario = ?");
     $stmt->execute([$usuario]);
     $user = $stmt->fetch();
 
     if ($user && password_verify($senha, $user['senha'])) {
         $_SESSION['admin_logged_in']      = true;
         $_SESSION['admin_user_id']        = $user['id'];
+        $_SESSION['admin_user_id_perfil'] = $user['id_perfil'];
         $_SESSION['admin_user_nome']      = $user['usuario'];
-        $_SESSION['admin_user_nome_real'] = $user['nome']; // Novo campo na sessão
+        $_SESSION['admin_user_nome_real'] = $user['nome']; 
         $_SESSION['admin_user_perfil']    = $user['perfil'];
 
         header("Location: dashboard.php");

@@ -48,7 +48,7 @@ $perfis_select = $pdo->query("SELECT id, nome FROM perfis ORDER BY nome ASC")->f
 $usuarios = $pdo->query("
     SELECT u.id, u.usuario, u.nome, p.nome as nome_perfil, u.id_perfil 
     FROM usuarios_admin u 
-    JOIN perfis p ON u.id_perfil = p.id 
+    LEFT JOIN perfis p ON u.id_perfil = p.id 
     ORDER BY u.usuario ASC
 ")->fetchAll();
 
@@ -122,14 +122,14 @@ include 'admin_header.php';
                                         <th class="text-end">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="usuarios-lista">
                                     <?php foreach ($usuarios as $u): ?>
                                     <tr>
                                         <td>
-                                            <div class="fw-bold"><?php echo htmlspecialchars($u['nome']); ?></div>
+                                            <div class="fw-bold"><?php echo htmlspecialchars($u['nome'] ?? 'Sem Nome'); ?></div>
                                             <small class="text-muted">@<?php echo htmlspecialchars($u['usuario']); ?></small>
                                         </td>
-                                        <td><span class="badge bg-light text-dark border"><?php echo htmlspecialchars($u['nome_perfil']); ?></span></td>
+                                        <td><span class="badge bg-light text-dark border"><?php echo htmlspecialchars($u['nome_perfil'] ?? 'Sem Perfil'); ?></span></td>
                                         <td class="text-end">
                                             <?php if (tem_permissao('usuarios', 'editar')): ?>
                                                 <a href="editar_usuario.php?id=<?php echo $u['id']; ?>" class="btn btn-primary btn-sm me-1"><i class="bi bi-pencil"></i></a>

@@ -1,5 +1,5 @@
 <?php
-// /admin/auth_check.php (Versão com Sistema de Permissões)
+// /admin/auth_check.php (Versão Corrigida)
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -11,54 +11,53 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-// 2. Garante que $pdo esteja disponível se precisarmos buscar algo
+// 2. Garante que $pdo esteja disponível
 require_once __DIR__ . '/../conexao.php';
 
-// 3. Função Global para Verificar Permissões
-function tem_permissao($recurso, $acao = 'ver') {
-    global $pdo;
+// 3. Carrega permissões e informações do perfil para a sessão (se não carregadas)
+if (!isset($_SESSION['permissoes_sessao']) || !isset($_SESSION['admin_user_perfil_nome'])) {
+    $id_perfil = $_SESSION['admin_user_id_perfil'] ?? 0;
     
-    // Suporte para o perfil 'admin' antigo ter acesso total total (fallback seguro)
+    // Busca o nome do perfil
+    $stmt_p = $pdo->prepare("SELECT nome FROM perfis WHERE id = ?");
+    $stmt_p->execute([$id_perfil]);
+    $perfil_info = $stmt_p->fetch();
+    
+    // Fallback se não encontrar perfil (usuário não migrado)
+    if (!$perfil_info) {
+        $_SESSION['admin_user_perfil_nome'] = ($_SESSION['admin_user_perfil'] == 'admin' ? 'Administrador' : 'Editor');
+    } else {
+        $_SESSION['admin_user_perfil_nome'] = $perfil_info['nome'];
+    }
+
+    // Busca as permissões
+    $permissoes = [];
+    $stmt = $pdo->prepare("SELECT recurso, p_ver, p_lancar, p_editar, p_excluir FROM permissoes_perfil WHERE id_perfil = ?");
+    $stmt->execute([$id_perfil]);
+    while ($row = $stmt->fetch()) {
+        $permissoes[$row['recurso']] = [
+            'ver' => (bool)$row['p_ver'],
+            'lancar' => (bool)$row['p_lancar'],
+            'editar' => (bool)$row['p_editar'],
+            'excluir' => (bool)$row['p_excluir']
+        ];
+    }
+    $_SESSION['permissoes_sessao'] = $permissoes;
+}
+
+// 4. Função Global para Verificar Permissões
+function tem_permissao($recurso, $acao = 'ver') {
+    // Admin master (antigo) tem acesso total
     if (isset($_SESSION['admin_user_perfil']) && $_SESSION['admin_user_perfil'] === 'admin') {
         return true;
     }
 
-    // Se as permissões não estiverem na sessão, carregue-as do banco
-    if (!isset($_SESSION['permissoes_sessao'])) {
-        $id_perfil = $_SESSION['admin_user_id_perfil'] ?? 0;
-        
-        // Se ainda não temos o id_perfil na sessão, busque no banco
-        if (!$id_perfil) {
-            $stmt = $pdo->prepare("SELECT id_perfil FROM usuarios_admin WHERE id = ?");
-            $stmt->execute([$_SESSION['admin_user_id']]);
-            $id_perfil = $stmt->fetchColumn();
-            $_SESSION['admin_user_id_perfil'] = $id_perfil;
-        }
-
-        $stmt_perms = $pdo->prepare("SELECT recurso, p_ver, p_lancar, p_editar, p_excluir FROM permissoes_perfil WHERE id_perfil = ?");
-        $stmt_perms->execute([$id_perfil]);
-        $perms_raw = $stmt_perms->fetchAll(PDO::FETCH_ASSOC);
-        
-        $_SESSION['permissoes_sessao'] = [];
-        foreach ($perms_raw as $p) {
-            $_SESSION['permissoes_sessao'][$p['recurso']] = [
-                'ver' => (bool)$p['p_ver'],
-                'lancar' => (bool)$p['p_lancar'],
-                'editar' => (bool)$p['p_editar'],
-                'excluir' => (bool)$p['p_excluir']
-            ];
-        }
-    }
-
-    // Verifica a permissão solicitada
-    $perms = $_SESSION['permissoes_sessao'];
+    $perms = $_SESSION['permissoes_sessao'] ?? [];
+    
     if (isset($perms[$recurso][$acao])) {
         return $perms[$recurso][$acao];
     }
 
-    return false; // Por padrão, se não encontrar, nega acesso
+    return false; // Negado por padrão
 }
-
-// 4. Se o usuário tentar acessar uma URL que ele não tem permissão de ver, podemos fazer um bloqueio automático rápido aqui 
-// Mas é melhor deixar por página para flexibilidade total de mensagens.
 ?>
