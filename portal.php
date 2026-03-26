@@ -76,6 +76,7 @@ if (!empty($registros_ids)) {
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <base href="<?php echo $base_url; ?>">
     <title><?php echo htmlspecialchars($secao['nome']); ?> - Portal da Transparência</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
