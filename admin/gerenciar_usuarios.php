@@ -16,13 +16,14 @@ $erro = '';
 // Lógica para cadastrar um novo usuário
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_usuario'])) {
     $usuario = trim($_POST['usuario']);
+    $nome = trim($_POST['nome']); // Novo campo
     $senha = $_POST['senha'];
     $senha_confirma = $_POST['senha_confirma'];
     $perfil = $_POST['perfil'];
 
     // Validações
-    if (empty($usuario) || empty($senha)) {
-        $erro = "Usuário e senha são obrigatórios.";
+    if (empty($usuario) || empty($nome) || empty($senha)) {
+        $erro = "Usuário, Nome e senha são obrigatórios.";
     } elseif ($senha !== $senha_confirma) {
         $erro = "As senhas não coincidem.";
     } elseif (!in_array($perfil, ['admin', 'editor'])) {
@@ -36,9 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_usuario'])) {
         } else {
             // Se tudo estiver OK, criptografa a senha e insere no banco
             $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-            $stmt_insert = $pdo->prepare("INSERT INTO usuarios_admin (usuario, senha, perfil) VALUES (?, ?, ?)");
-            $stmt_insert->execute([$usuario, $senha_hash, $perfil]);
-            $_SESSION['mensagem_sucesso'] = "Usuário '" . htmlspecialchars($usuario) . "' cadastrado com sucesso!";
+            $stmt_insert = $pdo->prepare("INSERT INTO usuarios_admin (usuario, nome, senha, perfil) VALUES (?, ?, ?, ?)");
+            $stmt_insert->execute([$usuario, $nome, $senha_hash, $perfil]);
+            $_SESSION['mensagem_sucesso'] = "Usuário '" . htmlspecialchars($nome) . "' cadastrado com sucesso!";
             header("Location: gerenciar_usuarios.php");
             exit;
         }
@@ -46,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_usuario'])) {
 }
 
 // Busca os usuários existentes para listar na página
-$usuarios = $pdo->query("SELECT id, usuario, perfil FROM usuarios_admin ORDER BY usuario ASC")->fetchAll();
+$usuarios = $pdo->query("SELECT id, usuario, nome, perfil FROM usuarios_admin ORDER BY usuario ASC")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -87,11 +88,15 @@ include 'admin_header.php';
                         <div class="card-body">
                             <form method="POST" action="gerenciar_usuarios.php">
                                 <div class="mb-3">
-                                    <label for="usuario" class="form-label">Nome de Usuário</label>
-                                    <input type="text" class="form-control" id="usuario" name="usuario" required>
+                                    <label for="nome" class="form-label">Nome Completo</label>
+                                    <input type="text" class="form-control" id="nome" name="nome" placeholder="Ex: Thiago de Assis" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="senha" class="form-label">Senha</label>
+                                    <label for="usuario" class="form-label">Nome de Usuário (Login)</label>
+                                    <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Ex: thiago.admin" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="senha" class="form-label">Senha de Acesso</label>
                                     <input type="password" class="form-control" id="senha" name="senha" required>
                                 </div>
                                 <div class="mb-3">
@@ -127,8 +132,8 @@ include 'admin_header.php';
                                     <?php foreach ($usuarios as $usuario): ?>
                                     <tr>
                                         <td>
-                                            <i class="bi bi-person-fill"></i>
-                                            <?php echo htmlspecialchars($usuario['usuario']); ?>
+                                            <div class="fw-bold"><?php echo htmlspecialchars($usuario['nome'] ?? 'Sem Nome'); ?></div>
+                                            <small class="text-muted">@<?php echo htmlspecialchars($usuario['usuario']); ?></small>
                                             <?php if ($usuario['id'] == $_SESSION['admin_user_id']) echo ' <span class="badge bg-secondary">Você</span>'; ?>
                                         </td>
                                         <td>
@@ -162,10 +167,7 @@ include 'admin_header.php';
     </div>
 </div>
 
-<footer class="text-center p-3 bg-light mt-4">
-    &copy; <?php echo date('Y'); ?> - Todos os direitos reservados.
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<?php include 'admin_footer.php'; ?>
 <script>
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl) });

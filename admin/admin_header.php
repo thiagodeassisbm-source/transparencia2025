@@ -130,14 +130,44 @@ function isActive($pageName) {
                 <h1><?php echo htmlspecialchars($page_title_for_header); ?></h1>
             </div>
             <div class="topbar-right">
-                <a href="editar_usuario.php?id=<?php echo $id_usuario_logado; ?>" class="user-profile">
-                    <span class="d-none d-md-inline"><?php echo htmlspecialchars($nome_usuario_logado); ?></span>
-                    <i class="bi bi-person-circle fs-4"></i>
-                </a>
-                <a href="logout.php" class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-box-arrow-right"></i> Sair
-                </a>
+                <div class="dropdown">
+                    <a href="#" class="user-profile dropdown-toggle" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="d-none d-md-inline me-2">
+                            <?php 
+                            $exibir_nome = $_SESSION['admin_user_nome_real'] ?? $_SESSION['admin_user_nome'];
+                            echo "Bem-vindo, " . htmlspecialchars($exibir_nome) . "!"; 
+                            ?>
+                        </span>
+                        <div class="avatar-circle">
+                            <?php 
+                            $iniciais = '';
+                            if (!empty($_SESSION['admin_user_nome_real'])) {
+                                $partes = explode(' ', $_SESSION['admin_user_nome_real']);
+                                $iniciais = strtoupper(substr($partes[0], 0, 1));
+                                if (count($partes) > 1) $iniciais .= strtoupper(substr($partes[count($partes)-1], 0, 1));
+                            } else {
+                                $iniciais = strtoupper(substr($_SESSION['admin_user_nome'], 0, 2));
+                            }
+                            echo $iniciais;
+                            ?>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userMenuDropdown">
+                        <li>
+                            <a class="dropdown-item py-2" href="editar_usuario.php?id=<?php echo $id_usuario_logado; ?>">
+                                <i class="bi bi-person-gear me-2"></i> Meu Perfil
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-danger" href="logout.php">
+                                <i class="bi bi-box-arrow-right me-2"></i> Sair do Sistema
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </header>
+
 
         <main class="admin-content">
