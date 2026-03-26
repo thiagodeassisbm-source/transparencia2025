@@ -4,15 +4,47 @@ require_once 'conexao.php';
 
 // Busca configurações globais da prefeitura
 try {
-    $stmt_conf = $pdo->query("SELECT chave, valor FROM configuracoes WHERE chave IN ('prefeitura_titulo', 'prefeitura_logo')");
+    $stmt_conf = $pdo->query("SELECT chave, valor FROM configuracoes WHERE chave IN ('prefeitura_titulo', 'prefeitura_logo', 'prefeitura_cor_principal', 'prefeitura_cor_secundaria')");
     $conf_data = $stmt_conf->fetchAll(PDO::FETCH_KEY_PAIR);
+    
     $prefeitura_titulo = !empty($conf_data['prefeitura_titulo']) ? $conf_data['prefeitura_titulo'] : 'Portal da Transparência Municipal';
     $prefeitura_logo = !empty($conf_data['prefeitura_logo']) ? $conf_data['prefeitura_logo'] : '';
-} catch (Exception $e) { $prefeitura_titulo = 'Portal da Transparência Municipal'; $prefeitura_logo = ''; }
+    $cor_p = $conf_data['prefeitura_cor_principal'] ?? '#2ca444';
+    $cor_s = $conf_data['prefeitura_cor_secundaria'] ?? '#1a4d1a';
+} catch (Exception $e) { 
+    $prefeitura_titulo = 'Portal da Transparência Municipal'; 
+    $prefeitura_logo = ''; 
+    $cor_p = '#2ca444';
+    $cor_s = '#1a4d1a';
+}
 
-// Normaliza o caminho do logo para o frontend (remove ../ se houver)
+// Normaliza o caminho do logo para o frontend
 $logo_src = str_replace('../', '', $prefeitura_logo);
 ?>
+<style>
+    :root {
+        --cor-principal: <?php echo $cor_p; ?>;
+        --cor-secundaria: <?php echo $cor_s; ?>;
+    }
+    .portal-main-banner { 
+        background-color: var(--cor-principal) !important; 
+        background-image: none !important; /* Remove o gradiente fixo para respeitar a cor principal */
+    }
+    .top-utility-bar-wrapper { 
+        background-color: var(--cor-secundaria) !important; 
+    }
+    .search-box { 
+        background-color: var(--cor-secundaria) !important; 
+    }
+    .sidebar-menu a.active {
+        color: var(--cor-secundaria) !important;
+        background-color: rgba(0,0,0,0.03);
+    }
+    .acc-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+</style>
+<header>
     <!-- Barra Utilitária Superior (Verde Escuro) -->
     <div class="top-utility-bar-wrapper">
         <div class="container-fluid container-custom-padding d-flex justify-content-between align-items-center">

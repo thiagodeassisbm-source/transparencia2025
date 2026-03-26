@@ -106,7 +106,7 @@ function isActive($pageName) {
                     </a>
                     <div class="collapse <?php echo $prefeitura_active ? 'show' : ''; ?>" id="collapsePrefeitura">
                         <ul class="submenu">
-                            <li><a href="informacoes_prefeitura.php" class="nav-link <?php echo isActive('informacoes_prefeitura.php'); ?>">Informações</a></li>
+                            <li><a href="informacoes_prefeitura.php" class="nav-link <?php echo isActive('informacoes_prefeitura.php'); ?>">Configurações</a></li>
                             <li><a href="gerenciar_usuarios.php" class="nav-link <?php echo isActive(['gerenciar_usuarios.php', 'editar_usuario.php']); ?>">Usuários</a></li>
                         </ul>
                     </div>
