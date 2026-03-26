@@ -28,7 +28,7 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
             </div>
         </div>
 
-        <div class="banner-content text-center py-4">
+        <div class="banner-content text-center py-1">
             <?php if ($logo_src): ?>
                 <img src="<?php echo htmlspecialchars($logo_src); ?>" alt="Brasão Prefeitura" class="prefeitura-logo-header mb-3">
             <?php endif; ?>

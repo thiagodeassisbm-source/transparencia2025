@@ -21,19 +21,6 @@ function isActive($pageName) {
     return $currentFile == $pageName ? 'active' : '';
 }
 
-// Busca configurações globais da prefeitura do banco de dados (usado no banner centralizado)
-$portal_titulo = 'Portal da Transparência';
-$portal_logo = '';
-if (isset($pdo)) {
-    try {
-        $stmt_conf = $pdo->query("SELECT chave, valor FROM configuracoes WHERE chave IN ('prefeitura_titulo', 'prefeitura_logo')");
-        $conf_data = $stmt_conf->fetchAll(PDO::FETCH_KEY_PAIR);
-        if ($conf_data) {
-            $portal_titulo = !empty($conf_data['prefeitura_titulo']) ? $conf_data['prefeitura_titulo'] : $portal_titulo;
-            $portal_logo = !empty($conf_data['prefeitura_logo']) ? $conf_data['prefeitura_logo'] : $portal_logo;
-        }
-    } catch (Exception $e) { /* Fallback silencioso */ }
-}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -195,6 +182,9 @@ if (isset($pdo)) {
     <!-- Main Content Area -->
     <div class="admin-main">
         <header class="admin-topbar">
+            <div class="topbar-left">
+                <h1 class="h5 mb-0 fw-600"><?php echo htmlspecialchars($page_title_for_header); ?></h1>
+            </div>
             <div class="topbar-right">
                 <div class="dropdown">
                     <a href="#" class="user-profile dropdown-toggle" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="0,-10">
@@ -235,19 +225,6 @@ if (isset($pdo)) {
             </div>
         </header>
 
-        <!-- Banner Centralizado (Estilo Anexo 2) -->
-        <div class="portal-header-banner">
-            <div class="container-fluid">
-                <?php if ($portal_logo): ?>
-                    <img src="<?php echo htmlspecialchars($portal_logo); ?>" alt="Logo Prefeitura" class="prefeitura-logo-header">
-                <?php endif; ?>
-                <h1 class="portal-main-title"><?php echo htmlspecialchars($portal_titulo); ?></h1>
-                <p class="portal-subtitle">Acesso rápido e transparente às publicações municipais</p>
-                <div class="portal-breadcrumb mt-2">
-                    <span>Início</span> / <strong><?php echo htmlspecialchars($page_title_for_header); ?></strong>
-                </div>
-            </div>
-        </div>
 
         <main class="admin-content p-4">
 

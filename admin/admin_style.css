@@ -184,11 +184,18 @@ body {
     border-bottom: 1px solid #e2e8f0;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding: 0 2rem;
     position: sticky;
     top: 0;
     z-index: 900;
+}
+
+.topbar-left h1 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--sidebar-bg);
 }
 
 /* Banner Header (Anexo 2) */

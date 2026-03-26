@@ -35,41 +35,41 @@
     background-color: #28a745;
     background-image: linear-gradient(135deg, #28a745 0%, #218838 100%);
     color: #fff;
-    padding: 2rem 0 4rem;
+    padding: 1rem 0 2rem;
     position: relative;
     box-shadow: inset 0 -10px 25px rgba(0,0,0,0.05);
 }
 
 .top-utility-bar {
     border-bottom: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     padding-bottom: 0.5rem;
 }
 
 .banner-content .prefeitura-logo-header {
-    max-height: 110px;
-    margin-bottom: 1.5rem;
+    max-height: 85px;
+    margin-bottom: 1rem;
     filter: drop-shadow(0 5px 8px rgba(0,0,0,0.15));
 }
 
 .banner-content h2.portal-main-title {
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     color: #fff !important;
 }
 
 .banner-content .portal-subtitle {
-    font-size: 1.1rem;
-    opacity: 0.95;
-    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin-bottom: 1.25rem;
     font-weight: 400;
 }
 
 .banner-content h1 {
-    font-size: 3rem;
+    font-size: 2.4rem;
     font-weight: 800;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     letter-spacing: -0.02em;
     color: #fff !important;
 }
