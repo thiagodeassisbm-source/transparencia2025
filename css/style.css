@@ -30,26 +30,29 @@
 
 /* --- 2. LAYOUT PRINCIPAL (CABEÇALHO E MENU) --- */
 
-/* Cabeçalho Estilo Anexo 1 */
+/* Cabeçalho Estilo Anexo 1 - Refinado */
 .top-utility-bar-wrapper {
-    background-color: #216a21; /* Verde mais escuro conforme anexo */
-    padding: 0.5rem 0;
+    background-color: #1a4d1a; /* Verde mais escuro e homogêneo */
+    padding: 0.35rem 0;
     font-family: 'Poppins', sans-serif;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-.btn-acc {
-    background: #1a4d1a;
-    border: none;
-    color: #fff;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    font-size: 0.65rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 4px;
-    font-weight: 700;
+.contrast-link {
+    cursor: pointer;
+    transition: opacity 0.2s;
+    font-weight: 500;
+}
+
+.contrast-link:hover {
+    opacity: 0.8;
+}
+
+.top-utility-bar-wrapper .btn-outline-light {
+    border-color: rgba(255,255,255,0.3);
+    padding: 0 0.5rem;
+    font-weight: 600;
+    font-size: 0.75rem;
 }
 
 .portal-main-banner {
@@ -61,7 +64,7 @@
 }
 
 .portal-main-banner .prefeitura-logo-header {
-    max-height: 100px;
+    max-height: 200px;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 

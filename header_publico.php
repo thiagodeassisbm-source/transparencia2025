@@ -25,18 +25,17 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
                 <?php endif; ?>
             </div>
             <div class="accessibility-bar d-flex align-items-center text-white small">
-                <div class="me-3 d-flex align-items-center" id="contrast-toggle" style="cursor:pointer;">
+                <div class="me-3 d-flex align-items-center contrast-link" id="contrast-toggle">
                     <i class="bi bi-circle-half me-1"></i> ALTO CONTRASTE
                 </div>
-                <div class="d-flex align-items-center">
-                    <span class="me-2">TAMANHO DA FONTE:</span>
-                    <button id="font-increase" class="btn-acc">A+</button>
-                    <button id="font-reset" class="btn-acc">A</button>
-                    <button id="font-decrease" class="btn-acc">A-</button>
+                <div class="d-flex align-items-center me-2">
+                    <span class="me-2 opacity-75">FONTE:</span>
+                    <button id="font-increase" class="btn btn-xs btn-outline-light me-1">A+</button>
+                    <button id="font-reset" class="btn btn-xs btn-outline-light me-1">A</button>
+                    <button id="font-decrease" class="btn btn-xs btn-outline-light">A-</button>
                 </div>
-                <div class="ms-3 d-flex gap-2">
-                    <a href="#" class="text-white"><i class="bi bi-gear-fill"></i></a>
-                    <a href="admin/login.php" class="text-white"><i class="bi bi-lock-fill"></i></a>
+                <div class="ms-2 d-flex gap-2">
+                    <a href="admin/login.php" class="btn btn-xs btn-outline-light border-0"><i class="bi bi-lock-fill"></i></a>
                 </div>
             </div>
         </div>
