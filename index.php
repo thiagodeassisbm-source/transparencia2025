@@ -1,5 +1,6 @@
 <?php
 // /index.php (Página Inicial Pública - Versão Definitiva Corrigida)
+// Teste de Deploy Hostinger - Webhook
 require_once 'conexao.php';
 
 // --- CÓDIGO CORRIGIDO PARA BUSCAR O TÍTULO DA PREFEITURA ---
