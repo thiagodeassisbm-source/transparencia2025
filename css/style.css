@@ -87,12 +87,12 @@
     background-color: #2ca444; /* Verde principal */
     background-image: linear-gradient(180deg, #2ca444 0%, #248a39 100%);
     color: #fff;
-    padding: 2rem 0;
+    padding: 0.6rem 0; /* Reduzido de 2rem para compensar o aumento da logo */
     box-shadow: inset 0 -10px 15px rgba(0,0,0,0.05);
 }
 
 .portal-main-banner .prefeitura-logo-header {
-    max-height: 110px;
+    max-height: 154px; /* Aumentado em 40% de 110px */
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
@@ -354,19 +354,7 @@ footer {
     color: #F2F6FB;           /* Texto claro para contraste */
 }
 
-/* --- 9. Estilos de Acessibilidade --- */
-
-.accessibility-bar {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.accessibility-bar .btn {
-    font-weight: bold;
-    padding: .25rem .5rem;
-    font-size: .875rem;
-    line-height: 1.5;
-}
+/* --- 9. Estilos de Acessibilidade (Alto Contraste) --- */
 
 .high-contrast {
     background-color: #000000 !important;
