@@ -24,18 +24,22 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
                     <span class="text-white opacity-75"><?php echo mb_strtoupper(htmlspecialchars($page_title)); ?></span>
                 <?php endif; ?>
             </div>
-            <div class="accessibility-bar d-flex align-items-center text-white small">
-                <div class="me-3 d-flex align-items-center contrast-link" id="contrast-toggle">
-                    <i class="bi bi-circle-half me-1"></i> ALTO CONTRASTE
+            <div class="accessibility-bar d-flex align-items-center">
+                <span class="accessibility-label me-3">ACESSIBILIDADE</span>
+                
+                <div class="acc-group d-flex">
+                    <button id="font-increase" class="acc-btn" title="Aumentar Fonte">A+</button>
+                    <button id="font-reset" class="acc-btn" title="Fonte Normal">A</button>
+                    <button id="font-decrease" class="acc-btn" title="Diminuir Fonte">A-</button>
+                    <button id="contrast-toggle" class="acc-btn ms-2" title="Alto Contraste">
+                        <i class="bi bi-circle-half"></i>
+                    </button>
                 </div>
-                <div class="d-flex align-items-center me-2">
-                    <span class="me-2 opacity-75">FONTE:</span>
-                    <button id="font-increase" class="btn btn-xs btn-outline-light me-1">A+</button>
-                    <button id="font-reset" class="btn btn-xs btn-outline-light me-1">A</button>
-                    <button id="font-decrease" class="btn btn-xs btn-outline-light">A-</button>
-                </div>
-                <div class="ms-2 d-flex gap-2">
-                    <a href="admin/login.php" class="btn btn-xs btn-outline-light border-0"><i class="bi bi-lock-fill"></i></a>
+
+                <div class="ms-3 login-utility">
+                    <a href="admin/login.php" class="acc-btn login-btn" title="Acesso Administrativo">
+                        <i class="bi bi-lock-fill"></i>
+                    </a>
                 </div>
             </div>
         </div>

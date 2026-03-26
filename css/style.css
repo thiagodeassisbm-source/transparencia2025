@@ -32,27 +32,55 @@
 
 /* Cabeçalho Estilo Anexo 1 - Refinado */
 .top-utility-bar-wrapper {
-    background-color: #1a4d1a; /* Verde mais escuro e homogêneo */
-    padding: 0.35rem 0;
+    background-color: #1a4d1a; /* Verde mais escuro conforme solicitado anteriormente */
+    padding: 0.5rem 0; /* Um pouco mais alto para comportar os botões quadrados */
     font-family: 'Poppins', sans-serif;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-.contrast-link {
+.accessibility-label {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    opacity: 0.95;
+}
+
+.acc-btn {
+    background: transparent;
+    border: 1.5px solid #fff;
+    color: #fff;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-right: 4px;
+    border-radius: 4px; /* Leve arredondamento conforme imagem */
+    transition: all 0.2s ease;
     cursor: pointer;
-    transition: opacity 0.2s;
-    font-weight: 500;
+    text-decoration: none;
 }
 
-.contrast-link:hover {
+.acc-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.acc-btn i {
+    font-size: 0.9rem;
+}
+
+.login-btn {
+    border-color: rgba(255, 255, 255, 0.3); /* Menos destaque para o login */
     opacity: 0.8;
 }
 
-.top-utility-bar-wrapper .btn-outline-light {
-    border-color: rgba(255,255,255,0.3);
-    padding: 0 0.5rem;
-    font-weight: 600;
-    font-size: 0.75rem;
+.login-btn:hover {
+    border-color: #fff;
+    opacity: 1;
 }
 
 .portal-main-banner {
@@ -64,7 +92,7 @@
 }
 
 .portal-main-banner .prefeitura-logo-header {
-    max-height: 200px;
+    max-height: 110px;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
