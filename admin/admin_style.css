@@ -101,6 +101,49 @@ body {
     color: #fff;
 }
 
+/* Sidebar Submenu Accordion */
+.sidebar-nav .nav-link.has-submenu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-nav .nav-link .submenu-arrow {
+    transition: transform 0.3s ease;
+    font-size: 0.75rem;
+    margin-right: 0;
+    opacity: 0.7;
+}
+
+.sidebar-nav .nav-link[aria-expanded="true"] .submenu-arrow {
+    transform: rotate(180deg);
+}
+
+.sidebar-nav .submenu {
+    list-style: none;
+    padding: 0 0 0.5rem 1rem;
+    margin: 0;
+    transition: all 0.3s ease;
+}
+
+.sidebar-nav .submenu .nav-link {
+    padding: 0.5rem 1rem 0.5rem 2.75rem;
+    font-size: 0.875rem;
+    color: #94a3b8;
+    margin-bottom: 0px;
+    background: transparent !important;
+}
+
+.sidebar-nav .submenu .nav-link:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.05) !important;
+}
+
+.sidebar-nav .submenu .nav-link.active {
+    color: var(--sidebar-active);
+    font-weight: 600;
+}
+
 /* Main Content Area */
 .admin-main {
     flex-grow: 1;

@@ -48,25 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_usuario'])) {
 
 // Busca os usuários existentes para listar na página
 $usuarios = $pdo->query("SELECT id, usuario, nome, perfil FROM usuarios_admin ORDER BY usuario ASC")->fetchAll();
-?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Gerenciar Usuários - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
-</head>
-<body class="bg-light-subtle">
 
-<?php
-// Define as variáveis para o cabeçalho reutilizável
 $page_title_for_header = 'Gerenciar Usuários';
-$active_breadcrumb = 'Gerenciar Usuários';
-$active_nav_link = 'gerenciar_usuarios.php';
 include 'admin_header.php';
 ?>
+
 
 <div class="container-fluid container-custom-padding">
     <div class="row">
@@ -168,9 +154,3 @@ include 'admin_header.php';
 </div>
 
 <?php include 'admin_footer.php'; ?>
-<script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl) });
-</script>
-</body>
-</html>

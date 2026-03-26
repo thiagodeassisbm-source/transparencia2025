@@ -4,7 +4,7 @@ require_once '../conexao.php';
 
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
     $_SESSION['mensagem_sucesso'] = "Acesso negado.";
-    header("Location: index.php");
+    header("Location: dashboard.php");
     exit;
 }
 
@@ -39,82 +39,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_categoria'])) 
 }
 
 $categorias = $pdo->query("SELECT id, nome, ordem FROM categorias ORDER BY ordem ASC")->fetchAll();
-?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Gerenciar Categorias - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
-    <style>
-        .list-group-item:hover { cursor: grab; }
-        .list-group-item:active { cursor: grabbing; }
-        .sortable-ghost { opacity: 0.4; background: #c8ebfb; }
-    </style>
-</head>
-<body class="bg-light-subtle">
 
-<?php 
 $page_title_for_header = 'Gerenciar Categorias'; 
 include 'admin_header.php'; 
 ?>
+
+<style>
+    .list-group-item:hover { cursor: grab; }
+    .list-group-item:active { cursor: grabbing; }
+    .sortable-ghost { opacity: 0.4; background: #c8ebfb; }
+</style>
+
 
 <div class="container-fluid container-custom-padding">
     <div class="row">
         <div class="col-12">
              <?php
             if (isset($_SESSION['mensagem_sucesso'])) {
-                echo '<div class="alert alert-success alert-dismissible fade show" role="alert">' 
+                echo '<div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">' 
                    . htmlspecialchars($_SESSION['mensagem_sucesso']) . 
                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                 unset($_SESSION['mensagem_sucesso']);
             }
              if ($erro) {
-                echo '<div class="alert alert-danger">' . htmlspecialchars($erro) . '</div>';
+                echo '<div class="alert alert-danger border-0 shadow-sm">' . htmlspecialchars($erro) . '</div>';
             }
             ?>
             <div class="row">
-                <div class="col-md-4">
-                    <div class="card h-100">
-                        <div class="card-header">Adicionar Nova Categoria</div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-white py-3 fw-bold">Adicionar Nova Categoria</div>
                         <div class="card-body">
                             <form method="POST" action="gerenciar_categorias.php">
                                 <div class="mb-3">
                                     <label for="nome" class="form-label">Nome da Categoria</label>
-                                    <input type="text" class="form-control" id="nome" name="nome" required>
+                                    <input type="text" class="form-control" id="nome" name="nome" placeholder="Ex: Financeiro" required>
                                 </div>
                                 <input type="hidden" name="add_categoria" value="1">
-                                <button type="submit" class="btn btn-success">Salvar Categoria</button>
+                                <button type="submit" class="btn btn-primary w-100">Salvar Categoria</button>
                             </form>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-8">
-                    <div class="card h-100">
-                        <div class="card-header">Categorias Existentes (Arraste para reordenar)</div>
+                <div class="col-md-8 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-white py-3 fw-bold">Categorias Existentes (Arraste para reordenar)</div>
                         <div id="lista-categorias" class="list-group list-group-flush">
-                            <?php foreach ($categorias as $categoria): ?>
-                                <div class="list-group-item d-flex justify-content-between align-items-center" data-id="<?php echo $categoria['id']; ?>">
-                                    <span>
-                                        <i class="bi bi-grip-vertical me-2"></i>
-                                        <?php echo htmlspecialchars($categoria['nome']); ?>
-                                    </span>
-                                    <div>
-                                        <a href="editar_categoria.php?id=<?php echo $categoria['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" title="Editar Categoria">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <form method="POST" action="gerenciar_categorias.php" class="d-inline ms-1" onsubmit="return confirm('Tem certeza que deseja excluir esta categoria? As seções e cards associados não serão apagados, mas ficarão sem categoria.');">
-                                            <input type="hidden" name="id_categoria" value="<?php echo $categoria['id']; ?>">
-                                            <input type="hidden" name="delete_categoria" value="1">
-                                            <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" title="Excluir Categoria">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                            <?php if (empty($categorias)): ?>
+                                <div class="p-5 text-center text-muted">Nenhuma categoria cadastrada.</div>
+                            <?php else: ?>
+                                <?php foreach ($categorias as $categoria): ?>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center py-3" data-id="<?php echo $categoria['id']; ?>">
+                                        <span>
+                                            <i class="bi bi-grip-vertical me-2 text-muted"></i>
+                                            <?php echo htmlspecialchars($categoria['nome']); ?>
+                                        </span>
+                                        <div class="d-flex gap-1">
+                                            <a href="editar_categoria.php?id=<?php echo $categoria['id']; ?>" class="btn btn-light border btn-sm" data-bs-toggle="tooltip" title="Editar Nome">
+                                                <i class="bi bi-pencil text-primary"></i>
+                                            </a>
+                                            <form method="POST" action="gerenciar_categorias.php" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir esta categoria? As seções e cards associados não serão apagados, mas ficarão sem categoria.');">
+                                                <input type="hidden" name="id_categoria" value="<?php echo $categoria['id']; ?>">
+                                                <input type="hidden" name="delete_categoria" value="1">
+                                                <button type="submit" class="btn btn-light border btn-sm" data-bs-toggle="tooltip" title="Excluir Categoria">
+                                                    <i class="bi bi-trash text-danger"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
-                                </div>
-                            <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -123,31 +117,29 @@ include 'admin_header.php';
     </div>
 </div>
 
-<footer class="text-center p-3 bg-light mt-4">
-    &copy; <?php echo date('Y'); ?> - Todos os direitos reservados.
-</footer>
-
+<?php include 'admin_footer.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl) });
-
+document.addEventListener('DOMContentLoaded', function() {
     const lista = document.getElementById('lista-categorias');
-    new Sortable(lista, {
-        animation: 150,
-        ghostClass: 'sortable-ghost',
-        onEnd: function (evt) {
-            const novaOrdem = Array.from(lista.children).map(item => item.getAttribute('data-id'));
-            fetch('salvar_ordem_categorias.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ordem: novaOrdem })
-            }).then(response => response.json()).then(data => {
-                if (!data.success) { alert('Ocorreu um erro ao salvar a nova ordem.'); }
-            });
-        }
-    });
+    if (lista) {
+        new Sortable(lista, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            handle: '.bi-grip-vertical',
+            onEnd: function (evt) {
+                const novaOrdem = Array.from(lista.children).map(item => item.getAttribute('data-id'));
+                fetch('salvar_ordem_categorias.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ordem: novaOrdem })
+                }).then(response => response.json()).then(data => {
+                    if (!data.success) { alert('Ocorreu um erro ao salvar a nova ordem.'); }
+                });
+            }
+        });
+    }
+});
 </script>
 </body>
 </html>

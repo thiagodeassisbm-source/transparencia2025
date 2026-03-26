@@ -5,7 +5,7 @@ require_once '../conexao.php';
 // Apenas admins podem acessar
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
     $_SESSION['mensagem_sucesso'] = "Acesso negado.";
-    header("Location: index.php");
+    header("Location: dashboard.php");
     exit;
 }
 
@@ -79,26 +79,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensagem = '<div class="alert alert-danger">Erro: ' . $e->getMessage() . '</div>';
     }
 }
-?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Criar Nova Seção/Card - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
-</head>
-<body class="bg-light-subtle">
-<?php 
+
 $page_title_for_header = 'Criar Nova Seção/Card'; 
 include 'admin_header.php'; 
 ?>
+
+
 <div class="container-fluid container-custom-padding">
     <div class="row"><div class="col-12">
         <?php echo $mensagem; ?>
         <form method="POST" action="criar_secoes.php" enctype="multipart/form-data">
-            <div class="card mb-4">
-                <div class="card-header">1. Dados do Card (Atalho na Página Inicial)</div>
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-header bg-white py-3">1. Dados do Card (Atalho na Página Inicial)</div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6 mb-3"><label for="card_titulo" class="form-label">Título do Card*</label><input type="text" class="form-control" id="card_titulo" name="card_titulo" required></div>
@@ -147,8 +139,8 @@ include 'admin_header.php';
                     </div>
                 </div>
             </div>
-            <div class="card" id="card_dados_secao">
-                <div class="card-header">2. Dados da Seção (Página de Destino com Tabela de Dados)</div>
+            <div class="card shadow-sm border-0" id="card_dados_secao">
+                <div class="card-header bg-white py-3">2. Dados da Seção (Página de Destino com Tabela de Dados)</div>
                 <div class="card-body">
                     <p class="text-muted">Preencha os campos abaixo apenas se o card precisar levar a uma nova seção com tabela de dados (opção padrão).</p>
                     <div class="row">
@@ -157,10 +149,11 @@ include 'admin_header.php';
                     </div>
                 </div>
             </div>
-            <div class="mt-4"><button type="submit" class="btn btn-success btn-lg">Salvar</button><a href="index.php" class="btn btn-secondary btn-lg">Cancelar</a></div>
+            <div class="mt-4 pb-5"><button type="submit" class="btn btn-primary btn-lg px-5">Salvar</button><a href="index.php" class="btn btn-light btn-lg border ms-2 px-4">Cancelar</a></div>
         </form>
     </div></div>
 </div>
+
 <?php include 'admin_footer.php'; ?>
 <script>
 document.addEventListener('DOMContentLoaded', function () {

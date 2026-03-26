@@ -19,28 +19,18 @@ foreach ($secoes_raw as $secao) {
     $categoria = $secao['nome_categoria'] ?? 'Sem Categoria';
     $secoes_agrupadas[$categoria][] = $secao;
 }
-?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Painel Administrativo - Portal da Transparência</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
-    <style>
-        .list-group-item-draggable:hover { cursor: grab; }
-        .list-group-item-draggable:active { cursor: grabbing; }
-        .sortable-ghost { opacity: 0.4; background: #c8ebfb; }
-        .accordion-button:not(.collapsed) { background-color: #e7f1ff; color: #0c63e4; }
-    </style>
-</head>
-<body class="bg-light-subtle">
 
-<?php 
 $page_title_for_header = 'Painel Administrativo'; 
 include 'admin_header.php'; 
 ?>
+
+<style>
+    .list-group-item-draggable:hover { cursor: grab; }
+    .list-group-item-draggable:active { cursor: grabbing; }
+    .sortable-ghost { opacity: 0.4; background: #c8ebfb; }
+    .accordion-button:not(.collapsed) { background-color: #f8f9fa; color: var(--primary-color); }
+</style>
+
 
 <div class="container-fluid container-custom-padding">
     <div class="row">

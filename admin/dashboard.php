@@ -32,20 +32,6 @@ $stmt_lanc_secao = $pdo->query(
 );
 $lancamentos_por_secao = $stmt_lanc_secao->fetchAll(PDO::FETCH_ASSOC);
 
-?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard - Painel Administrativo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="bg-light-subtle">
-
-<?php 
 $page_title_for_header = 'Dashboard'; 
 include 'admin_header.php'; 
 ?>
@@ -142,6 +128,7 @@ include 'admin_header.php';
 
 
 <?php include 'admin_footer.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Gráfico de Status da Ouvidoria
@@ -170,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 label: 'Nº de Lançamentos',
                 data: <?php echo json_encode(array_column($lancamentos_por_secao, 'total')); ?>,
-                backgroundColor: 'rgba(13, 110, 253, 0.7)'
+                backgroundColor: 'rgba(59, 130, 246, 0.7)'
             }]
         },
         options: {
