@@ -36,6 +36,20 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
     .search-box { 
         background-color: var(--cor-secundaria) !important; 
     }
+    .btn-dynamic-primary {
+        background-color: var(--cor-principal) !important;
+        border-color: var(--cor-principal) !important;
+        color: #fff !important;
+    }
+    .btn-dynamic-primary:hover {
+        filter: brightness(0.9);
+        color: #fff !important;
+    }
+    .active-dynamic .page-link {
+        background-color: var(--cor-principal) !important;
+        border-color: var(--cor-principal) !important;
+        color: #fff !important;
+    }
     .sidebar-menu a.active {
         color: var(--cor-secundaria) !important;
         background-color: rgba(0,0,0,0.03);

@@ -103,9 +103,9 @@ if ($categoria_id) {
                         $query_params_sort = $_GET;
                         unset($query_params_sort['sort'], $query_params_sort['page']);
                     ?>
-                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo ($ordem_atual === 'padrao') ? 'btn-success' : 'btn-outline-secondary'; ?>">Mais Acessados</a>
+                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo ($ordem_atual === 'padrao') ? 'btn-dynamic-primary' : 'btn-outline-secondary'; ?>">Mais Acessados</a>
                     <?php $query_params_sort['sort'] = 'alpha'; ?>
-                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo ($ordem_atual === 'alpha') ? 'btn-success' : 'btn-outline-secondary'; ?>">Ordem Alfabética</a>
+                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo ($ordem_atual === 'alpha') ? 'btn-dynamic-primary' : 'btn-outline-secondary'; ?>">Ordem Alfabética</a>
                 </div>
             </div>
             <div class="info-card-list">
@@ -118,8 +118,9 @@ if ($categoria_id) {
                         $target = !empty($card['link_url']) ? '_blank' : '_self';
                         ?>
                         <div class="info-card">
-                            <div class="icon-container">
-                                <img src="<?php echo htmlspecialchars(str_replace('../', '', $card['caminho_icone'])); ?>" alt="">
+                            <div class="icon-container position-relative">
+                                <div class="dynamic-icon shadow-sm"></div>
+                                <div class="dynamic-icon-text">i</div>
                             </div>
                             <div class="text-container">
                                 <div class="card-titulo">
@@ -147,7 +148,7 @@ if ($categoria_id) {
                     </li>
                     <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
                         <?php $query_params_page['page'] = $i; ?>
-                        <li class="page-item <?php if($pagina_atual == $i) { echo 'active'; } ?>">
+                        <li class="page-item <?php if($pagina_atual == $i) { echo 'active-dynamic'; } ?>">
                             <a class="page-link" href="?<?php echo http_build_query($query_params_page); ?>"><?php echo $i; ?></a>
                         </li>
                     <?php endfor; ?>
