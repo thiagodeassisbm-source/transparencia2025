@@ -35,7 +35,7 @@ $offset = ($pagina_atual - 1) * $itens_por_pagina;
 // --- 2. LÓGICA DE FILTROS, ORDENAÇÃO E FAVORITOS ---
 $ip_usuario = $_SERVER['REMOTE_ADDR'];
 $categoria_id = filter_input(INPUT_GET, 'categoria_id', FILTER_VALIDATE_INT);
-$categoria_slug = filter_input(INPUT_GET, 'categoria_slug', FILTER_SANITIZE_STRING);
+$categoria_slug = filter_input(INPUT_GET, 'categoria_slug', FILTER_DEFAULT);
 
 // Se tivermos apenas o slug, buscamos o ID correspondente
 if (empty($categoria_id) && !empty($categoria_slug)) {

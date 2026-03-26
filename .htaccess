@@ -1,8 +1,4 @@
-# .htaccess - Configurações de URLs Amigáveis para Transparência 2025
-
-# 1. Ativa o motor de reescrita
 RewriteEngine On
-RewriteBase /
 
 # 2. Ignora caminhos de arquivos e diretórios reais (ex: css/, imagens/, etc.)
 RewriteCond %{REQUEST_FILENAME} !-f

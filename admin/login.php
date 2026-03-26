@@ -11,22 +11,16 @@ if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
 $erro = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $usuario = $_POST['usuario'];
-    $senha = $_POST['senha'];
+    $senha   = $_POST['senha'];
 
-    // CORREÇÃO: Busca também o nome de usuário e o perfil
     $stmt = $pdo->prepare("SELECT id, usuario, senha, perfil FROM usuarios_admin WHERE usuario = ?");
     $stmt->execute([$usuario]);
     $user = $stmt->fetch();
 
-    // Verifica se o usuário existe e se a senha criptografada confere
     if ($user && password_verify($senha, $user['senha'])) {
-        // Autenticação bem-sucedida
-        $_SESSION['admin_logged_in'] = true;
-        $_SESSION['admin_user_id'] = $user['id'];
-        
-        // --- CÓDIGO CORRIGIDO E ADICIONADO ABAIXO ---
-        // Armazena o nome e o perfil do usuário na sessão
-        $_SESSION['admin_user_nome'] = $user['usuario'];
+        $_SESSION['admin_logged_in']   = true;
+        $_SESSION['admin_user_id']     = $user['id'];
+        $_SESSION['admin_user_nome']   = $user['usuario'];
         $_SESSION['admin_user_perfil'] = $user['perfil'];
 
         header("Location: index.php");
@@ -40,34 +34,283 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Painel Administrativo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Restrito - Portal da Transparência</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <style>
-        body { display: flex; align-items: center; justify-content: center; height: 100vh; background-color: #f8f9fa; }
-        .login-card { max-width: 400px; width: 100%; }
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --primary-accent: #2563eb;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f172a; /* Fallback */
+        }
+
+        /* --- BACKGROUND ANIMADO --- */
+        .bg-animated {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        .circle-1 {
+            width: 500px;
+            height: 500px;
+            background: rgba(37, 99, 235, 0.15);
+            top: -100px;
+            left: -100px;
+            animation-duration: 15s;
+        }
+
+        .circle-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(147, 51, 234, 0.15);
+            bottom: -50px;
+            right: -50px;
+            animation-duration: 25s;
+        }
+
+        .circle-3 {
+            width: 300px;
+            height: 300px;
+            background: rgba(14, 165, 233, 0.1);
+            top: 40%;
+            left: 30%;
+            animation-duration: 18s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(100px, 50px) scale(1.1); }
+            100% { transform: translate(-50px, 100px) scale(0.9); }
+        }
+
+        /* --- LOGIN CARD GLASSMORPHISM --- */
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            perspective: 1000px;
+        }
+
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes cardEnter {
+            from { opacity: 0; transform: translateY(30px) rotateX(-10deg); }
+            to { opacity: 1; transform: translateY(0) rotateX(0); }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .login-header i {
+            font-size: 3rem;
+            color: var(--primary-accent);
+            background: rgba(37, 99, 235, 0.1);
+            width: 80px;
+            height: 80px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
+
+        .login-header h1 {
+            font-weight: 600;
+            font-size: 1.75rem;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .login-header p {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* --- FORM STYLING --- */
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #475569;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            background: #fff;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .input-group-text {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding-left: 15px;
+        }
+
+        .form-control {
+            background: transparent;
+            border: none;
+            padding: 12px 15px;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+
+        .form-control:focus {
+            background: transparent;
+            box-shadow: none;
+            color: #1e293b;
+        }
+
+        .btn-login {
+            background: var(--primary-accent);
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .alert-custom {
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 0.9rem;
+            border: none;
+            background: rgba(239, 68, 68, 0.1);
+            color: #b91c1c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 30px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
-    <div class="card login-card">
-        <div class="card-body">
-            <h3 class="card-title text-center mb-4">Acesso Administrativo</h3>
+
+    <div class="bg-animated">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="bi bi-shield-lock-fill"></i>
+                <h1>Painel Administrativo</h1>
+                <p>Portal da Transparência 2025</p>
+            </div>
+
             <?php if ($erro): ?>
-                <div class="alert alert-danger"><?php echo $erro; ?></div>
+                <div class="alert-custom" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <?php echo $erro; ?>
+                </div>
             <?php endif; ?>
-            <form method="POST" action="login.php">
-                <div class="mb-3">
+
+            <form method="POST" action="login.php" autocomplete="off">
+                <div class="mb-4">
                     <label for="usuario" class="form-label">Usuário</label>
-                    <input type="text" class="form-control" id="usuario" name="usuario" required>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Digite seu usuário..." required autofocus>
+                    </div>
                 </div>
-                <div class="mb-3">
+
+                <div class="mb-4">
                     <label for="senha" class="form-label">Senha</label>
-                    <input type="password" class="form-control" id="senha" name="senha" required>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-key"></i></span>
+                        <input type="password" class="form-control" id="senha" name="senha" placeholder="Digite sua senha..." required>
+                    </div>
                 </div>
+
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Entrar</button>
+                    <button type="submit" class="btn btn-login">
+                        ACESSAR SISTEMA <i class="bi bi-arrow-right-short ms-1"></i>
+                    </button>
                 </div>
             </form>
+
+            <div class="footer-text">
+                &copy; <?php echo date('Y'); ?> - Todos os direitos reservados.
+            </div>
         </div>
     </div>
+
 </body>
 </html>
