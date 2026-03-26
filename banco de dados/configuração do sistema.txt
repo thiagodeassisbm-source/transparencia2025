@@ -1,0 +1,15 @@
+PARA CONFIGURAÇÃO DO SISTEMA EM UMA NOVA HOSPEDAGEM
+
+PROCURE NA RAIZ DO PROJETO O ARQUIVO  "conexão.php"
+
+Altere as linhas 7 a 11 com os dados do seu banco de dados:
+
+$host = 'localhost'; // ou o endereço do seu servidor de banco de dados
+$dbname = 'nome_banco';
+$user = 'nome_usuario';
+$pass = 'senha';
+$charset = 'utf8mb4';
+
+E não esquecendo de importar o banco de dados .sql para o banco de dados criado.
+
+

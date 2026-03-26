@@ -1,0 +1,22 @@
+# / .gitignore
+
+# Arquivos de conexão com banco de dados (Segurança)
+conexao.php
+
+# Pastas de uploads de usuários
+uploads/
+admin/uploads/
+
+# Backups e SQL
+backup/
+"banco de dados/"
+*.sql
+
+# Arquivos temporários e de sistema
+migrar_slugs.php
+.DS_Store
+Thumbs.db
+
+# Logs do servidor
+*.log
+error_log

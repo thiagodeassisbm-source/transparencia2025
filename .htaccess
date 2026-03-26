@@ -1,0 +1,17 @@
+# .htaccess - Configurações de URLs Amigáveis para Transparência 2025
+
+# 1. Ativa o motor de reescrita
+RewriteEngine On
+RewriteBase /
+
+# 2. Ignora caminhos de arquivos e diretórios reais (ex: css/, imagens/, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# 3. Regra para Categorias Amigáveis (ex: /categoria/ouvidoria)
+# Transforma internamente o caminho em index.php?categoria_slug=ouvidoria
+RewriteRule ^categoria/([a-z0-9-]+)/?$ index.php?categoria_slug=$1 [L,QSA]
+
+# 4. Outras regras de slug (opcionais para o futuro)
+# RewriteRule ^portal/([a-z0-9-]+)/?$ portal.php?slug=$1 [L,QSA]
+# RewriteRule ^pagina/([a-z0-9-]+)/?$ pagina.php?slug=$1 [L,QSA]
