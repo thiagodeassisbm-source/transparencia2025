@@ -30,39 +30,51 @@
 
 /* --- 2. LAYOUT PRINCIPAL (CABEÇALHO E MENU) --- */
 
-/* Cabeçalho Verde da Página (Banner Anexo 2 - Centralizado e Compacto) */
-.portal-header-banner.public-banner {
-    background-color: #28a745;
-    background-image: linear-gradient(135deg, #28a745 0%, #218838 100%);
+/* Cabeçalho Estilo Anexo 1 */
+.top-utility-bar-wrapper {
+    background-color: #216a21; /* Verde mais escuro conforme anexo */
+    padding: 0.5rem 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-acc {
+    background: #1a4d1a;
+    border: none;
     color: #fff;
-    padding: 0.75rem 0 1.5rem;
-    position: relative;
-    box-shadow: inset 0 -10px 25px rgba(0,0,0,0.05);
-}
-
-.top-utility-bar {
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-}
-
-.banner-content .prefeitura-logo-header {
-    max-height: 90px;
-    margin-bottom: 0.5rem;
-    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.15));
-}
-
-.banner-content h2.portal-main-title {
-    font-size: 2.1rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px;
     font-weight: 700;
-    margin-bottom: 0.25rem;
-    color: #fff !important;
 }
 
-.banner-content .portal-subtitle {
-    font-size: 1.1rem;
+.portal-main-banner {
+    background-color: #2ca444; /* Verde principal */
+    background-image: linear-gradient(180deg, #2ca444 0%, #248a39 100%);
+    color: #fff;
+    padding: 2rem 0;
+    box-shadow: inset 0 -10px 15px rgba(0,0,0,0.05);
+}
+
+.portal-main-banner .prefeitura-logo-header {
+    max-height: 100px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+.portal-main-banner h1.portal-main-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fff !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.portal-main-banner .portal-subtitle {
+    font-size: 1.25rem;
     opacity: 0.95;
-    margin-bottom: 1rem;
     font-weight: 400;
 }
 
