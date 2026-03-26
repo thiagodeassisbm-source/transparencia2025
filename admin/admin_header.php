@@ -51,10 +51,9 @@ function isActive($pageName) {
     <!-- Sidebar -->
     <aside class="admin-sidebar shadow">
         <div class="sidebar-header">
-            <h2>Transparência</h2>
+            <h2>Painel de controle</h2>
         </div>
         <nav class="sidebar-nav">
-            <div class="nav-group-title">Principal</div>
             <ul>
                 <li>
                     <a href="dashboard.php" class="nav-link <?php echo isActive('dashboard.php'); ?>">
@@ -63,7 +62,6 @@ function isActive($pageName) {
                 </li>
             </ul>
 
-            <div class="nav-group-title">Módulos</div>
             <ul>
                 <!-- LANÇAMENTOS -->
                 <li>
