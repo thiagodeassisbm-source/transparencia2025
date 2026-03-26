@@ -50,57 +50,49 @@ $page_title_for_header = 'Dashboard';
 include 'admin_header.php'; 
 ?>
 
-<div class="container-fluid container-custom-padding">
-    <div class="row">
+<div class="container-fluid">
+    <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Seções Criadas</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_secoes; ?></div>
-                        </div>
-                        <div class="col-auto"><i class="bi bi-folder-fill fs-2 text-gray-300"></i></div>
-                    </div>
+            <div class="card stat-card shadow-sm h-100">
+                <div class="stat-icon bg-light-blue">
+                    <i class="bi bi-folder2-open"></i>
+                </div>
+                <div class="stat-info">
+                    <p>Seções Criadas</p>
+                    <h3><?php echo $total_secoes; ?></h3>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total de Lançamentos</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_lancamentos; ?></div>
-                        </div>
-                        <div class="col-auto"><i class="bi bi-file-earmark-text-fill fs-2 text-gray-300"></i></div>
-                    </div>
+            <div class="card stat-card shadow-sm h-100">
+                <div class="stat-icon bg-light-green">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <div class="stat-info">
+                    <p>Total Lançamentos</p>
+                    <h3><?php echo $total_lancamentos; ?></h3>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Páginas de Conteúdo</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_paginas; ?></div>
-                        </div>
-                        <div class="col-auto"><i class="bi bi-file-richtext-fill fs-2 text-gray-300"></i></div>
-                    </div>
+            <div class="card stat-card shadow-sm h-100">
+                <div class="stat-icon bg-light-purple">
+                    <i class="bi bi-file-richtext"></i>
+                </div>
+                <div class="stat-info">
+                    <p>Páginas de Conteúdo</p>
+                    <h3><?php echo $total_paginas; ?></h3>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Manifestações (Ouvidoria)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_ouvidoria; ?></div>
-                        </div>
-                        <div class="col-auto"><i class="bi bi-chat-left-quote-fill fs-2 text-gray-300"></i></div>
-                    </div>
+            <div class="card stat-card shadow-sm h-100">
+                <div class="stat-icon bg-light-yellow">
+                    <i class="bi bi-chat-left-quote"></i>
+                </div>
+                <div class="stat-info">
+                    <p>Ouvidoria (Total)</p>
+                    <h3><?php echo $total_ouvidoria; ?></h3>
                 </div>
             </div>
         </div>
@@ -108,31 +100,46 @@ include 'admin_header.php';
 
     <div class="row">
         <div class="col-lg-5 mb-4">
-            <div class="card shadow h-100">
-                <div class="card-header">Situação das Manifestações (Ouvidoria)</div>
-                <div class="card-body d-flex justify-content-center align-items-center">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-header border-0 bg-white pt-4 px-4">
+                    <h5 class="mb-0 fw-bold">Situação da Ouvidoria</h5>
+                </div>
+                <div class="card-body d-flex justify-content-center align-items-center p-4">
                     <?php if ($total_ouvidoria > 0): ?>
-                        <canvas id="ouvidoriaStatusChart"></canvas>
+                        <div style="height: 300px; width: 100%;">
+                            <canvas id="ouvidoriaStatusChart"></canvas>
+                        </div>
                     <?php else: ?>
-                        <p class="text-muted">Sem dados da ouvidoria para exibir.</p>
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox-fill display-4 text-light"></i>
+                            <p class="text-muted mt-2">Sem dados para exibir.</p>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
         <div class="col-lg-7 mb-4">
-            <div class="card shadow h-100">
-                <div class="card-header">Lançamentos por Seção</div>
-                <div class="card-body">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-header border-0 bg-white pt-4 px-4">
+                    <h5 class="mb-0 fw-bold">Lançamentos Recentes por Seção</h5>
+                </div>
+                <div class="card-body p-4">
                     <?php if ($total_lancamentos > 0): ?>
-                        <canvas id="lancamentosSecaoChart"></canvas>
+                        <div style="height: 300px; width: 100%;">
+                            <canvas id="lancamentosSecaoChart"></canvas>
+                        </div>
                     <?php else: ?>
-                        <p class="text-muted">Sem lançamentos para exibir no gráfico.</p>
+                        <div class="text-center py-5">
+                            <i class="bi bi-bar-chart-fill display-4 text-light"></i>
+                            <p class="text-muted mt-2">Sem lançamentos para exibir.</p>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 
 <?php include 'admin_footer.php'; ?>
 <script>
