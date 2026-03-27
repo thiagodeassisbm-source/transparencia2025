@@ -143,6 +143,8 @@ include 'admin_header.php';
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted">Senha Inicial</label>
                             <input type="password" name="admin_pass" class="form-control" placeholder="********" required>
+                        </div>
+
                         <!-- SEÇÃO 4: CONFIGURAÇÕES DE BOAS-VINDAS -->
                         <div class="col-12 py-2 border-bottom mt-4 mb-2">
                             <h6 class="text-primary fw-bold mb-0">4. Configurações de Boas-vindas</h6>
