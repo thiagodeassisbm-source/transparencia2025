@@ -5,6 +5,9 @@ RewriteBase /sistemas/transparencia2026/
 # Ex: /portal/goiania/admin  ->  admin/login.php?slug=goiania
 RewriteRule ^portal/([a-zA-Z0-9_-]+)/admin/?$ admin/login.php?slug=$1 [QSA,L]
 
+# 1.1 Rota Debug (para casos de falha no login)
+RewriteRule ^portal/DEBUG/admin/?$ admin/debug_router.php [QSA,L]
+
 # 2. Suporte para index.php (Ex: /portal/jatai/index.php  ->  home da cidade)
 RewriteRule ^portal/([a-zA-Z0-9_-]+)/index\.php$ index.php?pref_slug=$1 [QSA,L]
 
