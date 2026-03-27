@@ -19,13 +19,26 @@ if ($filtro_usuario) {
     $params[] = $filtro_usuario;
 }
 
+// Filtro SaaS: Apenas logs da própria prefeitura e esconde logs de gestão global
+if (!$_SESSION['is_superadmin']) {
+    $sql .= " AND id_prefeitura = ? AND tabela != 'SUPERADMIN'";
+    $params[] = $_SESSION['id_prefeitura'];
+}
+
 $sql .= " ORDER BY horario DESC LIMIT 500"; // Limite para performance
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $logs = $stmt->fetchAll();
 
-// Pegar lista de usuários para filtro
-$usuarios_stmt = $pdo->query("SELECT DISTINCT usuario_id, usuario_nome FROM logs_sistema WHERE usuario_id > 0");
+// Pegar lista de usuários para filtro (Aplicando Filtro SaaS)
+$sql_users = "SELECT DISTINCT usuario_id, usuario_nome FROM logs_sistema WHERE usuario_id > 0";
+$params_users = [];
+if (!$_SESSION['is_superadmin']) {
+    $sql_users .= " AND id_prefeitura = ?";
+    $params_users[] = $_SESSION['id_prefeitura'];
+}
+$usuarios_stmt = $pdo->prepare($sql_users);
+$usuarios_stmt->execute($params_users);
 $usuarios = $usuarios_stmt->fetchAll();
 
 $page_title_for_header = 'Logs Gerais';
