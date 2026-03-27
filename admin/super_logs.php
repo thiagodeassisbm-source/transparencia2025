@@ -13,7 +13,7 @@ $stmt = $pdo->prepare("
     SELECT l.*, p.nome as prefeitura_nome 
     FROM logs_sistema l
     LEFT JOIN prefeituras p ON l.id_prefeitura = p.id
-    ORDER BY l.data_hora DESC 
+    ORDER BY l.horario DESC 
     LIMIT 200
 ");
 $stmt->execute();
@@ -43,24 +43,24 @@ include 'admin_header.php';
                             <th>Prefeitura</th>
                             <th>Módulo</th>
                             <th>Ação</th>
-                            <th>Descrição</th>
+                            <th>Descrição / Detalhes</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($logs as $log): ?>
                         <tr class="small">
-                            <td class="ps-4 text-nowrap"><?php echo date('d/m/Y H:i', strtotime($log['data_hora'])); ?></td>
+                            <td class="ps-4 text-nowrap"><?php echo date('d/m/Y H:i', strtotime($log['horario'])); ?></td>
                             <td>
                                 <span class="badge bg-primary-subtle text-primary py-2 px-3 rounded-pill border border-primary-subtle">
                                     <?php echo htmlspecialchars($log['prefeitura_nome'] ?? 'PLATAFORMA'); ?>
                                 </span>
                             </td>
-                            <td><span class="text-muted small fw-bold"><?php echo htmlspecialchars($log['modulo']); ?></span></td>
+                            <td><span class="text-muted small fw-bold text-uppercase"><?php echo htmlspecialchars($log['tabela'] ?? '---'); ?></span></td>
                             <td>
                                 <span class="badge bg-secondary-subtle text-secondary"><?php echo htmlspecialchars($log['acao']); ?></span>
                             </td>
                             <td class="text-wrap" style="max-width: 300px;">
-                                <span class="text-dark"><?php echo htmlspecialchars($log['descricao']); ?></span>
+                                <span class="text-dark"><?php echo htmlspecialchars($log['detalhes'] ?? '---'); ?></span>
                             </td>
                         </tr>
                         <?php endforeach; ?>
