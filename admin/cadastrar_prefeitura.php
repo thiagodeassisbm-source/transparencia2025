@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->commit();
         $sucesso = "Cliente cadastrado com sucesso$demo_status! O acesso já está liberado.";
     } catch (Exception $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) { $pdo->rollBack(); }
         $erro = "Erro ao cadastrar: " . $e->getMessage();
     }
 }
