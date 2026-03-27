@@ -35,9 +35,13 @@ include 'admin_header.php';
 ?>
 
 <div class="container-fluid py-4">
+    <div class="mb-4">
+        <h4 class="fw-bold text-dark mt-2">Bem-vindo à Central de Gerencimaneto de Prefeituras</h4>
+    </div>
+
     <!-- Row de Stats Principais -->
     <div class="row g-4 mb-5">
-        <div class="col-md-6 col-xl-3">
+        <div class="col-md-6 col-xl-6">
             <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="bg-primary bg-opacity-10 p-3 rounded-4 me-3">
@@ -50,7 +54,7 @@ include 'admin_header.php';
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-xl-3">
+        <div class="col-md-6 col-xl-6">
             <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="bg-info bg-opacity-10 p-3 rounded-4 me-3">
@@ -60,18 +64,6 @@ include 'admin_header.php';
                         <h6 class="text-muted small text-uppercase mb-1 fw-bold">Prefeituras</h6>
                         <h3 class="mb-0 fw-bold"><?php echo $total_clientes; ?></h3>
                     </div>
-                </div>
-            </div>
-        </div>
-        <!-- Card Informativo -->
-        <div class="col-md-12 col-xl-6">
-            <div class="card border-0 shadow-sm rounded-4 bg-dark text-white h-100 overflow-hidden" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
-                <div class="card-body p-4 position-relative">
-                    <div class="position-relative z-1">
-                        <h5 class="fw-bold mb-2">Bem-vindo à Central de Inteligência</h5>
-                        <p class="text-white-50 small mb-0">Você está gerindo uma plataforma multi-tenant. <br>Acompanhe aqui a saúde financeira e operacional do seu SaaS.</p>
-                    </div>
-                    <i class="bi bi-shield-check position-absolute translate-middle-y opacity-10" style="right: -10px; top: 50%; font-size: 8rem;"></i>
                 </div>
             </div>
         </div>
