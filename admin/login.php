@@ -4,10 +4,8 @@ require_once '../conexao.php';
 require_once 'functions_logs.php';
 
 // Se o usuário já está logado, redireciona para o painel
-if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header("Location: /sistemas/transparencia2026/admin/index.php");
-    exit;
-}
+// O sistema sempre mostrará a tela de login para permitir a entrada no contexto correto da prefeitura
+// (Mesmo que já haja um usuário logado em outra prefeitura ou como superadmin)
 
 // Busca o logo da prefeitura e o título do portal baseado no slug (SaaS)
 $pref_slug = filter_input(INPUT_GET, 'slug', FILTER_SANITIZE_SPECIAL_CHARS);
