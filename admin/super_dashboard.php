@@ -18,11 +18,12 @@ $stmt_venc = $pdo->prepare("SELECT nome, dia_vencimento, valor_mensalidade FROM 
 $stmt_venc->execute([$dia_hoje, $dia_hoje]);
 $vencimentos = $stmt_venc->fetchAll();
 
-// 3. Volume de Dados por Prefeitura (Exemplo de quantos itens cada um tem cadastrado)
+// 3. Volume de Dados por Prefeitura (Contagem de lançamentos/registros)
 $stmt_dados = $pdo->query("
-    SELECT p.nome, COUNT(d.id) as total_arquivos 
+    SELECT p.nome, COUNT(r.id) as total_arquivos 
     FROM prefeituras p 
-    LEFT JOIN dados_transparencia d ON p.id = d.id_prefeitura 
+    LEFT JOIN portais pt ON p.id = pt.id_prefeitura 
+    LEFT JOIN registros r ON pt.id = r.id_portal 
     GROUP BY p.id 
     ORDER BY total_arquivos DESC 
     LIMIT 5
