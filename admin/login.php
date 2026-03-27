@@ -9,8 +9,24 @@ if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
     exit;
 }
 
-// Busca o logo da prefeitura e o título do portal
-$stmt_conf = $pdo->query("SELECT chave, valor FROM configuracoes WHERE chave IN ('prefeitura_logo', 'prefeitura_titulo')");
+// Busca o logo da prefeitura e o título do portal baseado no slug (SaaS)
+$pref_slug = filter_input(INPUT_GET, 'slug', FILTER_SANITIZE_SPECIAL_CHARS);
+$id_prefeitura_contexto = null;
+
+if ($pref_slug) {
+    $stmt_p = $pdo->prepare("SELECT id FROM prefeituras WHERE slug = ?");
+    $stmt_p->execute([$pref_slug]);
+    $id_prefeitura_contexto = $stmt_p->fetchColumn();
+}
+
+$sql_conf = "SELECT chave, valor FROM configuracoes WHERE chave IN ('prefeitura_logo', 'prefeitura_titulo')";
+if ($id_prefeitura_contexto) {
+    $sql_conf .= " AND id_prefeitura = $id_prefeitura_contexto";
+} else {
+    $sql_conf .= " AND id_prefeitura = 1"; // Fallback para a principal
+}
+
+$stmt_conf = $pdo->query($sql_conf);
 $config = $stmt_conf->fetchAll(PDO::FETCH_KEY_PAIR);
 $logo_prefeitura = !empty($config['prefeitura_logo']) ? $config['prefeitura_logo'] : 'imagens/logo-up.png';
 $titulo_portal = $config['prefeitura_titulo'] ?? 'Portal da Transparência';
