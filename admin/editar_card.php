@@ -107,23 +107,7 @@ $pagina_sistema_atual = $is_pagina_sistema ? $card['link_url'] : '';
                 return;
             }
 
-            // Checar se há campos inválidos (mesmo que ocultos)
-            let invalidos = [];
-            const inputs = form.querySelectorAll('input, select, textarea');
-            inputs.forEach(i => {
-                if (!i.checkValidity()) {
-                    invalidos.push(`${i.name || i.id}: ${i.validationMessage} (${i.offsetParent ? 'Visível' : 'Oculto'})`);
-                }
-            });
-
-            if (invalidos.length > 0) {
-                console.warn(">>> [DEBUG] O navegador reportou campos inválidos:", invalidos);
-                if (!confirm("O navegador encontrou campos que ele considera inválidos:\n\n" + invalidos.join("\n") + "\n\nDeseja forçar o envio mesmo assim?")) {
-                    return;
-                }
-            }
-
-            console.log(">>> [DEBUG] Enviando formulário agora...");
+            console.log(">>> Enviando formulário agora...");
             form.submit();
         }
     </script>
@@ -229,7 +213,7 @@ include 'admin_header.php';
                 </div>
                 <div id="campo_link_externo" class="mb-3">
                     <label for="link_url" class="form-label">URL Externa*</label>
-                    <input type="url" class="form-control" id="link_url" name="link_url" value="<?php echo htmlspecialchars($card['link_url']); ?>" placeholder="https://www.exemplo.com">
+                    <input type="text" class="form-control" id="link_url" name="link_url" value="<?php echo htmlspecialchars($card['link_url']); ?>" placeholder="https://www.exemplo.com">
                 </div>
                 <div id="campo_secao_interna" class="mb-3">
                     <label for="id_secao" class="form-label">Seção de Destino (com Tabela de Dados)</label>

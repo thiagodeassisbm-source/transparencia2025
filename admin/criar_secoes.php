@@ -168,7 +168,7 @@ include 'admin_header.php';
                     </div>
                     <div id="campo_link_externo" class="mb-3" style="display: none;">
                         <label for="card_link_externo" class="form-label">URL Externa*</label>
-                        <input type="url" class="form-control" id="card_link_externo" name="card_link_externo" placeholder="https://www.exemplo.com">
+                        <input type="text" class="form-control" id="card_link_externo" name="card_link_externo" placeholder="https://www.exemplo.com">
                     </div>
                 </div>
             </div>
