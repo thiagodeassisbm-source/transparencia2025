@@ -15,7 +15,7 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         
         $map_portais = []; // old_id => new_id
         
-        $ins_p = $pdo->prepare("INSERT INTO portais (id_prefeitura, id_categoria, nome, slug, icone, descricao, ordem, is_demo) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
+        $ins_p = $pdo->prepare("INSERT INTO portais (id_prefeitura, id_categoria, nome, slug, ordem, is_demo) VALUES (?, ?, ?, ?, ?, 1)");
         
         foreach ($portais_origem as $p) {
             $ins_p->execute([
@@ -23,8 +23,6 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
                 $p['id_categoria'], 
                 $p['nome'], 
                 $p['slug'], 
-                $p['icone'], 
-                $p['descricao'], 
                 $p['ordem']
             ]);
             $new_p_id = $pdo->lastInsertId();
