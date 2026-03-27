@@ -5,13 +5,16 @@ RewriteBase /sistemas/transparencia2026/
 # Ex: /portal/goiania/admin  ->  admin/login.php?slug=goiania
 RewriteRule ^portal/([a-zA-Z0-9_-]+)/admin/?$ admin/login.php?slug=$1 [QSA,L]
 
-# 2. Redireciona para o portal da prefeitura pelo slug
+# 2. Suporte para index.php (Ex: /portal/jatai/index.php  ->  home da cidade)
+RewriteRule ^portal/([a-zA-Z0-9_-]+)/index\.php$ index.php?pref_slug=$1 [QSA,L]
+
+# 3. Redireciona para o portal da prefeitura pelo slug
 # Ex: /portal/goiania  ->  index.php?pref_slug=goiania
 RewriteRule ^portal/([a-zA-Z0-9_-]+)/?$ index.php?pref_slug=$1 [QSA,L]
 
-# 3. Redireciona para uma seção específica dentro da prefeitura
+# 4. Redireciona para uma seção específica dentro da prefeitura
 # Ex: /portal/goiania/folha-de-pagamento  ->  portal.php?pref_slug=goiania&slug=$2
 RewriteRule ^portal/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/?$ portal.php?pref_slug=$1&slug=$2 [QSA,L]
 
-# 4. Tratamento para Categorias
+# 5. Tratamento para Categorias
 RewriteRule ^portal/([a-zA-Z0-9_-]+)/categoria/([a-zA-Z0-9_-]+)/?$ index.php?pref_slug=$1&categoria_slug=$2 [QSA,L]
