@@ -2,6 +2,7 @@
 // /admin/editar_permissoes_perfil.php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 // Apenas administradores podem gerenciar permissões
 if ($_SESSION['admin_user_perfil'] !== 'admin') { header("Location: dashboard.php"); exit; }
@@ -32,6 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_permissoes']))
         $p_excluir = isset($acoes['excluir']) ? 1 : 0;
         $stmt_ins->execute([$perfil_id, $recurso, $p_ver, $p_lancar, $p_editar, $p_excluir]);
     }
+
+    $nome_perfil = $perfil['nome'];
+    registrar_log($pdo, 'EDIÇÃO', 'permissoes_perfil', "Atualizou as permissões do perfil: $nome_perfil (ID: $perfil_id)");
 
     $_SESSION['mensagem_sucesso'] = "Permissões do perfil '{$perfil['nome']}' atualizadas com sucesso!";
     header("Location: gerenciar_perfis.php");

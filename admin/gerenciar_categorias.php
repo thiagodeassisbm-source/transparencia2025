@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
     $_SESSION['mensagem_sucesso'] = "Acesso negado.";
@@ -16,6 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_categoria'])) {
     if (!empty($nome)) {
         $stmt = $pdo->prepare("INSERT INTO categorias (nome) VALUES (?)");
         $stmt->execute([$nome]);
+        $cat_id = $pdo->lastInsertId();
+        
+        registrar_log($pdo, 'ADIÇÃO', 'categorias', "Adicionou a categoria: $nome (ID: $cat_id)");
+        
         $_SESSION['mensagem_sucesso'] = "Categoria adicionada com sucesso!";
     } else {
         $erro = "O nome da categoria não pode ser vazio.";
@@ -32,6 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_categoria'])) 
         // e cards ligados a esta categoria fiquem com id_categoria = NULL.
         $stmt = $pdo->prepare("DELETE FROM categorias WHERE id = ?");
         $stmt->execute([$id_categoria]);
+        
+        registrar_log($pdo, 'EXCLUSÃO', 'categorias', "Excluiu a categoria ID: $id_categoria");
+        
         $_SESSION['mensagem_sucesso'] = "Categoria excluída com sucesso!";
     }
     header("Location: gerenciar_categorias.php");

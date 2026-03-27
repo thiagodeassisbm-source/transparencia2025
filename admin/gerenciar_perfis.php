@@ -2,6 +2,7 @@
 // /admin/gerenciar_perfis.php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 // Apenas administradores podem acessar a gestão de perfis
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
@@ -25,6 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_perfil'])) {
         } else {
             $stmt_insert = $pdo->prepare("INSERT INTO perfis (nome) VALUES (?)");
             $stmt_insert->execute([$nome]);
+            $perfil_id = $pdo->lastInsertId();
+            
+            registrar_log($pdo, 'ADIÇÃO', 'perfis', "Criou novo perfil de acesso: $nome (ID: $perfil_id)");
+            
             $_SESSION['mensagem_sucesso'] = "Perfil '$nome' criado! Agora configure as permissões.";
             header("Location: gerenciar_perfis.php");
             exit;

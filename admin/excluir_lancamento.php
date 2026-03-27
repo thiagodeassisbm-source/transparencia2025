@@ -5,6 +5,7 @@ error_reporting(E_ALL);
 
 session_start();
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registro_id'])) {
     $registro_id = filter_input(INPUT_POST, 'registro_id', FILTER_VALIDATE_INT);
@@ -38,6 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registro_id'])) {
             $stmt_delete->execute([$registro_id]);
             
             $pdo->commit();
+            
+            registrar_log($pdo, 'EXCLUSÃO', 'registros', "Excluiu lançamento ID: $registro_id (Seção: $portal_id)");
+            
             $_SESSION['mensagem_sucesso'] = "Lançamento excluído com sucesso!";
 
         } catch (Exception $e) {

@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 // Apenas admins podem acessar
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
@@ -32,6 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_campo'])) {
 
         $stmt = $pdo->prepare("INSERT INTO campos_portal (id_portal, nome_campo, tipo_campo, opcoes_campo, ordem, pesquisavel, detalhes_apenas) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$portal_id, $nome_campo, $tipo_campo, $opcoes_campo, $nova_ordem, $pesquisavel, $detalhes_apenas]);
+        $campo_id = $pdo->lastInsertId();
+        
+        registrar_log($pdo, 'ADIÇÃO', 'campos_portal', "Adicionou campo: $nome_campo (Seção ID: $portal_id, Campo ID: $campo_id)");
+        
         $_SESSION['mensagem_sucesso'] = "Campo adicionado com sucesso!";
     } else {
         $_SESSION['mensagem_sucesso'] = "Erro: Nome e tipo do campo são obrigatórios.";

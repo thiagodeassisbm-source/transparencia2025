@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 // Variáveis de sessão do usuário
 $perfil_usuario = $_SESSION['admin_user_perfil'];
@@ -65,6 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $pdo->commit();
+        
+        $nome_secao = $secao['nome'] ?? 'Seção ID: ' . $portal_id;
+        registrar_log($pdo, 'ADIÇÃO', 'registros', "Lançou novos dados na seção: $nome_secao (ID Registro: $id_registro)");
+        
         $_SESSION['mensagem_sucesso'] = "Lançamento inserido com sucesso!";
         header("Location: ver_lancamentos.php?portal_id=" . $portal_id);
         exit();

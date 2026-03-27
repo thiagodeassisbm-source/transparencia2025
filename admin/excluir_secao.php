@@ -2,6 +2,7 @@
 // /admin/excluir_secao.php
 session_start();
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['portal_id'])) {
     $portal_id = filter_input(INPUT_POST, 'portal_id', FILTER_VALIDATE_INT);
@@ -32,6 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['portal_id'])) {
             $stmt_delete->execute([$portal_id]);
 
             $pdo->commit();
+            
+            registrar_log($pdo, 'EXCLUSÃO', 'portais', "Excluiu a seção/portal ID: $portal_id");
 
             $_SESSION['mensagem_sucesso'] = "Seção e todos os seus dados foram excluídos com sucesso!";
 

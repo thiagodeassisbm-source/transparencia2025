@@ -2,6 +2,7 @@
 // /admin/editar_usuario.php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 $usuario_id_para_editar = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$usuario_id_para_editar) { header("Location: dashboard.php"); exit; }
@@ -61,6 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $stmt_update = $pdo->prepare($sql);
                 $stmt_update->execute($params);
+                
+                registrar_log($pdo, 'EDIÇÃO', 'usuarios_admin', "Atualizou o usuário: $usuario (ID: $usuario_id_para_editar)");
                 
                 // Atualiza sessão se for o próprio usuário
                 if ($usuario_id_para_editar == $id_logado) {

@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
     header("Location: index.php");
@@ -36,6 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute(['prefeitura_logo', $caminho_destino]);
         }
     }
+
+    registrar_log($pdo, 'EDIÇÃO', 'configuracoes', "Atualizou as informações gerais da prefeitura.");
 
     $_SESSION['mensagem_sucesso'] = "Configurações da Prefeitura salvas com sucesso!";
     header("Location: informacoes_prefeitura.php");

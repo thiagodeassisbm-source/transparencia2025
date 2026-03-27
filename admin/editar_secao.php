@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 // Variáveis de sessão do usuário
 $perfil_usuario = $_SESSION['admin_user_perfil'];
@@ -61,6 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
+        
+        registrar_log($pdo, 'EDIÇÃO', 'portais', "Atualizou a seção/portal: $nome (ID: $secao_id)");
+        
         $_SESSION['mensagem_sucesso'] = "Seção atualizada com sucesso!";
         header("Location: index.php");
         exit;

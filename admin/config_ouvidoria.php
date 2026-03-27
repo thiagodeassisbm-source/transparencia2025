@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
     header("Location: index.php");
@@ -16,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($configuracoes as $chave => $valor) {
         $stmt->execute([trim($valor), $chave]);
     }
+
+    registrar_log($pdo, 'EDIÇÃO', 'configuracoes', "Atualizou as configurações da Ouvidoria.");
 
     $_SESSION['mensagem_sucesso'] = "Configurações da Ouvidoria salvas com sucesso!";
     header("Location: config_ouvidoria.php");

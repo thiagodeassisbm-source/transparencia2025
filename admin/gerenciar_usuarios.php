@@ -2,6 +2,7 @@
 // /admin/gerenciar_usuarios.php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 // Apenas administradores podem gerenciar usuários ou perfis (dependendo da logica)
 // No entanto, vamos permitir que quem tem permissão de 'usuarios' veja esta tela
@@ -34,6 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_usuario']) && tem
             $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
             $stmt_insert = $pdo->prepare("INSERT INTO usuarios_admin (usuario, nome, senha, id_perfil) VALUES (?, ?, ?, ?)");
             $stmt_insert->execute([$usuario, $nome, $senha_hash, $id_perfil]);
+            $user_id = $pdo->lastInsertId();
+            
+            registrar_log($pdo, 'ADIÇÃO', 'usuarios_admin', "Criou novo usuário: $usuario (ID: $user_id)");
+            
             $_SESSION['mensagem_sucesso'] = "Usuário cadastrado com sucesso!";
             header("Location: gerenciar_usuarios.php");
             exit;

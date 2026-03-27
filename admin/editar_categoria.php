@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
     header("Location: index.php");
@@ -16,6 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($nome)) {
         $stmt = $pdo->prepare("UPDATE categorias SET nome = ? WHERE id = ?");
         $stmt->execute([$nome, $categoria_id]);
+        
+        registrar_log($pdo, 'EDIÇÃO', 'categorias', "Renomeou a categoria para: $nome (ID: $categoria_id)");
+        
         $_SESSION['mensagem_sucesso'] = "Categoria atualizada com sucesso!";
         header("Location: gerenciar_categorias.php");
         exit;
