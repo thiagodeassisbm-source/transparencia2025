@@ -2,7 +2,7 @@
 require_once '../conexao.php';
 
 try {
-    // 1. Garantir que a estrutura está pronta (as colunas já foram criadas no passo anterior, mas vamos garantir)
+    // 1. Garantir que a estrutura está pronta
     $pdo->exec("CREATE TABLE IF NOT EXISTS prefeituras (
         id INT AUTO_INCREMENT PRIMARY KEY,
         nome VARCHAR(255) NOT NULL,
@@ -26,33 +26,38 @@ try {
         $pref_id = $pdo->lastInsertId();
     }
 
+    // --- CORREÇÃO DE DUPLICIDADE ---
+    // Limpamos o email do usuário 'admin' para liberar para o novo superadmin
+    $pdo->exec("UPDATE usuarios_admin SET email = 'admin@sistema.com' WHERE usuario = 'admin'");
+
     // 3. RETIRAR superadmin do usuário "admin" comum (ele vira apenas admin da prefeitura principal)
-    $admin_pass = password_hash('123456789', PASSWORD_DEFAULT);
+    $pass_comum = password_hash('123456789', PASSWORD_DEFAULT);
     $pdo->prepare("UPDATE usuarios_admin SET is_superadmin = 0, id_prefeitura = ?, senha = ? WHERE usuario = 'admin'")
-        ->execute([$pref_id, $admin_pass]);
+        ->execute([$pref_id, $pass_comum]);
 
     // 4. CRIAR ou ATUALIZAR o Super Admin Real
     $super_user = 'superadmin';
     $super_email = 'superadmin@sistema.com';
     $super_pass = password_hash('123456789', PASSWORD_DEFAULT);
 
-    $stmt_check = $pdo->prepare("SELECT id FROM usuarios_admin WHERE usuario = ?");
-    $stmt_check->execute([$super_user]);
-    $super_exists = $stmt_check->fetchColumn();
+    // Se o usuário 'superadmin' já existe, atualizamos, se não, inserimos.
+    $stmt_super = $pdo->prepare("SELECT id FROM usuarios_admin WHERE usuario = ?");
+    $stmt_super->execute([$super_user]);
+    $super_id = $stmt_super->fetchColumn();
 
-    if ($super_exists) {
-        $pdo->prepare("UPDATE usuarios_admin SET email = ?, senha = ?, is_superadmin = 1, id_prefeitura = NULL WHERE usuario = ?")
-            ->execute([$super_email, $super_pass, $super_user]);
+    if ($super_id) {
+        $pdo->prepare("UPDATE usuarios_admin SET email = ?, senha = ?, is_superadmin = 1, id_prefeitura = NULL WHERE id = ?")
+            ->execute([$super_email, $super_pass, $super_id]);
     } else {
         $pdo->prepare("INSERT INTO usuarios_admin (usuario, email, senha, id_perfil, is_superadmin, id_prefeitura, nome) VALUES (?, ?, ?, ?, ?, ?, ?)")
             ->execute([$super_user, $super_email, $super_pass, 1, 1, null, 'Super Gestor']);
     }
 
-    echo "<h1>Separação de usuários concluída!</h1>";
+    echo "<h1>Separação Concluída com Sucesso! (Sem Duplicidade)</h1>";
     echo "<ul>
             <li>Usuário <b>admin</b> agora é Administrador Local (Prefeitura Principal).</li>
             <li>Usuário <b>superadmin</b> criado/atualizado com acesso Global.</li>
-            <li>Ambos com senha: <b>123456789</b></li>
+            <li>Senha para ambos: <b>123456789</b></li>
           </ul>";
     echo "<p><a href='login.php'>Voltar para o Login</a></p>";
 
