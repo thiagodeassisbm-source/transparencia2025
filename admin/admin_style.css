@@ -54,13 +54,15 @@ body {
 }
 
 .sidebar-header h2 {
-    font-size: 1.15rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
     margin: 0;
     color: #fff;
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .sidebar-header h2::before {

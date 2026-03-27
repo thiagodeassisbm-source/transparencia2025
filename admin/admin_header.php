@@ -47,7 +47,6 @@ function isActive($pageName) {
     <aside class="admin-sidebar shadow">
         <div class="sidebar-header">
             <h2>Painel de controle</h2>
-            <div class="text-white opacity-50 small ms-3">SISTEMA v2025</div>
         </div>
         <nav class="sidebar-nav">
             <ul>
@@ -158,15 +157,15 @@ function isActive($pageName) {
                 </li>
                 <?php endif; ?>
 
-                <!-- ENTRADA DE DADOS XML (Apenas Admin geralmente) -->
+                <!-- CONFIGURAÇÕES (Geral) -->
                 <?php if ($_SESSION['admin_user_perfil'] === 'admin'): ?>
                 <li>
                     <?php $entrada_active = isActive(['importar_xml.php', 'mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>
-                    <a href="#collapseEntrada" class="nav-link has-submenu <?php echo $entrada_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
-                        <span><i class="bi bi-filetype-xml"></i> XML</span>
+                    <a href="#collapseConfig" class="nav-link has-submenu <?php echo $entrada_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
+                        <span><i class="bi bi-gear-fill"></i> CONFIGURAÇÕES</span>
                         <i class="bi bi-chevron-down submenu-arrow"></i>
                     </a>
-                    <div class="collapse <?php echo $entrada_active ? 'show' : ''; ?>" id="collapseEntrada">
+                    <div class="collapse <?php echo $entrada_active ? 'show' : ''; ?>" id="collapseConfig">
                         <ul class="submenu">
                             <li><a href="mapear_xml.php" class="nav-link <?php echo isActive(['mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>">Gerenciar XML</a></li>
                             <li><a href="importar_xml.php" class="nav-link <?php echo isActive('importar_xml.php'); ?>">Importar XML</a></li>
