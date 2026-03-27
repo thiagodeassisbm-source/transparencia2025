@@ -483,7 +483,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     <?php endif; ?>
 
-                    <form method="POST" action="login.php" autocomplete="off">
+                    <form method="POST" action="" autocomplete="off">
                         <div class="mb-4">
                             <label for="usuario" class="form-label">Usuário / E-mail</label>
                             <div class="input-group">
