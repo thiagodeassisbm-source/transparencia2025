@@ -64,34 +64,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             height: 100%;
             margin: 0;
             font-family: 'Outfit', sans-serif;
-            background: var(--dark-bg);
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
             color: #fff;
-            overflow: hidden;
+            overflow: auto;
         }
 
         .login-wrapper {
             display: flex;
             min-height: 100vh;
             width: 100%;
-        }
-
-        /* --- LADO ESQUERDO (CONTEÚDO) --- */
-        .left-side {
-            flex: 1.2;
-            display: flex;
-            flex-direction: column;
             justify-content: center;
-            padding: 40px 8%;
-            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            align-items: center;
+            padding: 40px 20px;
             position: relative;
-            overflow: hidden;
             z-index: 1;
         }
 
-        /* Efeito de rede/plexus no fundo */
-        .left-side::before {
+        /* Efeito de rede/plexus no fundo global */
+        body::before {
             content: '';
-            position: absolute;
+            position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-image: radial-gradient(rgba(99, 102, 241, 0.15) 1.5px, transparent 1.5px);
             background-size: 30px 30px;
@@ -99,22 +91,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             opacity: 0.5;
         }
 
-        .left-side::after {
-            content: '';
-            position: absolute;
-            top: -20%; right: -10%; width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-            z-index: -1;
+        .login-content {
+            display: flex;
+            width: 100%;
+            max-width: 1100px;
+            gap: 80px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- LADO ESQUERDO (CONTEÚDO) --- */
+        .left-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centraliza itens */
+            text-align: center; /* Centraliza texto */
         }
 
         .brand-container {
-            margin-bottom: 50px;
+            margin-bottom: 40px;
             animation: fadeInDown 0.8s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .brand-logo-wrapper {
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 50%;
@@ -122,15 +127,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             align-items: center;
             justify-content: center;
             padding: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             position: relative;
             box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
         }
 
         .brand-logo-wrapper img {
-            max-width: 100%;
-            max-height: 100%;
-            filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+            max-width: 85%;
+            max-height: 85%;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
         }
 
         .brand-logo-wrapper::after {
@@ -145,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .brand-content h1 {
             font-size: 3.5rem;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             letter-spacing: -1px;
             background: linear-gradient(to right, #fff, #94a3b8);
             -webkit-background-clip: text;
@@ -155,28 +160,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .brand-content p.subtitle {
             font-size: 1.25rem;
             color: #94a3b8;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .feature-list {
             list-style: none;
             padding: 0;
             margin: 0;
+            text-align: left; /* Lista alinhada à esquerda para leitura */
+            align-self: flex-start; /* Alinha a lista à esquerda do container centralizado */
+            margin-left: auto;
+            margin-right: auto;
+            display: inline-block;
         }
 
         .feature-item {
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 20px;
-            font-size: 1.1rem;
+            margin-bottom: 18px;
+            font-size: 1.05rem;
             color: #cbd5e1;
             animation: fadeInLeft 0.8s ease-out both;
         }
 
         .feature-item i {
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             background: rgba(99, 102, 241, 0.2);
             border: 1px solid rgba(99, 102, 241, 0.4);
             border-radius: 50%;
@@ -184,77 +194,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             align-items: center;
             justify-content: center;
             color: #818cf8;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
         .more-text {
-            margin-top: 30px;
+            margin-top: 25px;
             font-style: italic;
             color: #64748b;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         /* --- LADO DIREITO (LOGIN) --- */
         .right-side {
-            flex: 0.8;
+            flex: 0.9;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #0b0e14;
-            padding: 40px;
-            position: relative;
         }
 
         .login-card {
             width: 100%;
-            max-width: 480px;
+            max-width: 440px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 32px;
-            padding: 50px;
+            padding: 45px;
             box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.5);
             animation: fadeInRight 0.8s ease-out;
         }
 
         .login-card-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 35px;
         }
 
         .icon-box {
-            width: 60px;
-            height: 60px;
+            width: 55px;
+            height: 55px;
             background: rgba(99, 102, 241, 0.2);
             border-radius: 16px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             color: var(--primary-purple);
-            font-size: 1.5rem;
-            margin-bottom: 20px;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
         }
 
         .login-card-header h2 {
-            font-size: 1.75rem;
+            font-size: 1.6rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             color: #fff;
         }
 
         .login-card-header p {
-            color: #94a3b8;
-            font-size: 0.95rem;
+            color: #64748b;
+            font-size: 0.9rem;
         }
 
         .form-label {
-            color: #94a3b8;
+            color: #64748b;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .input-group {
@@ -273,7 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .input-group-text {
             background: transparent;
             border: none;
-            color: #64748b;
+            color: #475569;
             padding-left: 15px;
         }
 
@@ -281,8 +288,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: transparent;
             border: none;
             color: #fff;
-            padding: 14px 15px;
-            font-size: 1rem;
+            padding: 13px 15px;
+            font-size: 0.95rem;
         }
 
         .form-control:focus {
@@ -294,16 +301,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-login {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             border: none;
-            border-radius: 14px;
-            padding: 16px;
+            border-radius: 12px;
+            padding: 14px;
             font-weight: 700;
             color: white;
             transition: all 0.3s ease;
-            margin-top: 15px;
+            margin-top: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            font-size: 1rem;
         }
 
         .btn-login:hover {
@@ -318,7 +326,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #f87171;
             padding: 12px;
             border-radius: 12px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 25px;
             display: flex;
             align-items: center;
@@ -327,8 +335,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .footer-links {
             text-align: center;
-            margin-top: 30px;
-            font-size: 0.85rem;
+            margin-top: 25px;
+            font-size: 0.8rem;
             color: #64748b;
         }
 
@@ -364,103 +372,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         /* Responsividade */
         @media (max-width: 992px) {
-            .login-wrapper { flex-direction: column; overflow: auto; }
-            .left-side { flex: none; padding: 60px 40px; }
-            .right-side { flex: none; min-height: 600px; padding: 20px; }
+            .login-content { flex-direction: column; gap: 50px; }
+            .left-side { flex: none; }
+            .right-side { flex: none; width: 100%; }
             .brand-content h1 { font-size: 2.5rem; }
-            body { overflow: auto; }
+            .feature-list { align-self: center; }
         }
     </style>
 </head>
 <body>
 
     <div class="login-wrapper">
-        <!-- LADO ESQUERDO -->
-        <div class="left-side">
-            <div class="brand-container">
-                <div class="brand-logo-wrapper">
-                    <img src="<?php echo htmlspecialchars($logo_prefeitura); ?>" alt="Logo Prefeitura">
+        <div class="login-content">
+            <!-- LADO ESQUERDO -->
+            <div class="left-side">
+                <div class="brand-container">
+                    <div class="brand-logo-wrapper">
+                        <img src="<?php echo htmlspecialchars($logo_prefeitura); ?>" alt="Logo Prefeitura">
+                    </div>
+                    <div class="brand-content">
+                        <h1>Realize o seu Login</h1>
+                        <p class="subtitle"><?php echo htmlspecialchars($titulo_portal); ?></p>
+                    </div>
                 </div>
-                <div class="brand-content">
-                    <h1>Realize o seu Login</h1>
-                    <p class="subtitle"><?php echo htmlspecialchars($titulo_portal); ?></p>
+
+                <div class="feature-wrapper">
+                    <ul class="feature-list">
+                        <li class="feature-item" style="animation-delay: 0.1s">
+                            <i class="bi bi-check-lg"></i>
+                            Gerenciamento centralizado de dados da Transparência
+                        </li>
+                        <li class="feature-item" style="animation-delay: 0.2s">
+                            <i class="bi bi-check-lg"></i>
+                            Controle de acesso e logs de auditoria
+                        </li>
+                        <li class="feature-item" style="animation-delay: 0.3s">
+                            <i class="bi bi-check-lg"></i>
+                            Monitoramento em tempo real de licitações e contratos
+                        </li>
+                        <li class="feature-item" style="animation-delay: 0.4s">
+                            <i class="bi bi-check-lg"></i>
+                            Relatórios dinâmicos e inteligência de dados
+                        </li>
+                        <li class="feature-item" style="animation-delay: 0.5s">
+                            <i class="bi bi-check-lg"></i>
+                            Suporte técnico especializado UP GYN
+                        </li>
+                    </ul>
                 </div>
+
+                <p class="more-text">E muito mais...</p>
             </div>
 
-            <ul class="feature-list">
-                <li class="feature-item" style="animation-delay: 0.1s">
-                    <i class="bi bi-check-lg"></i>
-                    Gerenciamento centralizado de dados da Transparência
-                </li>
-                <li class="feature-item" style="animation-delay: 0.2s">
-                    <i class="bi bi-check-lg"></i>
-                    Controle de acesso e logs de auditoria
-                </li>
-                <li class="feature-item" style="animation-delay: 0.3s">
-                    <i class="bi bi-check-lg"></i>
-                    Monitoramento em tempo real de licitações e contratos
-                </li>
-                <li class="feature-item" style="animation-delay: 0.4s">
-                    <i class="bi bi-check-lg"></i>
-                    Relatórios dinâmicos e inteligência de dados
-                </li>
-                <li class="feature-item" style="animation-delay: 0.5s">
-                    <i class="bi bi-check-lg"></i>
-                    Suporte técnico especializado UP GYN
-                </li>
-            </ul>
-
-            <p class="more-text">E muito mais...</p>
-        </div>
-
-        <!-- LADO DIREITO -->
-        <div class="right-side">
-            <div class="login-card">
-                <div class="login-card-header">
-                    <div class="icon-box">
-                        <i class="bi bi-lock-fill"></i>
-                    </div>
-                    <h2>Bem-vindo de volta</h2>
-                    <p>Acesse sua conta para continuar</p>
-                </div>
-
-                <?php if ($erro): ?>
-                    <div class="alert-error">
-                        <i class="bi bi-exclamation-circle"></i>
-                        <?php echo $erro; ?>
-                    </div>
-                <?php endif; ?>
-
-                <form method="POST" action="login.php" autocomplete="off">
-                    <div class="mb-4">
-                        <label for="usuario" class="form-label">Usuário / E-mail</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input type="text" class="form-control" id="usuario" name="usuario" placeholder="admin" required autofocus>
+            <!-- LADO DIREITO -->
+            <div class="right-side">
+                <div class="login-card">
+                    <div class="login-card-header">
+                        <div class="icon-box">
+                            <i class="bi bi-lock-fill"></i>
                         </div>
+                        <h2>Bem-vindo de volta</h2>
+                        <p>Acesse sua conta para continuar</p>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="senha" class="form-label">Senha de Acesso</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-key"></i></span>
-                            <input type="password" class="form-control" id="senha" name="senha" placeholder="********" required>
-                            <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
-                                <i class="bi bi-eye" id="eyeIcon"></i>
-                            </span>
+                    <?php if ($erro): ?>
+                        <div class="alert-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <?php echo $erro; ?>
                         </div>
-                    </div>
+                    <?php endif; ?>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-login">
-                            <i class="bi bi-box-arrow-in-right"></i> Entrar no Sistema
-                        </button>
-                    </div>
-                </form>
+                    <form method="POST" action="login.php" autocomplete="off">
+                        <div class="mb-4">
+                            <label for="usuario" class="form-label">Usuário / E-mail</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" id="usuario" name="usuario" placeholder="admin" required autofocus>
+                            </div>
+                        </div>
 
-                <div class="footer-links">
-                    <p class="mb-1"><i class="bi bi-shield-check me-1"></i> Conexão segura e criptografada</p>
-                    <p>Desenvolvido por <a href="https://upgyn.com.br" target="_blank">UPGYN</a></p>
+                        <div class="mb-4">
+                            <label for="senha" class="form-label">Senha de Acesso</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-key"></i></span>
+                                <input type="password" class="form-control" id="senha" name="senha" placeholder="********" required>
+                                <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
+                                    <i class="bi bi-eye" id="eyeIcon"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-login">
+                                <i class="bi bi-box-arrow-in-right"></i> Entrar no Sistema
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="footer-links">
+                        <p class="mb-1"><i class="bi bi-shield-check me-1"></i> Conexão segura e criptografada</p>
+                        <p>Desenvolvido por <a href="https://upgyn.com.br" target="_blank">UPGYN</a></p>
+                    </div>
                 </div>
             </div>
         </div>
