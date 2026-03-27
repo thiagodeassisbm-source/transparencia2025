@@ -106,6 +106,14 @@ include 'admin_header.php';
 ?>
 <div class="container-fluid container-custom-padding">
     <div class="row"><div class="col-12">
+    <?php
+    if (isset($_SESSION['mensagem_sucesso'])) {
+        echo '<div class="alert alert-info alert-dismissible fade show" role="alert">' 
+           . htmlspecialchars($_SESSION['mensagem_sucesso']) . 
+           '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+        unset($_SESSION['mensagem_sucesso']);
+    }
+    ?>
     <div class="card">
         <div class="card-header"><h4>Formulário de Edição de Card</h4></div>
         <div class="card-body">
@@ -280,6 +288,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const val = e.target.value.trim();
         previewBI.className = 'bi ' + (val || 'bi-info-circle');
     });
+
+    // Forçar estado inicial correto dos ícones
+    if (radioBootstrap.checked) {
+        inputBootstrap.required = true;
+    }
 });
 </script>
 </body>
