@@ -4,13 +4,16 @@ require_once '../conexao.php';
 
 $perfil_usuario = $_SESSION['admin_user_perfil'];
 
-// --- 1. CONSULTA ATUALIZADA PARA ORDENAR POR CATEGORIA ---
-$stmt = $pdo->query(
+// --- 1. CONSULTA ATUALIZADA PARA ORDENAR POR CATEGORIA E FILTRAR POR PREFEITURA ---
+$pref_id = $_SESSION['id_prefeitura'] ?? 0;
+$stmt = $pdo->prepare(
     "SELECT p.id, p.nome, p.slug, c.nome as nome_categoria 
      FROM portais p
      LEFT JOIN categorias c ON p.id_categoria = c.id
+     WHERE p.id_prefeitura = ?
      ORDER BY c.ordem, c.nome, p.ordem ASC"
 );
+$stmt->execute([$pref_id]);
 $secoes_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // --- 2. ORGANIZA AS SEÇÕES EM GRUPOS DE CATEGORIA ---

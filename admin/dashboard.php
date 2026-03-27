@@ -3,17 +3,33 @@ require_once 'auth_check.php';
 require_once '../conexao.php';
 
 // --- BUSCA DE DADOS PARA OS CARDS NUMÉRICOS ---
-$total_secoes = $pdo->query("SELECT COUNT(id) FROM portais")->fetchColumn();
-$total_lancamentos = $pdo->query("SELECT COUNT(id) FROM registros")->fetchColumn();
-$total_paginas = $pdo->query("SELECT COUNT(id) FROM paginas")->fetchColumn();
-$total_ouvidoria = $pdo->query("SELECT COUNT(id) FROM ouvidoria_manifestacoes")->fetchColumn();
+$pref_id = $_SESSION['id_prefeitura'] ?? 0;
+
+$total_secoes = $pdo->prepare("SELECT COUNT(id) FROM portais WHERE id_prefeitura = ?");
+$total_secoes->execute([$pref_id]);
+$total_secoes = $total_secoes->fetchColumn();
+
+$total_lancamentos = $pdo->prepare("SELECT COUNT(id) FROM registros WHERE id_portal IN (SELECT id FROM portais WHERE id_prefeitura = ?)");
+$total_lancamentos->execute([$pref_id]);
+$total_lancamentos = $total_lancamentos->fetchColumn();
+
+$total_paginas = $pdo->prepare("SELECT COUNT(id) FROM paginas WHERE id_prefeitura = ?");
+$total_paginas->execute([$pref_id]);
+$total_paginas = $total_paginas->fetchColumn();
+
+$total_ouvidoria = $pdo->prepare("SELECT COUNT(id) FROM ouvidoria_manifestacoes WHERE id_prefeitura = ?");
+$total_ouvidoria->execute([$pref_id]);
+$total_ouvidoria = $total_ouvidoria->fetchColumn();
 
 // --- DADOS PARA O GRÁfico DE STATUS DA OUVIDORIA ---
-$stats_status_raw = $pdo->query(
+$stmt_ouvidoria = $pdo->prepare(
     "SELECT status, COUNT(id) as total 
      FROM ouvidoria_manifestacoes 
+     WHERE id_prefeitura = ?
      GROUP BY status"
-)->fetchAll(PDO::FETCH_KEY_PAIR);
+);
+$stmt_ouvidoria->execute([$pref_id]);
+$stats_status_raw = $stmt_ouvidoria->fetchAll(PDO::FETCH_KEY_PAIR);
 $stats_status = [];
 $status_possiveis = ['Recebida', 'Em Análise', 'Respondida', 'Finalizada'];
 foreach ($status_possiveis as $status) {
@@ -22,14 +38,16 @@ foreach ($status_possiveis as $status) {
 
 
 // --- DADOS PARA O GRÁFICO DE LANÇAMENTOS POR SEÇÃO ---
-$stmt_lanc_secao = $pdo->query(
+$stmt_lanc_secao = $pdo->prepare(
     "SELECT p.nome, COUNT(r.id) as total
      FROM registros r
      JOIN portais p ON r.id_portal = p.id
+     WHERE p.id_prefeitura = ?
      GROUP BY p.nome
      ORDER BY total DESC
-     LIMIT 7" // Pega as 7 seções com mais lançamentos
+     LIMIT 7"
 );
+$stmt_lanc_secao->execute([$pref_id]);
 $lancamentos_por_secao = $stmt_lanc_secao->fetchAll(PDO::FETCH_ASSOC);
 
 $page_title_for_header = 'Dashboard'; 
