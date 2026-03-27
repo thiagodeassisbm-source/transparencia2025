@@ -79,9 +79,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Busca os dados atuais do usuário
-$stmt = $pdo->prepare("SELECT id, usuario, nome, id_perfil FROM usuarios_admin WHERE id = ?");
-$stmt->execute([$usuario_id_para_editar]);
+// Busca os dados atuais do usuário (Aplicando Travas SaaS)
+$sql_user = "SELECT id, usuario, nome, id_perfil FROM usuarios_admin WHERE id = ?";
+$params_user = [$usuario_id_para_editar];
+
+if (!$_SESSION['is_superadmin']) {
+    $sql_user .= " AND id_prefeitura = ?";
+    $params_user[] = $_SESSION['id_prefeitura'];
+}
+
+$stmt = $pdo->prepare($sql_user);
+$stmt->execute($params_user);
 $usuario_atual = $stmt->fetch();
 if (!$usuario_atual) { header("Location: dashboard.php"); exit; }
 

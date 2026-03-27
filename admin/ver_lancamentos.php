@@ -8,9 +8,17 @@ if (!$portal_id) { header("Location: index.php"); exit; }
 // Pega o perfil do usuário da sessão para decidir quais botões mostrar
 $perfil_usuario = $_SESSION['admin_user_perfil'];
 
-// Busca informações da seção
-$stmt_portal = $pdo->prepare("SELECT nome FROM portais WHERE id = ?");
-$stmt_portal->execute([$portal_id]);
+// Busca informações da seção (Aplicando Trava SaaS)
+$sql_portal = "SELECT nome FROM portais WHERE id = ?";
+$params_portal = [$portal_id];
+
+if (!$_SESSION['is_superadmin']) {
+    $sql_portal .= " AND id_prefeitura = ?";
+    $params_portal[] = $_SESSION['id_prefeitura'];
+}
+
+$stmt_portal = $pdo->prepare($sql_portal);
+$stmt_portal->execute($params_portal);
 $secao = $stmt_portal->fetch();
 if (!$secao) { header("Location: index.php"); exit; }
 

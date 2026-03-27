@@ -33,8 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_usuario']) && tem
             $erro = "Este nome de usuário já está em uso.";
         } else {
             $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-            $stmt_insert = $pdo->prepare("INSERT INTO usuarios_admin (usuario, nome, senha, id_perfil) VALUES (?, ?, ?, ?)");
-            $stmt_insert->execute([$usuario, $nome, $senha_hash, $id_perfil]);
+            $id_prefeitura = $_SESSION['id_prefeitura'];
+            
+            $stmt_insert = $pdo->prepare("INSERT INTO usuarios_admin (usuario, nome, senha, id_perfil, id_prefeitura) VALUES (?, ?, ?, ?, ?)");
+            $stmt_insert->execute([$usuario, $nome, $senha_hash, $id_perfil, $id_prefeitura]);
             $user_id = $pdo->lastInsertId();
             
             registrar_log($pdo, 'ADIÇÃO', 'usuarios_admin', "Criou novo usuário: $usuario (ID: $user_id)");
@@ -49,13 +51,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_usuario']) && tem
 // Busca os perfis para o select
 $perfis_select = $pdo->query("SELECT id, nome FROM perfis ORDER BY nome ASC")->fetchAll();
 
-// Busca os usuários existentes com os nomes dos perfis
-$usuarios = $pdo->query("
+// Busca os usuários existentes com os nomes dos perfis (Aplicando Filtro SaaS)
+$sql_usuarios = "
     SELECT u.id, u.usuario, u.nome, p.nome as nome_perfil, u.id_perfil 
     FROM usuarios_admin u 
-    LEFT JOIN perfis p ON u.id_perfil = p.id 
-    ORDER BY u.usuario ASC
-")->fetchAll();
+    LEFT JOIN perfis p ON u.id_perfil = p.id
+";
+
+if (!$_SESSION['is_superadmin']) {
+    $sql_usuarios .= " WHERE u.id_prefeitura = :pref_id ";
+}
+$sql_usuarios .= " ORDER BY u.usuario ASC";
+
+$stmt_list = $pdo->prepare($sql_usuarios);
+if (!$_SESSION['is_superadmin']) {
+    $stmt_list->bindValue(':pref_id', $_SESSION['id_prefeitura']);
+}
+$stmt_list->execute();
+$usuarios = $stmt_list->fetchAll();
 
 $page_title_for_header = 'Gerenciar Usuários';
 include 'admin_header.php';
