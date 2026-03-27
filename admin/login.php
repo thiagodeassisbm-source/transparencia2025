@@ -428,7 +428,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="left-side">
                 <div class="brand-container">
                     <div class="brand-logo-wrapper">
-                        <img src="<?php echo htmlspecialchars($logo_prefeitura); ?>" alt="Logo Prefeitura">
+                        <?php if ($id_prefeitura_contexto && !empty($config['prefeitura_logo'])): ?>
+                            <img src="<?php echo htmlspecialchars($logo_prefeitura); ?>" alt="Logo Prefeitura">
+                        <?php else: ?>
+                            <i class="bi bi-bank text-white" style="font-size: 4rem;"></i>
+                        <?php endif; ?>
                     </div>
                     <div class="brand-content">
                         <h1>Realize o seu Login</h1>
