@@ -460,7 +460,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </li>
                         <li class="feature-item" style="animation-delay: 0.5s">
                             <i class="bi bi-check-lg"></i>
-                            Suporte técnico especializado UP GYN
+                            Suporte técnico especializado
                         </li>
                     </ul>
                 </div>
