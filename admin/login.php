@@ -17,11 +17,11 @@ $titulo_portal = $config['prefeitura_titulo'] ?? 'Portal da Transparência';
 
 $erro = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $usuario = $_POST['usuario'];
-    $senha   = $_POST['senha'];
+    $usuario_ou_email = $_POST['usuario'];
+    $senha            = $_POST['senha'];
 
-    $stmt = $pdo->prepare("SELECT id, usuario, nome, senha, perfil, id_perfil FROM usuarios_admin WHERE usuario = ?");
-    $stmt->execute([$usuario]);
+    $stmt = $pdo->prepare("SELECT id, usuario, email, nome, senha, perfil, id_perfil, is_superadmin, id_prefeitura FROM usuarios_admin WHERE usuario = ? OR email = ?");
+    $stmt->execute([$usuario_ou_email, $usuario_ou_email]);
     $user = $stmt->fetch();
 
     if ($user && password_verify($senha, $user['senha'])) {
@@ -31,10 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['admin_user_nome']      = $user['usuario'];
         $_SESSION['admin_user_nome_real'] = $user['nome']; 
         $_SESSION['admin_user_perfil']    = $user['perfil'];
+        $_SESSION['is_superadmin']        = (int)$user['is_superadmin'];
+        $_SESSION['id_prefeitura']        = $user['id_prefeitura'] ?? null;
 
         registrar_log($pdo, 'LOGIN', 'usuarios_admin', "Usuário logou com sucesso.");
 
-        header("Location: dashboard.php");
+        if ($_SESSION['is_superadmin'] === 1) {
+            header("Location: super_dashboard.php");
+        } else {
+            header("Location: dashboard.php");
+        }
         exit;
     } else {
         registrar_log($pdo, 'FALHA-LOGIN', 'usuarios_admin', "Tentativa de login falhou para usuário: $usuario");

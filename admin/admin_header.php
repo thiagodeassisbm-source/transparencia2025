@@ -58,6 +58,17 @@ function isActive($pageName) {
                     </a>
                 </li>
                 <?php endif; ?>
+
+                <?php if (isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1): ?>
+                <li class="mt-4 mb-2">
+                    <span class="text-uppercase small fw-bold px-3 text-warning opacity-75">Administração Global</span>
+                </li>
+                <li>
+                    <a href="super_dashboard.php" class="nav-link text-warning fw-bold border border-warning border-opacity-25 rounded m-2">
+                        <i class="bi bi-shield-lock-fill"></i> Central Super Admin
+                    </a>
+                </li>
+                <?php endif; ?>
             </ul>
 
             <ul>
