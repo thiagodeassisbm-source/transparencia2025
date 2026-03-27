@@ -29,6 +29,7 @@ $sucesso = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_SPECIAL_CHARS);
+    $slug = filter_input(INPUT_POST, 'slug', FILTER_SANITIZE_SPECIAL_CHARS);
     $responsavel_nome = filter_input(INPUT_POST, 'responsavel_nome', FILTER_SANITIZE_SPECIAL_CHARS);
     $responsavel_contato = filter_input(INPUT_POST, 'responsavel_contato', FILTER_SANITIZE_SPECIAL_CHARS);
     $dia_vencimento = filter_input(INPUT_POST, 'dia_vencimento', FILTER_VALIDATE_INT);
@@ -37,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_SPECIAL_CHARS);
 
     try {
-        $stmt_upd = $pdo->prepare("UPDATE prefeituras SET nome = ?, responsavel_nome = ?, responsavel_contato = ?, dia_vencimento = ?, valor_mensalidade = ?, data_contratacao = ?, status = ? WHERE id = ?");
-        $stmt_upd->execute([$nome, $responsavel_nome, $responsavel_contato, $dia_vencimento, $valor_mensalidade, $data_contratacao, $status, $id]);
+        $stmt_upd = $pdo->prepare("UPDATE prefeituras SET nome = ?, slug = ?, responsavel_nome = ?, responsavel_contato = ?, dia_vencimento = ?, valor_mensalidade = ?, data_contratacao = ?, status = ? WHERE id = ?");
+        $stmt_upd->execute([$nome, $slug, $responsavel_nome, $responsavel_contato, $dia_vencimento, $valor_mensalidade, $data_contratacao, $status, $id]);
 
         registrar_log($pdo, 'SUPERADMIN', 'EDITAR_PREFEITURA', "Dados da prefeitura $nome atualizados.");
         $sucesso = "Dados atualizados com sucesso!";
@@ -74,11 +75,18 @@ include 'admin_header.php';
                         <div class="col-12 py-2 border-bottom mb-2">
                             <h6 class="text-primary fw-bold mb-0">1. Informações Cadastrais</h6>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Nome de Identificação (SaaS)</label>
                             <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($pref['nome']); ?>" required>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">Slug (URL Amigável)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">/portal/</span>
+                                <input type="text" name="slug" class="form-control" value="<?php echo htmlspecialchars($pref['slug']); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Status de Acesso</label>
                             <select name="status" class="form-select">
                                 <option value="ativo" <?php echo $pref['status'] == 'ativo' ? 'selected' : ''; ?>>Ativo</option>
