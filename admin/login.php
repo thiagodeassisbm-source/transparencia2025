@@ -121,20 +121,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /* --- LOGIN CARD GLASSMORPHISM --- */
         .login-container {
             width: 100%;
-            max-width: 420px;
-            padding: 20px;
-            perspective: 1000px;
+            max-width: 560px;
+            padding: 30px;
+            perspective: 2000px;
         }
 
         .login-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: rgba(255, 255, 255, 0.85); /* Slightly less translucent for better contrast */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 32px;
+            padding: 50px;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.4);
+            animation: cardEnter 1s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         @keyframes cardEnter {
@@ -148,39 +148,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .login-header i {
-            font-size: 3rem;
-            color: var(--primary-accent);
-            background: rgba(37, 99, 235, 0.1);
-            width: 80px;
-            height: 80px;
+            font-size: 3.5rem;
+            color: white;
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            width: 90px;
+            height: 90px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 20px;
-            margin-bottom: 15px;
+            border-radius: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
         }
 
         .login-header h1 {
-            font-weight: 600;
-            font-size: 1.75rem;
+            font-weight: 700;
+            font-size: 2rem;
             color: #1e293b;
             margin: 0;
+            letter-spacing: -0.5px;
         }
 
         .login-header p {
             color: #64748b;
-            font-size: 0.9rem;
-            margin-top: 5px;
+            font-size: 1rem;
+            margin-top: 8px;
+            font-weight: 400;
         }
 
         /* --- FORM STYLING --- */
         .form-label {
             font-weight: 600;
-            font-size: 0.85rem;
-            color: #475569;
-            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #334155;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
 
         .input-group {
@@ -219,16 +222,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn-login {
-            background: var(--primary-accent);
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             border: none;
-            border-radius: 12px;
-            padding: 14px;
-            font-weight: 600;
+            border-radius: 14px;
+            padding: 16px;
+            font-weight: 700;
             color: white;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
-            margin-top: 10px;
+            margin-top: 15px;
+            letter-spacing: 1px;
         }
 
         .btn-login:hover {
