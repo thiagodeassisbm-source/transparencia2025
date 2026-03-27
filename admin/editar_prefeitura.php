@@ -120,23 +120,29 @@ include 'admin_header.php';
                             <small class="text-muted" style="font-size: 0.65rem;">Ex: transparencia.goiania.go.gov.br</small>
                         </div>
 
-                        <!-- Card de Guia DNS -->
-                        <div class="col-12 mt-2">
-                            <div class="alert alert-light border border-primary-subtle rounded-3 p-3 shadow-sm">
-                                <h6 class="text-primary fw-bold mb-2"><i class="bi bi-info-circle-fill me-2"></i>Como configurar o domínio do cliente:</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-6 border-end">
-                                        <p class="mb-1 small"><strong>Passo 1: DNS no cliente</strong></p>
-                                        <ul class="mb-0 small text-muted ps-3">
-                                            <li>Crie uma entrada <strong>CNAME</strong> apontando para <code>upgyn.com.br</code></li>
-                                            <li>Ou uma entrada <strong>A</strong> apontando para o IP do Servidor.</li>
-                                        </ul>
+                        <!-- Guia Detalhado de Configuração Whitelabel -->
+                        <div class="col-12 mt-3">
+                            <div class="card border-primary-subtle shadow-sm">
+                                <div class="card-header bg-primary-subtle py-2">
+                                    <h6 class="mb-0 text-primary fw-bold small"><i class="bi bi-magic me-2"></i>Como Funciona o Domínio Próprio (Whitelabel)</h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row g-3 small">
+                                        <div class="col-md-4">
+                                            <p class="fw-bold text-dark mb-1"><span class="badge bg-primary me-1">1</span> O que escrever no campo?</p>
+                                            <p class="text-muted mb-0">Digite o endereço final que a cidade vai usar. <br>Exemplo: <code>transparencia.cidade.gov.br</code></p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p class="fw-bold text-dark mb-1"><span class="badge bg-primary me-1">2</span> Lado do Cliente (Eles fazem)</p>
+                                            <p class="text-muted mb-0">O técnico da prefeitura deve ir no painel de DNS (Registro.br) e criar um <strong>CNAME</strong> apontando para o <strong>endereço do nosso sistema</strong>.</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p class="fw-bold text-dark mb-1"><span class="badge bg-primary me-1">3</span> Lado do Servidor (Você faz)</p>
+                                            <p class="text-muted mb-0">No seu painel de Hospedagem, adicione este domínio como um <strong>Alias</strong> ou <strong>Domínio Estacionado</strong> apontando para esta instalação.</p>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <p class="mb-1 small"><strong>Passo 2: No nosso Servidor (Hostinger)</strong></p>
-                                        <ul class="mb-0 small text-muted ps-3">
-                                            <li>Adicione este domínio como um <strong>Alias</strong> ou <strong>Domínio Adicional</strong> no painel de controle para que o servidor reconheça o acesso.</li>
-                                        </ul>
+                                    <div class="mt-3 p-2 bg-light rounded text-center small text-primary">
+                                        <i class="bi bi-info-circle-fill me-1"></i> Com estes 3 passos, o servidor reconhecerá quem está chegando e mostrará o portal correto automaticamente!
                                     </div>
                                 </div>
                             </div>
