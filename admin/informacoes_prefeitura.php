@@ -9,14 +9,16 @@ if ($_SESSION['admin_user_perfil'] !== 'admin') {
 }
 
 // Lógica para salvar as configurações
+$id_prefeitura = $_SESSION['id_prefeitura'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $configuracoes = $_POST['config'];
     
-    // Preparar prepared statement robusto (Insert ou Update)
-    $stmt = $pdo->prepare("INSERT INTO configuracoes (chave, valor) VALUES (?, ?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)");
+    // Preparar prepared statement robusto (Insert ou Update por Prefeitura)
+    $stmt = $pdo->prepare("INSERT INTO configuracoes (chave, valor, id_prefeitura) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)");
     
     foreach ($configuracoes as $chave => $valor) {
-        $stmt->execute([$chave, trim($valor)]);
+        $stmt->execute([$chave, trim($valor), $id_prefeitura]);
     }
 
     // Lógica para o upload do logo
@@ -34,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $caminho_destino = $upload_dir . $nome_arquivo;
         
         if (move_uploaded_file($_FILES['logo']['tmp_name'], $caminho_destino)) {
-            $stmt->execute(['prefeitura_logo', $caminho_destino]);
+            $stmt->execute(['prefeitura_logo', $caminho_destino, $id_prefeitura]);
         }
     }
 
@@ -45,8 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Busca as configurações atuais do banco para preencher o formulário
-$stmt = $pdo->query("SELECT chave, valor FROM configuracoes WHERE chave LIKE 'prefeitura_%'");
+// Busca as configurações atuais do banco para preencher o formulário (Filtrado por Prefeitura)
+$stmt = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE id_prefeitura = ? AND chave LIKE 'prefeitura_%'");
+$stmt->execute([$id_prefeitura]);
 $config_atuais = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
 // Valores padrão se não existirem

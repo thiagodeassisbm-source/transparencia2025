@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dia_vencimento = filter_input(INPUT_POST, 'dia_vencimento', FILTER_VALIDATE_INT);
     $valor_mensalidade = filter_input(INPUT_POST, 'valor_mensalidade', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     $data_contratacao = filter_input(INPUT_POST, 'data_contratacao', FILTER_SANITIZE_SPECIAL_CHARS);
+    $dominio_customizado = filter_input(INPUT_POST, 'dominio_customizado', FILTER_SANITIZE_URL);
     
     // Dados do Usuário Admin da Prefeitura
     $admin_user = filter_input(INPUT_POST, 'admin_user', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -37,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->beginTransaction();
 
         // 1. Cria a Prefeitura
-        $stmt = $pdo->prepare("INSERT INTO prefeituras (nome, slug, responsavel_nome, responsavel_contato, dia_vencimento, valor_mensalidade, data_contratacao) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$nome, $slug, $responsavel_nome, $responsavel_contato, $dia_vencimento, $valor_mensalidade, $data_contratacao]);
+        $stmt = $pdo->prepare("INSERT INTO prefeituras (nome, slug, responsavel_nome, responsavel_contato, dia_vencimento, valor_mensalidade, data_contratacao, dominio_customizado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$nome, $slug, $responsavel_nome, $responsavel_contato, $dia_vencimento, $valor_mensalidade, $data_contratacao, $dominio_customizado]);
         $id_prefeitura = $pdo->lastInsertId();
 
         // 2. Cria o Usuário Admin Local
@@ -93,12 +94,20 @@ include 'admin_header.php';
                             <label class="form-label small fw-bold text-muted">Nome da Prefeitura</label>
                             <input type="text" name="nome" class="form-control" placeholder="Ex: Prefeitura de Goiânia" required>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Slug (URL Amigável)</label>
-                            <div class="input-group">
+                            <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light">/portal/</span>
                                 <input type="text" name="slug" class="form-control" placeholder="goiania" required>
                             </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">Domínio Customizado (Whitelabel)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light"><i class="bi bi-globe"></i></span>
+                                <input type="text" name="dominio_customizado" class="form-control" placeholder="ex: transparencia.goiania.go.gov.br">
+                            </div>
+                            <small class="text-muted" style="font-size: 0.65rem;">Opcional. Exemplo: transparencia.cidade.com.br</small>
                         </div>
 
                         <!-- SEÇÃO 2: DADOS DE COBRANÇA -->

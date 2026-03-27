@@ -40,11 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dia_vencimento = filter_input(INPUT_POST, 'dia_vencimento', FILTER_VALIDATE_INT);
     $valor_mensalidade = filter_input(INPUT_POST, 'valor_mensalidade', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     $data_contratacao = filter_input(INPUT_POST, 'data_contratacao', FILTER_SANITIZE_SPECIAL_CHARS);
+    $data_contratacao = filter_input(INPUT_POST, 'data_contratacao', FILTER_SANITIZE_SPECIAL_CHARS);
     $status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_SPECIAL_CHARS);
+    $dominio_customizado = filter_input(INPUT_POST, 'dominio_customizado', FILTER_SANITIZE_URL);
 
     try {
-        $stmt_upd = $pdo->prepare("UPDATE prefeituras SET nome = ?, slug = ?, responsavel_nome = ?, responsavel_contato = ?, dia_vencimento = ?, valor_mensalidade = ?, data_contratacao = ?, status = ? WHERE id = ?");
-        $stmt_upd->execute([$nome, $slug, $responsavel_nome, $responsavel_contato, $dia_vencimento, $valor_mensalidade, $data_contratacao, $status, $id]);
+        $stmt_upd = $pdo->prepare("UPDATE prefeituras SET nome = ?, slug = ?, responsavel_nome = ?, responsavel_contato = ?, dia_vencimento = ?, valor_mensalidade = ?, data_contratacao = ?, status = ?, dominio_customizado = ? WHERE id = ?");
+        $stmt_upd->execute([$nome, $slug, $responsavel_nome, $responsavel_contato, $dia_vencimento, $valor_mensalidade, $data_contratacao, $status, $dominio_customizado, $id]);
 
         // Atualizar Usuário Admin se necessário
         $new_admin_user = filter_input(INPUT_POST, 'admin_user', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -102,12 +104,20 @@ include 'admin_header.php';
                             <label class="form-label small fw-bold text-muted">Nome de Identificação (SaaS)</label>
                             <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($pref['nome']); ?>" required>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">Slug (URL Amigável)</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light">/portal/</span>
                                 <input type="text" name="slug" class="form-control" value="<?php echo htmlspecialchars($pref['slug']); ?>" required>
                             </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted">Domínio Customizado</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-globe"></i></span>
+                                <input type="text" name="dominio_customizado" class="form-control" value="<?php echo htmlspecialchars($pref['dominio_customizado'] ?? ''); ?>">
+                            </div>
+                            <small class="text-muted" style="font-size: 0.65rem;">Ex: transparencia.goiania.go.gov.br</small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Status de Acesso</label>

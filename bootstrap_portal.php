@@ -30,7 +30,8 @@ $id_prefeitura_ativa = $prefeitura_ativa['id'];
 $nome_prefeitura_ativa = $prefeitura_ativa['nome'];
 $slug_prefeitura_ativa = $prefeitura_ativa['slug'];
 
-// 6. Atualiza a URL base para as páginas públicas (opcional, para garantir links corretos)
-// A URL base agora deve levar em conta o contexto do portal/slug
-$base_portal_url = $base_url . "portal/" . $slug_prefeitura_ativa . "/";
+// 6. Atualiza a URL base para as páginas públicas (Inteligente para Whitelabel)
+// Se for um domínio customizado, a base é a raiz. Se for via UP GYN, a base é /portal/slug/
+$is_custom_domain = ($domain != 'www.upgyn.com.br' && $domain != 'upgyn.com.br');
+$base_portal_url = $is_custom_domain ? $base_url : ($base_url . "portal/" . $slug_prefeitura_ativa . "/");
 ?>
