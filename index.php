@@ -22,6 +22,8 @@ if (empty($categoria_id) && !empty($categoria_slug)) {
 
 $ordem_atual = $_GET['sort'] ?? 'padrao';
 
+$sql_base = "FROM cards_informativos c LEFT JOIN portais p ON c.id_secao = p.id";
+
 // Filtro por Prefeitura (Obrigatório no SaaS)
 $sql_where = " WHERE p.id_prefeitura = ?";
 $params_where[] = $id_prefeitura_ativa;
