@@ -190,7 +190,7 @@ body {
     padding: 0 2rem;
     position: sticky;
     top: 0;
-    z-index: 900;
+    z-index: 1050; /* Aumentado para ficar acima de tudo */
 }
 
 .topbar-left h1 {
@@ -522,6 +522,7 @@ body {
 .dropdown-menu {
     border-radius: 12px !important;
     padding: 0.5rem !important;
+    z-index: 1100 !important; /* Garante que o menu flutue sobre as abas e cards */
 }
 .dropdown-item {
     border-radius: 8px !important;

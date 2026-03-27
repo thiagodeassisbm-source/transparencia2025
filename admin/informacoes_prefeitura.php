@@ -247,7 +247,6 @@ include 'admin_header.php';
     </div></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function syncColor(source, type) {
     const picker = document.getElementById('picker_' + type);
@@ -270,8 +269,3 @@ function syncColor(source, type) {
 </script>
 
 <?php include 'admin_footer.php'; ?>
-</body>
-</html>
->
-</body>
-</html>
