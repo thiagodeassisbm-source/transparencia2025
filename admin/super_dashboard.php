@@ -12,11 +12,16 @@ if (!isset($_SESSION['is_superadmin']) || $_SESSION['is_superadmin'] !== 1) {
 $total_clientes = $pdo->query("SELECT COUNT(*) FROM prefeituras")->fetchColumn();
 $receita_mensal = $pdo->query("SELECT SUM(valor_mensalidade) FROM prefeituras WHERE status = 'ativo'")->fetchColumn() ?: 0;
 
-// 2. Busca lista de prefeituras
-$stmt = $pdo->query("SELECT * FROM prefeituras ORDER BY criado_em DESC");
+// 2. Busca lista de prefeituras com o título configurado se existir
+$stmt = $pdo->query("
+    SELECT p.*, 
+    (SELECT valor FROM configuracoes WHERE chave = 'prefeitura_titulo' AND id_prefeitura = p.id LIMIT 1) as titulo_config 
+    FROM prefeituras p 
+    ORDER BY p.criado_em DESC
+");
 $prefeituras = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$page_title_for_header = 'Central Gestora SaaS';
+$page_title_for_header = 'Gestão de Prefeituras SaaS';
 include 'admin_header.php';
 ?>
 
@@ -61,8 +66,8 @@ include 'admin_header.php';
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
             <div>
-                <h5 class="mb-0 fw-bold text-dark">Gestão de Clientes</h5>
-                <p class="text-muted small mb-0">Controle de contratos e dados financeiros</p>
+                <h5 class="mb-0 fw-bold text-dark">Gestão de Prefeituras</h5>
+                <p class="text-muted small mb-0">Controle de contratos e dados financeiros por município</p>
             </div>
         </div>
         <div class="card-body p-0">
@@ -74,7 +79,7 @@ include 'admin_header.php';
                             <th class="py-3 text-muted small text-uppercase">Contrato / Venc.</th>
                             <th class="py-3 text-muted small text-uppercase">Valor Mensal</th>
                             <th class="py-3 text-muted small text-uppercase text-center">Status</th>
-                            <th class="py-3 text-muted small text-uppercase text-end pe-4">Ações de Gestão</th>
+                            <th class="py-3 text-muted small text-uppercase text-center pe-4" style="width: 220px;">Ações de Gestão</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -86,7 +91,13 @@ include 'admin_header.php';
                                         <i class="bi bi-building text-primary"></i>
                                     </div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($pref['nome']); ?></h6>
+                                        <?php 
+                                            $exibir_nome = $pref['titulo_config'] ?: $pref['nome'];
+                                            if (stripos($exibir_nome, 'Prefeitura') === false) {
+                                                $exibir_nome = 'Prefeitura de ' . $exibir_nome;
+                                            }
+                                        ?>
+                                        <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($exibir_nome); ?></h6>
                                         <span class="text-muted small">Resp: <?php echo htmlspecialchars($pref['responsavel_nome'] ?? '---'); ?> (<?php echo htmlspecialchars($pref['responsavel_contato'] ?? '---'); ?>)</span>
                                     </div>
                                 </div>
@@ -102,24 +113,26 @@ include 'admin_header.php';
                                 <?php if ($pref['status'] == 'ativo'): ?>
                                     <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 border border-success-subtle">ATIVO</span>
                                 <?php elseif ($pref['status'] == 'pendente_pagamento'): ?>
-                                    <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2 border border-warning-subtle">PAGAMENTO PENDENTE</span>
+                                    <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2 border border-warning-subtle">PENDENTE</span>
                                 <?php else: ?>
                                     <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2 border border-danger-subtle">SUSPENSO</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="text-end pe-4">
+                            <td class="text-center pe-4">
                                 <div class="btn-group shadow-sm rounded-pill overflow-hidden bg-white border">
                                     <a href="switch_pref.php?id=<?php echo $pref['id']; ?>" class="btn btn-white btn-sm px-3" title="Auditória Direta">
-                                        <i class="bi bi-search text-primary me-2"></i> Auditória
+                                        <i class="bi bi-search text-primary"></i>
                                     </a>
-                                    <div class="vr mx-0"></div>
+                                    <a href="editar_prefeitura.php?id=<?php echo $pref['id']; ?>" class="btn btn-white btn-sm px-3 border-start">
+                                        <i class="bi bi-pencil-square text-dark"></i>
+                                    </a>
                                     <?php if ($pref['status'] == 'ativo'): ?>
-                                        <a href="alterar_status_pref.php?id=<?php echo $pref['id']; ?>&status=suspenso" class="btn btn-white btn-sm px-3" onclick="return confirm('Confirmar suspensão de acesso?')">
-                                            <i class="bi bi-lock-fill text-danger me-2"></i> Bloquear
+                                        <a href="alterar_status_pref.php?id=<?php echo $pref['id']; ?>&status=suspenso" class="btn btn-white btn-sm px-3 border-start" onclick="return confirm('Confirmar suspensão de acesso?')" title="Bloquear">
+                                            <i class="bi bi-lock-fill text-danger"></i>
                                         </a>
                                     <?php else: ?>
-                                        <a href="alterar_status_pref.php?id=<?php echo $pref['id']; ?>&status=ativo" class="btn btn-white btn-sm px-3">
-                                            <i class="bi bi-unlock-fill text-success me-2"></i> Desbloquear
+                                        <a href="alterar_status_pref.php?id=<?php echo $pref['id']; ?>&status=ativo" class="btn btn-white btn-sm px-3 border-start" title="Desbloquear">
+                                            <i class="bi bi-unlock-fill text-success"></i>
                                         </a>
                                     <?php endif; ?>
                                 </div>
