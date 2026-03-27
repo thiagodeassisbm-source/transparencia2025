@@ -98,6 +98,35 @@ $pagina_sistema_atual = $is_pagina_sistema ? $card['link_url'] : '';
     <title>Editar Card - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
+    <script>
+        function forcarSalvamento() {
+            console.log(">>> [DEBUG] Botão Clicado. Iniciando Forçar Salvamento...");
+            const form = document.getElementById('form_editar_card');
+            if (!form) {
+                alert("Erro Fatal: Formulário 'form_editar_card' não encontrado!");
+                return;
+            }
+
+            // Checar se há campos inválidos (mesmo que ocultos)
+            let invalidos = [];
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(i => {
+                if (!i.checkValidity()) {
+                    invalidos.push(`${i.name || i.id}: ${i.validationMessage} (${i.offsetParent ? 'Visível' : 'Oculto'})`);
+                }
+            });
+
+            if (invalidos.length > 0) {
+                console.warn(">>> [DEBUG] O navegador reportou campos inválidos:", invalidos);
+                if (!confirm("O navegador encontrou campos que ele considera inválidos:\n\n" + invalidos.join("\n") + "\n\nDeseja forçar o envio mesmo assim?")) {
+                    return;
+                }
+            }
+
+            console.log(">>> [DEBUG] Enviando formulário agora...");
+            form.submit();
+        }
+    </script>
 </head>
 <body class="bg-light-subtle">
 <?php 
@@ -212,7 +241,7 @@ include 'admin_header.php';
                     </select>
                 </div>
                 <input type="hidden" name="caminho_icone_antigo" value="<?php echo htmlspecialchars($card['caminho_icone']); ?>">
-                <div class="mt-4"><button type="submit" class="btn btn-primary">Salvar Alterações</button><a href="gerenciar_cards.php" class="btn btn-secondary">Cancelar</a></div>
+                <div class="mt-4"><button type="button" class="btn btn-primary" onclick="forcarSalvamento()">Salvar Alterações</button><a href="gerenciar_cards.php" class="btn btn-secondary">Cancelar</a></div>
             </form>
         </div>
     </div>
