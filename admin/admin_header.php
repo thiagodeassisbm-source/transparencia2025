@@ -60,19 +60,20 @@ function isActive($pageName) {
                 <ul>
                     <li>
                         <a href="super_dashboard.php" class="nav-link <?php echo isActive('super_dashboard.php'); ?>">
-                            <i class="bi bi-buildings"></i> Central de Gestão
+                            <i class="bi bi-buildings"></i> Central de Inteligência
                         </a>
                     </li>
                     <li class="mt-3 px-3 mb-2 small text-muted text-uppercase fw-bold">Gestão SaaS</li>
                     <li>
-                        <?php $cad_active = isActive(['cadastrar_prefeitura.php']); ?>
+                        <?php $cad_active = isActive(['gerenciar_prefeituras.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php']); ?>
                         <a href="#collapseSuperCad" class="nav-link has-submenu <?php echo $cad_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
-                            <span><i class="bi bi-plus-circle"></i> Cadastrar</span>
+                            <span><i class="bi bi-plus-circle"></i> Gerenciar</span>
                             <i class="bi bi-chevron-down submenu-arrow"></i>
                         </a>
                         <div class="collapse <?php echo $cad_active ? 'show' : ''; ?>" id="collapseSuperCad">
                             <ul class="submenu">
-                                <li><a href="cadastrar_prefeitura.php" class="nav-link <?php echo isActive('cadastrar_prefeitura.php'); ?>">Prefeituras</a></li>
+                                <li><a href="gerenciar_prefeituras.php" class="nav-link <?php echo isActive(['gerenciar_prefeituras.php', 'editar_prefeitura.php']); ?>">Prefeituras</a></li>
+                                <li><a href="cadastrar_prefeitura.php" class="nav-link <?php echo isActive('cadastrar_prefeitura.php'); ?>">Nova Prefeitura</a></li>
                             </ul>
                         </div>
                     </li>
