@@ -54,24 +54,19 @@ function isActive($pageName) {
                 <!-- MENU EXCLUSIVO SUPER ADMIN (VISÃO GLOBAL) -->
                 <ul>
                     <li>
-                        <a href="super_dashboard.php" class="nav-link active">
+                        <a href="super_dashboard.php" class="nav-link <?php echo isActive('super_dashboard.php'); ?>">
                             <i class="bi bi-buildings"></i> Central de Clientes
                         </a>
                     </li>
-                    <li class="mt-3 px-3 mb-2 small text-muted text-uppercase fw-bold">Plataforma</li>
+                    <li class="mt-3 px-3 mb-2 small text-muted text-uppercase fw-bold">Auditória SaaS</li>
                     <li>
-                        <a href="gerenciar_usuarios.php" class="nav-link">
-                            <i class="bi bi-people"></i> Admins do Sistema
-                        </a>
-                    </li>
-                    <li>
-                        <a href="logs_gerais.php" class="nav-link">
-                            <i class="bi bi-activity"></i> Logs da Plataforma
+                        <a href="super_logs.php" class="nav-link <?php echo isActive('super_logs.php'); ?>">
+                            <i class="bi bi-activity"></i> Auditoria Global
                         </a>
                     </li>
                     <li class="mt-4">
                         <a href="logout.php" class="nav-link text-danger">
-                            <i class="bi bi-box-arrow-left"></i> Sair do Sistema
+                            <i class="bi bi-box-arrow-left"></i> Sair da Central
                         </a>
                     </li>
                 </ul>
