@@ -28,7 +28,7 @@ include 'admin_header.php';
 <div class="super-dashboard px-4">
     <!-- Header com Stats -->
     <div class="row mb-5 g-4 mt-2">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 bg-white">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="flex-shrink-0 bg-primary bg-opacity-10 p-3 rounded-4 me-4">
@@ -41,7 +41,7 @@ include 'admin_header.php';
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 bg-white">
                 <div class="card-body p-4 d-flex align-items-center">
                     <div class="flex-shrink-0 bg-success bg-opacity-10 p-3 rounded-4 me-4">
@@ -53,12 +53,6 @@ include 'admin_header.php';
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 text-center">
-            <a href="cadastrar_prefeitura.php" class="btn btn-primary btn-lg rounded-pill h-100 d-flex flex-column justify-content-center align-items-center w-100 border-0 shadow" style="background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);">
-                <i class="bi bi-plus-circle-fill fs-2 mb-2"></i>
-                <span class="fw-bold">Novo Cliente / Prefeitura</span>
-            </a>
         </div>
     </div>
 
