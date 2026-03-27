@@ -117,7 +117,7 @@ include 'admin_header.php';
     <div class="card">
         <div class="card-header"><h4>Formulário de Edição de Card</h4></div>
         <div class="card-body">
-            <form method="POST" action="editar_card.php?id=<?php echo $card_id; ?>" enctype="multipart/form-data">
+            <form id="form_editar_card" method="POST" action="editar_card.php?id=<?php echo $card_id; ?>" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-6 mb-3"><label for="titulo" class="form-label">Título Principal</label><input type="text" class="form-control" id="titulo" name="titulo" value="<?php echo htmlspecialchars($card['titulo']); ?>" required></div>
                     <div class="col-md-6 mb-3"><label for="subtitulo" class="form-label">Subtítulo</label><input type="text" class="form-control" id="subtitulo" name="subtitulo" value="<?php echo htmlspecialchars($card['subtitulo']); ?>" required></div>
@@ -287,6 +287,46 @@ document.addEventListener('DOMContentLoaded', function () {
     inputBootstrap.addEventListener('input', (e) => {
         const val = e.target.value.trim();
         previewBI.className = 'bi ' + (val || 'bi-info-circle');
+    });
+
+    // --- DEBUG SCRIPT PARA IDENTIFICAR O BLOQUEIO ---
+    const form = document.getElementById('form_editar_card');
+    form.addEventListener('submit', function(e) {
+        console.log(">>> Tentando enviar formulário...");
+        
+        let invalidFields = [];
+        const inputs = form.querySelectorAll('input, select, textarea');
+        
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                invalidFields.push({
+                    name: input.name,
+                    id: input.id,
+                    type: input.type,
+                    value: input.value,
+                    required: input.required,
+                    visible: input.offsetParent !== null,
+                    error: input.validationMessage
+                });
+            }
+        });
+
+        if (invalidFields.length > 0) {
+            console.error(">>> BLOQUEADO: Campos inválidos encontrados:", invalidFields);
+            let msg = "O envio foi bloqueado pelo navegador devido aos seguintes campos:\n\n";
+            invalidFields.forEach(f => {
+                msg += `- Champo: ${f.name || f.id} (${f.visible ? 'Visível' : 'OCULTO!'})\n  Erro: ${f.error}\n\n`;
+            });
+            alert(msg);
+            e.preventDefault(); // Impede o envio se houver erro visível para nós no debug
+        } else {
+            console.log(">>> Sucesso na validação. Enviando dados via POST!");
+            // Logar os dados que estão sendo enviados para conferência no console
+            const formData = new FormData(form);
+            for (let [key, value] of formData.entries()) {
+                console.log(`- ${key}:`, value instanceof File ? value.name : value);
+            }
+        }
     });
 
     // Forçar estado inicial correto dos ícones
