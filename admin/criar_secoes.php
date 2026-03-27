@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 // Apenas admins podem acessar
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
@@ -77,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt_card = $pdo->prepare("INSERT INTO cards_informativos (id_categoria, id_secao, link_url, titulo, subtitulo, caminho_icone, tipo_icone, ordem) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt_card->execute([$id_categoria, $id_secao, $link_url, $card_titulo, $card_subtitulo, $caminho_icone, $tipo_icone, $card_ordem]);
+        $card_new_id = $pdo->lastInsertId();
+        
+        registrar_log($pdo, 'ADIÇÃO', 'cards_informativos', "Criou novo card: $card_titulo (ID: $card_new_id)");
         
         $pdo->commit();
         $_SESSION['mensagem_sucesso'] = "Card criado com sucesso!";
