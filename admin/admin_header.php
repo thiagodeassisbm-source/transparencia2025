@@ -50,7 +50,12 @@ function isActive($pageName) {
             <h2>Painel de controle</h2>
         </div>
         <nav class="sidebar-nav">
-            <?php if (basename($_SERVER['PHP_SELF']) == 'super_dashboard.php' && isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1): ?>
+            <?php 
+            $super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'switch_pref.php', 'alterar_status_pref.php'];
+            $is_super_context = in_array(basename($_SERVER['PHP_SELF']), $super_pages);
+            
+            if ($is_super_context && isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1): 
+            ?>
                 <!-- MENU EXCLUSIVO SUPER ADMIN (VISÃO GLOBAL) -->
                 <ul>
                     <li>
