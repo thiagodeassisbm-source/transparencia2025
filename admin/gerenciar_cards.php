@@ -70,7 +70,13 @@ include 'admin_header.php';
                             <tr>
                                 <td><?php echo htmlspecialchars($card['ordem']); ?></td>
                                 <td>
-                                    <img src="<?php echo htmlspecialchars($card['caminho_icone']); ?>" alt="Ícone" style="width: 40px; height: 40px; object-fit: contain;">
+                                    <?php if (($card['tipo_icone'] ?? 'imagem') === 'bootstrap'): ?>
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="bi <?php echo htmlspecialchars($card['caminho_icone']); ?> text-primary fs-5"></i>
+                                        </div>
+                                    <?php else: ?>
+                                        <img src="<?php echo htmlspecialchars($card['caminho_icone']); ?>" alt="Ícone" style="width: 40px; height: 40px; object-fit: contain;">
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <?php echo htmlspecialchars($card['titulo']); ?><br>

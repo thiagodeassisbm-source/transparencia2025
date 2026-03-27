@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $subtitulo = trim($_POST['subtitulo']);
         $ordem = (int)$_POST['ordem'];
         $caminho_icone_antigo = $_POST['caminho_icone_antigo'];
+        $tipo_icone = $_POST['tipo_icone'] ?? 'imagem'; // 'imagem' ou 'bootstrap'
         $caminho_icone_final = $caminho_icone_antigo;
 
         if (empty($id_categoria)) { $id_categoria = null; }
@@ -48,17 +49,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty($id_secao)) { $id_secao = null; }
         }
 
-        if (isset($_FILES['icone_upload']) && $_FILES['icone_upload']['error'] === UPLOAD_ERR_OK) {
-            if (!empty($caminho_icone_antigo) && file_exists($caminho_icone_antigo)) { unlink($caminho_icone_antigo); }
-            $upload_dir = '../uploads/';
-            $nome_arquivo = 'card-' . uniqid() . '-' . basename($_FILES['icone_upload']['name']);
-            $caminho_destino = $upload_dir . $nome_arquivo;
-            move_uploaded_file($_FILES['icone_upload']['tmp_name'], $caminho_destino);
-            $caminho_icone_final = $caminho_destino;
+        if ($tipo_icone === 'imagem') {
+            if (isset($_FILES['icone_upload']) && $_FILES['icone_upload']['error'] === UPLOAD_ERR_OK) {
+                if (!empty($caminho_icone_antigo) && file_exists($caminho_icone_antigo)) { unlink($caminho_icone_antigo); }
+                $upload_dir = '../uploads/';
+                $nome_arquivo = 'card-' . uniqid() . '-' . basename($_FILES['icone_upload']['name']);
+                $caminho_destino = $upload_dir . $nome_arquivo;
+                move_uploaded_file($_FILES['icone_upload']['tmp_name'], $caminho_destino);
+                $caminho_icone_final = $caminho_destino;
+            }
+        } else {
+            $caminho_icone_final = trim($_POST['icone_bootstrap'] ?? 'bi-info-circle');
         }
         
-        $stmt = $pdo->prepare("UPDATE cards_informativos SET id_categoria = ?, id_secao = ?, link_url = ?, titulo = ?, subtitulo = ?, caminho_icone = ?, ordem = ? WHERE id = ?");
-        $stmt->execute([$id_categoria, $id_secao, $link_url, $titulo, $subtitulo, $caminho_icone_final, $ordem, $card_id]);
+        $stmt = $pdo->prepare("UPDATE cards_informativos SET id_categoria = ?, id_secao = ?, link_url = ?, titulo = ?, subtitulo = ?, caminho_icone = ?, tipo_icone = ?, ordem = ? WHERE id = ?");
+        $stmt->execute([$id_categoria, $id_secao, $link_url, $titulo, $subtitulo, $caminho_icone_final, $tipo_icone, $ordem, $card_id]);
         
         $pdo->commit();
         $_SESSION['mensagem_sucesso'] = "Card atualizado com sucesso!";
@@ -110,8 +115,48 @@ include 'admin_header.php';
                     <div class="col-md-6 mb-3"><label for="subtitulo" class="form-label">Subtítulo</label><input type="text" class="form-control" id="subtitulo" name="subtitulo" value="<?php echo htmlspecialchars($card['subtitulo']); ?>" required></div>
                     <div class="col-md-6 mb-3"><label for="id_categoria" class="form-label">Categoria do Card</label><select class="form-select" id="id_categoria" name="id_categoria"><option value="">-- Sem Categoria --</option><?php foreach ($categorias as $categoria): ?><option value="<?php echo $categoria['id']; ?>" <?php echo ($categoria['id'] == $card['id_categoria']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($categoria['nome']); ?></option><?php endforeach; ?></select></div>
                     <div class="col-md-6 mb-3"><label for="ordem" class="form-label">Ordem de Exibição</label><input type="number" class="form-control" id="ordem" name="ordem" value="<?php echo htmlspecialchars($card['ordem']); ?>"></div>
-                    <div class="col-md-6 mb-3"><label for="card_icone" class="form-label">Enviar Novo Ícone (Opcional)</label><input type="file" class="form-control" id="card_icone" name="icone_upload" accept="image/*"></div>
-                    <div class="col-md-6 mb-3"><label class="form-label">Ícone Atual</label><br><img src="<?php echo htmlspecialchars($card['caminho_icone']); ?>" alt="Ícone atual" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: contain;"></div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Tipo de Ícone</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tipo_icone" id="tipo_imagem" value="imagem" <?php echo ($card['tipo_icone'] ?? 'imagem') === 'imagem' ? 'checked' : ''; ?>>
+                                <label class="form-check-label" for="tipo_imagem">Imagem (Upload)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tipo_icone" id="tipo_bootstrap" value="bootstrap" <?php echo ($card['tipo_icone'] ?? 'imagem') === 'bootstrap' ? 'checked' : ''; ?>>
+                                <label class="form-check-label" for="tipo_bootstrap">Ícone do Sistema (Bootstrap)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row align-items-end">
+                    <div class="col-md-6 mb-3" id="campo_upload_icone" style="display: <?php echo ($card['tipo_icone'] ?? 'imagem') === 'imagem' ? 'block' : 'none'; ?>;">
+                        <label for="card_icone" class="form-label">Enviar Novo Ícone (Opcional)</label>
+                        <input type="file" class="form-control" id="card_icone" name="icone_upload" accept="image/*">
+                        <?php if (($card['tipo_icone'] ?? 'imagem') === 'imagem'): ?>
+                            <small class="text-muted">Ícone Atual: <?php echo basename($card['caminho_icone']); ?></small>
+                        <?php endif; ?>
+                    </div>
+                    <div class="col-md-6 mb-3" id="campo_bootstrap_icone" style="display: <?php echo ($card['tipo_icone'] ?? 'imagem') === 'bootstrap' ? 'block' : 'none'; ?>;">
+                        <label for="icone_bootstrap" class="form-label">Classe do Ícone Bootstrap (ex: bi-gear)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi <?php echo ($card['tipo_icone'] ?? 'imagem') === 'bootstrap' ? $card['caminho_icone'] : 'bi-info-circle'; ?>" id="preview_bi"></i></span>
+                            <input type="text" class="form-control" id="icone_bootstrap" name="icone_bootstrap" value="<?php echo ($card['tipo_icone'] ?? 'imagem') === 'bootstrap' ? htmlspecialchars($card['caminho_icone']) : ''; ?>" placeholder="bi-star">
+                        </div>
+                        <small class="text-muted"><a href="https://icons.getbootstrap.com/" target="_blank">Ver catálogo de ícones</a></small>
+                    </div>
+                    <div class="col-md-6 mb-3 text-center">
+                        <label class="form-label d-block text-start">Visualização Atual</label>
+                        <div class="p-3 border rounded bg-white d-inline-block shadow-sm" id="icon_display_preview">
+                            <?php if (($card['tipo_icone'] ?? 'imagem') === 'imagem' && !empty($card['caminho_icone'])): ?>
+                                <img src="<?php echo htmlspecialchars($card['caminho_icone']); ?>" alt="Ícone atual" style="width: 50px; height: 50px; object-fit: contain;">
+                            <?php elseif (($card['tipo_icone'] ?? 'imagem') === 'bootstrap' && !empty($card['caminho_icone'])): ?>
+                                <i class="bi <?php echo $card['caminho_icone']; ?>" style="font-size: 2.5rem; color: var(--primary-color);"></i>
+                            <?php else: ?>
+                                <span class="text-muted">Nenhum</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
                 <hr>
                 <p class="fw-bold">Tipo de Link do Card:</p>
@@ -210,6 +255,31 @@ document.addEventListener('DOMContentLoaded', function () {
     switchExterno.addEventListener('change', updateFormState);
 
     updateFormState(); // Inicializa o formulário no estado correto
+
+    // Lógica para Troca de Tipo de Ícone
+    const radioImagem = document.getElementById('tipo_imagem');
+    const radioBootstrap = document.getElementById('tipo_bootstrap');
+    const fieldUpload = document.getElementById('campo_upload_icone');
+    const fieldBootstrap = document.getElementById('campo_bootstrap_icone');
+    const inputBootstrap = document.getElementById('icone_bootstrap');
+    const previewBI = document.getElementById('preview_bi');
+
+    radioImagem.addEventListener('change', () => {
+        fieldUpload.style.display = 'block';
+        fieldBootstrap.style.display = 'none';
+        inputBootstrap.required = false;
+    });
+
+    radioBootstrap.addEventListener('change', () => {
+        fieldUpload.style.display = 'none';
+        fieldBootstrap.style.display = 'block';
+        inputBootstrap.required = true;
+    });
+
+    inputBootstrap.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        previewBI.className = 'bi ' + (val || 'bi-info-circle');
+    });
 });
 </script>
 </body>

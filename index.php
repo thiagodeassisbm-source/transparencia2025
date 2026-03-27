@@ -40,7 +40,7 @@ $total_paginas = ceil($total_itens / $itens_por_pagina);
 // --- 4. BUSCA DOS ITENS DA PÁGINA ATUAL ---
 // ATUALIZAÇÃO: Favoritos são baseados em cookie ou na tabela favoritos_usuarios se desejar. 
 // Mantendo a lógica de favoritos_usuarios via IP para consistência com o anterior.
-$sql_select = "SELECT c.id, c.titulo, c.subtitulo, c.caminho_icone, c.link_url, p.slug,
+$sql_select = "SELECT c.id, c.titulo, c.subtitulo, c.caminho_icone, c.tipo_icone, c.link_url, p.slug,
                (SELECT COUNT(*) FROM favoritos_usuarios fu WHERE fu.id_card = c.id AND fu.ip_usuario = ?) as favorito ";
 
 $sql_order = "";
@@ -122,7 +122,15 @@ include 'header_publico.php';
                         <div class="info-card border-0 shadow-sm">
                             <div class="icon-container position-relative">
                                 <div class="dynamic-icon shadow-sm"></div>
-                                <div class="dynamic-icon-text">i</div>
+                                <div class="dynamic-icon-text">
+                                    <?php if (($card['tipo_icone'] ?? 'imagem') === 'bootstrap'): ?>
+                                        <i class="bi <?php echo htmlspecialchars($card['caminho_icone']); ?>"></i>
+                                    <?php elseif (!empty($card['caminho_icone'])): ?>
+                                        <img src="<?php echo htmlspecialchars($card['caminho_icone']); ?>" alt="" style="width: 24px; height: 24px; object-fit: contain;">
+                                    <?php else: ?>
+                                        <i class="bi bi-info-circle"></i>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <div class="text-container">
                                 <div class="card-titulo">
