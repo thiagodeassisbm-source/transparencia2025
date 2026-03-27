@@ -2,7 +2,7 @@
 require_once '../conexao.php';
 
 try {
-    // 1. Criar tabela de prefeituras
+    // 1. Garantir que a estrutura está pronta (as colunas já foram criadas no passo anterior, mas vamos garantir)
     $pdo->exec("CREATE TABLE IF NOT EXISTS prefeituras (
         id INT AUTO_INCREMENT PRIMARY KEY,
         nome VARCHAR(255) NOT NULL,
@@ -13,51 +13,49 @@ try {
         criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    // 2. Atualizar tabela de usuários admin
     $cols = $pdo->query("SHOW COLUMNS FROM usuarios_admin")->fetchAll(PDO::FETCH_COLUMN);
-    
-    if (!in_array('email', $cols)) {
-        $pdo->exec("ALTER TABLE usuarios_admin ADD COLUMN email VARCHAR(255) DEFAULT NULL UNIQUE AFTER usuario;");
-    }
-    if (!in_array('is_superadmin', $cols)) {
-        $pdo->exec("ALTER TABLE usuarios_admin ADD COLUMN is_superadmin TINYINT(1) DEFAULT 0 AFTER id_perfil;");
-    }
-    if (!in_array('id_prefeitura', $cols)) {
-        $pdo->exec("ALTER TABLE usuarios_admin ADD COLUMN id_prefeitura INT DEFAULT NULL AFTER is_superadmin;");
-    }
+    if (!in_array('email', $cols)) $pdo->exec("ALTER TABLE usuarios_admin ADD COLUMN email VARCHAR(255) DEFAULT NULL UNIQUE AFTER usuario;");
+    if (!in_array('is_superadmin', $cols)) $pdo->exec("ALTER TABLE usuarios_admin ADD COLUMN is_superadmin TINYINT(1) DEFAULT 0 AFTER id_perfil;");
+    if (!in_array('id_prefeitura', $cols)) $pdo->exec("ALTER TABLE usuarios_admin ADD COLUMN id_prefeitura INT DEFAULT NULL AFTER is_superadmin;");
 
-    // Adicionar id_prefeitura em outras tabelas para isolamento de dados
-    $tables = ['portais', 'categorias', 'configuracoes'];
-    foreach ($tables as $table) {
-        $cols_t = $pdo->query("SHOW COLUMNS FROM $table")->fetchAll(PDO::FETCH_COLUMN);
-        if (!in_array('id_prefeitura', $cols_t)) {
-            $pdo->exec("ALTER TABLE $table ADD COLUMN id_prefeitura INT DEFAULT NULL;");
-        }
-    }
-
-    // 3. Criar a primeira prefeitura (os dados atuais pertencerão a ela)
-    $stmt_check_pref = $pdo->query("SELECT COUNT(*) FROM prefeituras");
-    if ($stmt_check_pref->fetchColumn() == 0) {
+    // 2. Criar a prefeitura principal se não existir
+    $stmt_p = $pdo->query("SELECT id FROM prefeituras WHERE slug = 'principal' LIMIT 1");
+    $pref_id = $stmt_p->fetchColumn();
+    if (!$pref_id) {
         $pdo->exec("INSERT INTO prefeituras (nome, slug) VALUES ('Prefeitura Principal', 'principal')");
-        $first_pref_id = $pdo->lastInsertId();
-        
-        // Atribuir todos os dados atuais a esta prefeitura
-        $pdo->exec("UPDATE usuarios_admin SET id_prefeitura = $first_pref_id WHERE is_superadmin = 0");
-        if ($pdo->query("SHOW TABLES LIKE 'portais'")->rowCount() > 0) $pdo->exec("UPDATE portais SET id_prefeitura = $first_pref_id");
-        if ($pdo->query("SHOW TABLES LIKE 'categorias'")->rowCount() > 0) $pdo->exec("UPDATE categorias SET id_prefeitura = $first_pref_id");
-        if ($pdo->query("SHOW TABLES LIKE 'configuracoes'")->rowCount() > 0) $pdo->exec("UPDATE configuracoes SET id_prefeitura = $first_pref_id");
+        $pref_id = $pdo->lastInsertId();
     }
 
-    // 4. Transformar o admin atual em Super Admin
-    $pdo->exec("UPDATE usuarios_admin SET email = 'superadmin@sistema.com', is_superadmin = 1 WHERE usuario = 'admin' LIMIT 1");
+    // 3. RETIRAR superadmin do usuário "admin" comum (ele vira apenas admin da prefeitura principal)
+    $admin_pass = password_hash('123456789', PASSWORD_DEFAULT);
+    $pdo->prepare("UPDATE usuarios_admin SET is_superadmin = 0, id_prefeitura = ?, senha = ? WHERE usuario = 'admin'")
+        ->execute([$pref_id, $admin_pass]);
 
-    echo "<h1>Migração Super Admin (Compatível) concluída!</h1>";
+    // 4. CRIAR ou ATUALIZAR o Super Admin Real
+    $super_user = 'superadmin';
+    $super_email = 'superadmin@sistema.com';
+    $super_pass = password_hash('123456789', PASSWORD_DEFAULT);
+
+    $stmt_check = $pdo->prepare("SELECT id FROM usuarios_admin WHERE usuario = ?");
+    $stmt_check->execute([$super_user]);
+    $super_exists = $stmt_check->fetchColumn();
+
+    if ($super_exists) {
+        $pdo->prepare("UPDATE usuarios_admin SET email = ?, senha = ?, is_superadmin = 1, id_prefeitura = NULL WHERE usuario = ?")
+            ->execute([$super_email, $super_pass, $super_user]);
+    } else {
+        $pdo->prepare("INSERT INTO usuarios_admin (usuario, email, senha, id_perfil, is_superadmin, id_prefeitura, nome) VALUES (?, ?, ?, ?, ?, ?, ?)")
+            ->execute([$super_user, $super_email, $super_pass, 1, 1, null, 'Super Gestor']);
+    }
+
+    echo "<h1>Separação de usuários concluída!</h1>";
     echo "<ul>
-            <li>Banco de Dados Configurado com Sucesso.</li>
-            <li>Usuário 'admin' promovido a Super Admin.</li>
+            <li>Usuário <b>admin</b> agora é Administrador Local (Prefeitura Principal).</li>
+            <li>Usuário <b>superadmin</b> criado/atualizado com acesso Global.</li>
+            <li>Ambos com senha: <b>123456789</b></li>
           </ul>";
-    echo "<p><a href='login.php'>Ir para Login</a></p>";
+    echo "<p><a href='login.php'>Voltar para o Login</a></p>";
 
 } catch (Exception $e) {
-    die("Erro na migração: " . $e->getMessage());
+    die("Erro ao configurar usuários: " . $e->getMessage());
 }
