@@ -119,6 +119,28 @@ include 'admin_header.php';
                             </div>
                             <small class="text-muted" style="font-size: 0.65rem;">Ex: transparencia.goiania.go.gov.br</small>
                         </div>
+
+                        <!-- Card de Guia DNS -->
+                        <div class="col-12 mt-2">
+                            <div class="alert alert-light border border-primary-subtle rounded-3 p-3 shadow-sm">
+                                <h6 class="text-primary fw-bold mb-2"><i class="bi bi-info-circle-fill me-2"></i>Como configurar o domínio do cliente:</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6 border-end">
+                                        <p class="mb-1 small"><strong>Passo 1: DNS no cliente</strong></p>
+                                        <ul class="mb-0 small text-muted ps-3">
+                                            <li>Crie uma entrada <strong>CNAME</strong> apontando para <code>upgyn.com.br</code></li>
+                                            <li>Ou uma entrada <strong>A</strong> apontando para o IP do Servidor.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-1 small"><strong>Passo 2: No nosso Servidor (Hostinger)</strong></p>
+                                        <ul class="mb-0 small text-muted ps-3">
+                                            <li>Adicione este domínio como um <strong>Alias</strong> ou <strong>Domínio Adicional</strong> no painel de controle para que o servidor reconheça o acesso.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Status de Acesso</label>
                             <select name="status" class="form-select">
