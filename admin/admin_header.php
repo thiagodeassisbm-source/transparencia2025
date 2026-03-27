@@ -48,7 +48,8 @@ function isActive($pageName) {
     <aside class="admin-sidebar shadow">
         <div class="sidebar-header">
             <h2>Painel de controle</h2>
-           <nav class="sidebar-nav">
+        </div>
+        <nav class="sidebar-nav">
             <?php if (basename($_SERVER['PHP_SELF']) == 'super_dashboard.php' && isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1): ?>
                 <!-- MENU EXCLUSIVO SUPER ADMIN (VISÃO GLOBAL) -->
                 <ul>
