@@ -101,9 +101,8 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $pdo->commit();
         return true;
     } catch (Exception $e) {
-        $pdo->rollBack();
-        error_log("Erro ao clonar dados: " . $e->getMessage());
-        return false;
+        if ($pdo->inTransaction()) { $pdo->rollBack(); }
+        throw new Exception("Falha na clonagem (Banco de Dados): " . $e->getMessage());
     }
 }
 ?>
