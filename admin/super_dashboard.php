@@ -2,146 +2,159 @@
 require_once 'auth_check.php';
 require_once '../conexao.php';
 
-// Apenas Super Admin pode ver esta página
+// Bloqueia se não for superadmin
 if (!isset($_SESSION['is_superadmin']) || $_SESSION['is_superadmin'] !== 1) {
     header("Location: dashboard.php");
     exit;
 }
 
-// Lógica de Troca de Prefeitura (Acesso Rápido)
-if (isset($_GET['acessar'])) {
-    $id_pref = filter_input(INPUT_GET, 'acessar', FILTER_VALIDATE_INT);
-    if ($id_pref) {
-        $_SESSION['id_prefeitura'] = $id_pref;
-        header("Location: dashboard.php");
-        exit;
-    }
-}
+// 1. Busca estatísticas globais
+$total_clientes = $pdo->query("SELECT COUNT(*) FROM prefeituras")->fetchColumn();
+$receita_mensal = $pdo->query("SELECT SUM(valor_mensalidade) FROM prefeituras WHERE status = 'ativo'")->fetchColumn() ?: 0;
 
-// Estatísticas Globais
-$total_prefeituras = $pdo->query("SELECT COUNT(*) FROM prefeituras")->fetchColumn();
-$total_vagas = $pdo->query("SELECT COUNT(*) FROM registros")->fetchColumn(); // total de dados lançados
-$prefeituras = $pdo->query("SELECT * FROM prefeituras ORDER BY nome ASC")->fetchAll();
+// 2. Busca lista de prefeituras
+$stmt = $pdo->query("SELECT * FROM prefeituras ORDER BY criado_em DESC");
+$prefeituras = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$page_title_for_header = 'Central do Super Admin';
+$page_title_for_header = 'Central de Clientes';
+include 'admin_header.php';
 ?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Super Admin - Plataforma</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="admin_style.css?v=<?php echo time(); ?>">
-    <style>
-        .card-stat { transition: all 0.3s ease; border: none; border-radius: 15px; }
-        .card-stat:hover { transform: translateY(-5px); }
-        .table-custom { border-radius: 15px; overflow: hidden; background: #fff; }
-        .table-custom thead { background: #6366f1; color: #fff; }
-        .status-badge { font-size: 0.75rem; padding: 5px 12px; border-radius: 50px; }
-    </style>
-</head>
-<body class="bg-light">
 
-<?php include 'admin_header.php'; ?>
-
-<div class="container-fluid container-custom-padding py-4">
-    <div class="row g-4 mb-4">
+<div class="super-dashboard">
+    <!-- Header com Stats -->
+    <div class="row mb-5 g-4">
         <div class="col-md-4">
-            <div class="card card-stat shadow-sm bg-primary text-white h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="avatar-lg bg-white bg-opacity-25 rounded-circle p-3 me-3"><i class="bi bi-buildings fs-1"></i></div>
+            <div class="card bg-dark text-white border-0 shadow-sm overflow-hidden h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1 opacity-75">Clientes / Prefeituras</h6>
-                        <h2 class="mb-0 fw-bold"><?php echo $total_prefeituras; ?></h2>
+                        <h6 class="text-white-50 text-uppercase small ls-1">Total de Clientes</h6>
+                        <h2 class="mb-0 fw-bold display-6"><?php echo $total_clientes; ?></h2>
+                    </div>
+                    <div class="stats-icon-bg opacity-25">
+                        <i class="bi bi-buildings-fill fs-1"></i>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card card-stat shadow-sm bg-indigo text-white h-100" style="background: #4f46e5;">
-                <div class="card-body d-flex align-items-center">
-                    <div class="avatar-lg bg-white bg-opacity-25 rounded-circle p-3 me-3"><i class="bi bi-database-check fs-1"></i></div>
+            <div class="card bg-primary text-white border-0 shadow-sm overflow-hidden h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1 opacity-75">Base de Dados Total</h6>
-                        <h2 class="mb-0 fw-bold"><?php echo $total_vagas; ?> registros</h2>
+                        <h6 class="text-white-50 text-uppercase small ls-1">Receita Mensal (MRR)</h6>
+                        <h2 class="mb-0 fw-bold display-6">R$ <?php echo number_format($receita_mensal, 2, ',', '.'); ?></h2>
+                    </div>
+                    <div class="stats-icon-bg opacity-25">
+                        <i class="bi bi-currency-dollar fs-1"></i>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-             <div class="card card-stat shadow-sm bg-success text-white h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="avatar-lg bg-white bg-opacity-25 rounded-circle p-3 me-3"><i class="bi bi-shield-check fs-1"></i></div>
+            <div class="card bg-success text-white border-0 shadow-sm overflow-hidden h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1 opacity-75">Status GERAL</h6>
-                        <h2 class="mb-0 fw-bold">Online</h2>
+                        <h6 class="text-white-50 text-uppercase small ls-1">Status da Plataforma</h6>
+                        <h2 class="mb-0 fw-bold h4">SISTEMA ONLINE</h2>
+                    </div>
+                    <div class="stats-icon-bg opacity-25 text-white">
+                        <i class="bi bi-shield-check fs-1"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Gestão de Prefeituras -->
-    <div class="card shadow-sm border-0 table-custom">
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-list-task me-2 text-primary"></i> Prefeituras sob Gestão</h5>
-            <button class="btn btn-primary rounded-pill btn-sm px-4"><i class="bi bi-plus-circle me-1"></i> Novo Cliente</button>
+    <!-- Lista de Clientes -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0 fw-bold text-dark">Gestão de Prefeituras</h5>
+                <p class="text-muted small mb-0">Controle de contratos, pagamentos e acessos</p>
+            </div>
+            <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#modalNovoCliente">
+                <i class="bi bi-plus-lg me-2"></i> Novo Cliente
+            </button>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th class="ps-4">Prefeitura</th>
-                        <th>URL Slug</th>
-                        <th>Status</th>
-                        <th>Lançamentos</th>
-                        <th class="text-end pe-4">Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($prefeituras)): ?>
-                    <tr><td colspan="5" class="text-center py-5">Nenhum cliente cadastrado.</td></tr>
-                    <?php endif; ?>
-                    <?php foreach ($prefeituras as $pref): ?>
-                    <tr>
-                        <td class="ps-4">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm me-3 border rounded shadow-sm p-1 bg-white">
-                                    <img src="<?php echo !empty($pref['logo']) ? '../'.$pref['logo'] : '../imagens/logo-placeholder.png'; ?>" style="width: 32px; height: 32px; object-fit: contain;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light bg-opacity-50">
+                        <tr>
+                            <th class="ps-4 py-3 border-0 text-muted small text-uppercase">Prefeitura</th>
+                            <th class="py-3 border-0 text-muted small text-uppercase">Contrato</th>
+                            <th class="py-3 border-0 text-muted small text-uppercase">Valor</th>
+                            <th class="py-3 border-0 text-muted small text-uppercase">Últ. Pagamento</th>
+                            <th class="py-3 border-0 text-muted small text-uppercase text-center">Status</th>
+                            <th class="py-3 border-0 text-muted small text-uppercase text-end pe-4">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($prefeituras as $pref): ?>
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm rounded-circle bg-light d-flex align-items-center justify-content-center me-3 border">
+                                        <i class="bi bi-building text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($pref['nome']); ?></h6>
+                                        <span class="text-muted small">/<?php echo $pref['slug']; ?></span>
+                                    </div>
                                 </div>
-                                <span class="fw-bold"><?php echo htmlspecialchars($pref['nome']); ?></span>
-                            </div>
-                        </td>
-                        <td><code class="bg-light p-1">/<?php echo $pref['slug']; ?></code></td>
-                        <td>
-                            <span class="status-badge <?php echo $pref['status'] == 'ativo' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'; ?>">
-                                <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> <?php echo ucfirst($pref['status']); ?>
-                            </span>
-                        </td>
-                        <td>
-                            <?php 
-                                $id_p = $pref['id'];
-                                $qtd = $pdo->query("SELECT COUNT(*) FROM registros WHERE id_portal IN (SELECT id FROM portais WHERE id_prefeitura = $id_p)")->fetchColumn() ?: 0;
-                                echo $qtd;
-                            ?>
-                        </td>
-                        <td class="text-end pe-4">
-                            <a href="super_dashboard.php?acessar=<?php echo $pref['id']; ?>" class="btn btn-outline-primary btn-sm rounded-pill"><i class="bi bi-door-open me-1"></i> Acessar Painel</a>
-                            <button class="btn btn-light btn-sm rounded-pill ms-1"><i class="bi bi-gear"></i></button>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                            </td>
+                            <td>
+                                <span class="small"><?php echo $pref['data_contratacao'] ? date('d/m/Y', strtotime($pref['data_contratacao'])) : '---'; ?></span>
+                            </td>
+                            <td>
+                                <span class="fw-bold">R$ <?php echo number_format($pref['valor_mensalidade'], 2, ',', '.'); ?></span>
+                            </td>
+                            <td>
+                                <span class="small text-muted"><?php echo $pref['data_ultimo_pagamento'] ? date('d/m/Y', strtotime($pref['data_ultimo_pagamento'])) : 'Pendente'; ?></span>
+                            </td>
+                            <td class="text-center">
+                                <?php if ($pref['status'] == 'ativo'): ?>
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-3">Ativo</span>
+                                <?php elseif ($pref['status'] == 'pendente_pagamento'): ?>
+                                    <span class="badge bg-warning-subtle text-warning rounded-pill px-3">Inadimplente</span>
+                                <?php else: ?>
+                                    <span class="badge bg-danger-subtle text-danger rounded-pill px-3">Suspenso</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm rounded-pill overflow-hidden bg-white border">
+                                    <a href="switch_pref.php?id=<?php echo $pref['id']; ?>" class="btn btn-white btn-sm px-3" title="Acessar Painel">
+                                        <i class="bi bi-box-arrow-in-right text-primary"></i>
+                                    </a>
+                                    <button class="btn btn-white btn-sm px-3" data-bs-toggle="modal" data-bs-target="#editPref_<?php echo $pref['id']; ?>" title="Editar">
+                                        <i class="bi bi-pencil-square text-muted"></i>
+                                    </button>
+                                    <?php if ($pref['status'] == 'ativo'): ?>
+                                        <a href="alterar_status_pref.php?id=<?php echo $pref['id']; ?>&status=suspenso" class="btn btn-white btn-sm px-3" onclick="return confirm('Confirmar suspensão de acesso?')">
+                                            <i class="bi bi-lock-fill text-danger"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="alterar_status_pref.php?id=<?php echo $pref['id']; ?>&status=ativo" class="btn btn-white btn-sm px-3">
+                                            <i class="bi bi-unlock-fill text-success"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
-<footer class="text-center p-4 text-muted small">
-    &copy; <?php echo date('Y'); ?> - Sistema de Transparência Multi-Central
-</footer>
+<style>
+.super-dashboard { max-width: 1400px; margin: 0 auto; }
+.avatar-sm { width: 40px; height: 40px; }
+.ls-1 { letter-spacing: 0.1em; }
+.btn-white:hover { background: #f8f9fa; }
+.bg-primary { background: linear-gradient(45deg, #4f46e5, #6366f1) !important; }
+.bg-dark { background: #1e293b !important; }
+</style>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<?php include 'admin_footer.php'; ?>

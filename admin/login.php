@@ -25,25 +25,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch();
 
     if ($user && password_verify($senha, $user['senha'])) {
-        $_SESSION['admin_logged_in']      = true;
-        $_SESSION['admin_user_id']        = $user['id'];
-        $_SESSION['admin_user_id_perfil'] = $user['id_perfil'];
-        $_SESSION['admin_user_nome']      = $user['usuario'];
-        $_SESSION['admin_user_nome_real'] = $user['nome']; 
-        $_SESSION['admin_user_perfil']    = $user['perfil'];
-        $_SESSION['is_superadmin']        = (int)$user['is_superadmin'];
-        $_SESSION['id_prefeitura']        = $user['id_prefeitura'] ?? null;
+        // Verifica se a prefeitura está ativa (apenas para usuários comuns)
+        if ($user['is_superadmin'] == 0 && $user['id_prefeitura']) {
+            $stmt_status = $pdo->prepare("SELECT status FROM prefeituras WHERE id = ?");
+            $stmt_status->execute([$user['id_prefeitura']]);
+            $status_prefeitura = $stmt_status->fetchColumn();
 
-        registrar_log($pdo, 'LOGIN', 'usuarios_admin', "Usuário logou com sucesso.");
-
-        if ($_SESSION['is_superadmin'] === 1) {
-            header("Location: super_dashboard.php");
-        } else {
-            header("Location: dashboard.php");
+            if ($status_prefeitura === 'suspenso') {
+                registrar_log($pdo, 'BLOQUEADO', 'usuarios_admin', "Tentativa de login bloqueada: Prefeitura suspensa.");
+                $erro = "Seu acesso está suspenso temporariamente. Entre em contato com o suporte.";
+                // Interrompe o login
+            }
         }
-        exit;
+
+        if (empty($erro)) {
+            $_SESSION['admin_logged_in']      = true;
+            $_SESSION['admin_user_id']        = $user['id'];
+            $_SESSION['admin_user_id_perfil'] = $user['id_perfil'];
+            $_SESSION['admin_user_nome']      = $user['usuario'];
+            $_SESSION['admin_user_nome_real'] = $user['nome']; 
+            $_SESSION['admin_user_perfil']    = $user['perfil'];
+            $_SESSION['is_superadmin']        = (int)$user['is_superadmin'];
+            $_SESSION['id_prefeitura']        = $user['id_prefeitura'] ?? null;
+
+            registrar_log($pdo, 'LOGIN', 'usuarios_admin', "Usuário logou com sucesso.");
+
+            if ($_SESSION['is_superadmin'] === 1) {
+                header("Location: super_dashboard.php");
+            } else {
+                header("Location: dashboard.php");
+            }
+            exit;
+        }
     } else {
-        registrar_log($pdo, 'FALHA-LOGIN', 'usuarios_admin', "Tentativa de login falhou para usuário: $usuario");
+        registrar_log($pdo, 'FALHA-LOGIN', 'usuarios_admin', "Tentativa de login falhou.");
         $erro = "Usuário ou senha inválidos!";
     }
 }
