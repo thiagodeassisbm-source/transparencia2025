@@ -39,8 +39,8 @@ include 'admin_header.php';
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card shadow-sm h-100">
-                <div class="stat-icon bg-light-blue">
+            <div class="card stat-card vibrant-card bg-vibrant-blue shadow h-100 border-0">
+                <div class="stat-icon">
                     <i class="bi bi-folder2-open"></i>
                 </div>
                 <div class="stat-info">
@@ -50,8 +50,8 @@ include 'admin_header.php';
             </div>
         </div>
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card shadow-sm h-100">
-                <div class="stat-icon bg-light-green">
+            <div class="card stat-card vibrant-card bg-vibrant-green shadow h-100 border-0">
+                <div class="stat-icon">
                     <i class="bi bi-file-earmark-text"></i>
                 </div>
                 <div class="stat-info">
@@ -61,8 +61,8 @@ include 'admin_header.php';
             </div>
         </div>
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card shadow-sm h-100">
-                <div class="stat-icon bg-light-purple">
+            <div class="card stat-card vibrant-card bg-vibrant-purple shadow h-100 border-0">
+                <div class="stat-icon">
                     <i class="bi bi-file-richtext"></i>
                 </div>
                 <div class="stat-info">
@@ -72,8 +72,8 @@ include 'admin_header.php';
             </div>
         </div>
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card shadow-sm h-100">
-                <div class="stat-icon bg-light-yellow">
+            <div class="card stat-card vibrant-card bg-vibrant-yellow shadow h-100 border-0">
+                <div class="stat-icon">
                     <i class="bi bi-chat-left-quote"></i>
                 </div>
                 <div class="stat-info">
@@ -140,10 +140,23 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: <?php echo json_encode(array_keys($stats_status)); ?>,
             datasets: [{
                 data: <?php echo json_encode(array_values($stats_status)); ?>,
-                backgroundColor: ['#ffc107', '#fd7e14', '#198754', '#6c757d'],
+                backgroundColor: ['#f59e0b', '#ef4444', '#10b981', '#6b7280'],
+                borderWidth: 0
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                }
+            }
+        }
     });
     <?php endif; ?>
 
@@ -157,7 +170,8 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 label: 'Nº de Lançamentos',
                 data: <?php echo json_encode(array_column($lancamentos_por_secao, 'total')); ?>,
-                backgroundColor: 'rgba(59, 130, 246, 0.7)'
+                backgroundColor: '#3b82f6',
+                borderRadius: 8
             }]
         },
         options: {
