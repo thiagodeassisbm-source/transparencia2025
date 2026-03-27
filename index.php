@@ -146,6 +146,12 @@ include 'header_publico.php';
                                 <i class="bi <?php echo $card['favorito'] ? 'bi-star-fill text-warning' : 'bi-star'; ?>"></i>
                                 <span class="d-none d-md-inline ms-1 small">Favoritar</span>
                             </div>
+
+                            <?php if (isset($card['is_demo']) && $card['is_demo'] == 1): ?>
+                                <div class="demo-badge position-absolute top-0 end-0 bg-danger text-white px-2 py-1 small rounded-bottom-0 rounded-start-2 shadow-sm" style="font-size: 0.65rem; font-weight: 700;">
+                                    <i class="bi bi-info-circle me-1"></i> DEMONSTRATIVO
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
