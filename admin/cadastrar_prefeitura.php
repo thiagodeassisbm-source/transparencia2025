@@ -1,7 +1,8 @@
 <?php
 require_once 'auth_check.php';
-require_once '../conexao.php';
+require_once 'conexao.php';
 require_once 'functions_logs.php';
+require_once 'functions_demo.php'; // Adiciona motor de clonagem demo
 
 // Bloqueia se não for superadmin
 if (!isset($_SESSION['is_superadmin']) || $_SESSION['is_superadmin'] !== 1) {
@@ -50,8 +51,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         registrar_log($pdo, 'SUPERADMIN', 'NOVA_PREFEITURA', "Prefeitura $nome cadastrada com sucesso (ID: $id_prefeitura)");
         
+        // 4. Carrega conteúdo de demonstração se solicitado
+        $carregar_demo = filter_input(INPUT_POST, 'carregar_demo', FILTER_VALIDATE_INT);
+        $demo_status = "";
+        if ($carregar_demo === 1) {
+            if (clonar_dados_demonstrativos($pdo, 1, $id_prefeitura)) {
+                $demo_status = " e conteúdo de demonstração inicializado";
+            }
+        }
+
         $pdo->commit();
-        $sucesso = "Cliente cadastrado com sucesso! O acesso já está liberado.";
+        $sucesso = "Cliente cadastrado com sucesso$demo_status! O acesso já está liberado.";
     } catch (Exception $e) {
         $pdo->rollBack();
         $erro = "Erro ao cadastrar: " . $e->getMessage();
@@ -133,6 +143,18 @@ include 'admin_header.php';
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted">Senha Inicial</label>
                             <input type="password" name="admin_pass" class="form-control" placeholder="********" required>
+                        <!-- SEÇÃO 4: CONFIGURAÇÕES DE BOAS-VINDAS -->
+                        <div class="col-12 py-2 border-bottom mt-4 mb-2">
+                            <h6 class="text-primary fw-bold mb-0">4. Configurações de Boas-vindas</h6>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check form-switch p-3 bg-light rounded-3 border">
+                                <input class="form-check-input ms-0 me-3" type="checkbox" name="carregar_demo" value="1" id="switchDemo" checked>
+                                <label class="form-check-label fw-bold" for="switchDemo">
+                                    <i class="bi bi-magic text-warning me-2"></i> Carregar conteúdo demonstrativo de exemplo
+                                    <small class="d-block text-muted fw-normal mt-1">Isso preencherá o portal com seções e dados de teste para facilitar o onboarding do cliente.</small>
+                                </label>
+                            </div>
                         </div>
 
                         <div class="col-12 mt-5 text-end">
