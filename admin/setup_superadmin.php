@@ -2,8 +2,6 @@
 require_once '../conexao.php';
 
 try {
-    $pdo->beginTransaction();
-
     // 1. Criar tabela de prefeituras
     $pdo->exec("CREATE TABLE IF NOT EXISTS prefeituras (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -16,7 +14,6 @@ try {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
     // 2. Atualizar tabela de usuários admin
-    // Verifica se colunas já existem antes de adicionar
     $cols = $pdo->query("SHOW COLUMNS FROM usuarios_admin")->fetchAll(PDO::FETCH_COLUMN);
     
     if (!in_array('email', $cols)) {
@@ -46,25 +43,21 @@ try {
         
         // Atribuir todos os dados atuais a esta prefeitura
         $pdo->exec("UPDATE usuarios_admin SET id_prefeitura = $first_pref_id WHERE is_superadmin = 0");
-        $pdo->exec("UPDATE portais SET id_prefeitura = $first_pref_id");
-        $pdo->exec("UPDATE categorias SET id_prefeitura = $first_pref_id");
-        $pdo->exec("UPDATE configuracoes SET id_prefeitura = $first_pref_id");
+        if ($pdo->query("SHOW TABLES LIKE 'portais'")->rowCount() > 0) $pdo->exec("UPDATE portais SET id_prefeitura = $first_pref_id");
+        if ($pdo->query("SHOW TABLES LIKE 'categorias'")->rowCount() > 0) $pdo->exec("UPDATE categorias SET id_prefeitura = $first_pref_id");
+        if ($pdo->query("SHOW TABLES LIKE 'configuracoes'")->rowCount() > 0) $pdo->exec("UPDATE configuracoes SET id_prefeitura = $first_pref_id");
     }
 
-    // 4. Transformar o admin atual em Super Admin (ou criar um novo se preferir)
-    // Aqui vou definir o email para o admin padrão para teste
+    // 4. Transformar o admin atual em Super Admin
     $pdo->exec("UPDATE usuarios_admin SET email = 'superadmin@sistema.com', is_superadmin = 1 WHERE usuario = 'admin' LIMIT 1");
 
-    $pdo->commit();
-    echo "<h1>Migração Super Admin concluída!</h1>";
+    echo "<h1>Migração Super Admin (Compatível) concluída!</h1>";
     echo "<ul>
-            <li>Tabela 'prefeituras' criada.</li>
-            <li>Campos 'email' e 'is_superadmin' adicionados.</li>
-            <li>Usuário 'admin' promovido a Super Admin (E-mail: superadmin@sistema.com).</li>
+            <li>Banco de Dados Configurado com Sucesso.</li>
+            <li>Usuário 'admin' promovido a Super Admin.</li>
           </ul>";
     echo "<p><a href='login.php'>Ir para Login</a></p>";
 
 } catch (Exception $e) {
-    if ($pdo->inTransaction()) { $pdo->rollBack(); }
     die("Erro na migração: " . $e->getMessage());
 }
