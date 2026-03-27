@@ -7,7 +7,7 @@ require_once 'functions_logs.php';
 // O sistema sempre mostrará a tela de login para permitir a entrada no contexto correto da prefeitura
 // (Mesmo que já haja um usuário logado em outra prefeitura ou como superadmin)
 
-// Busca o logo da prefeitura e o título do portal baseado no slug (SaaS)
+// 1. Busca o logo e o título (SaaS Unificado)
 $pref_slug = filter_input(INPUT_GET, 'slug', FILTER_SANITIZE_SPECIAL_CHARS);
 $id_prefeitura_contexto = null;
 
@@ -17,17 +17,18 @@ if ($pref_slug) {
     $id_prefeitura_contexto = $stmt_p->fetchColumn();
 }
 
-$sql_conf = "SELECT chave, valor FROM configuracoes WHERE chave IN ('prefeitura_logo', 'prefeitura_titulo')";
+// Configuração de Identidade (Se não houver slug, usa o padrão Global)
 if ($id_prefeitura_contexto) {
-    $sql_conf .= " AND id_prefeitura = $id_prefeitura_contexto";
+    $sql_conf = "SELECT chave, valor FROM configuracoes WHERE id_prefeitura = $id_prefeitura_contexto AND chave IN ('prefeitura_logo', 'prefeitura_titulo')";
+    $stmt_conf = $pdo->query($sql_conf);
+    $config = $stmt_conf->fetchAll(PDO::FETCH_KEY_PAIR);
+    $logo_prefeitura = !empty($config['prefeitura_logo']) ? $config['prefeitura_logo'] : 'imagens/logo-up.png';
+    $titulo_portal = $config['prefeitura_titulo'] ?? 'Gestão de Transparência';
 } else {
-    $sql_conf .= " AND id_prefeitura = 1"; // Fallback para a principal
+    // Branding Global SaaS
+    $logo_prefeitura = 'imagens/logo-up.png';
+    $titulo_portal = 'Painel Administrativo Central';
 }
-
-$stmt_conf = $pdo->query($sql_conf);
-$config = $stmt_conf->fetchAll(PDO::FETCH_KEY_PAIR);
-$logo_prefeitura = !empty($config['prefeitura_logo']) ? $config['prefeitura_logo'] : 'imagens/logo-up.png';
-$titulo_portal = $config['prefeitura_titulo'] ?? 'Portal da Transparência';
 
 $erro = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
