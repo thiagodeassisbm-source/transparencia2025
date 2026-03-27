@@ -55,10 +55,10 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             $stmt_r->execute([$p['id']]);
             $registros_origem = $stmt_r->fetchAll();
             
-            $ins_r = $pdo->prepare("INSERT INTO registros (id_portal, data_cadastro, is_demo) VALUES (?, ?, 1)");
+            $ins_r = $pdo->prepare("INSERT INTO registros (id_portal, is_demo) VALUES (?, 1)");
             
             foreach ($registros_origem as $r) {
-                $ins_r->execute([$new_p_id, $r['data_cadastro']]);
+                $ins_r->execute([$new_p_id]);
                 $new_r_id = $pdo->lastInsertId();
                 
                 // --- Clona Valores do Registro ---
