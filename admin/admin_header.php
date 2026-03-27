@@ -96,24 +96,16 @@ function isActive($pageName) {
                 <?php endif; ?>
 
                 <!-- CONFIGURAÇÕES PREFEITURA -->
-                <?php if (tem_permissao('configuracoes', 'ver') || tem_permissao('usuarios', 'ver')): ?>
+                <?php if (tem_permissao('configuracoes', 'ver')): ?>
                 <li>
-                    <?php $prefeitura_active = isActive(['informacoes_prefeitura.php', 'gerenciar_usuarios.php', 'gerenciar_perfis.php', 'editar_usuario.php']); ?>
+                    <?php $prefeitura_active = isActive(['informacoes_prefeitura.php']); ?>
                     <a href="#collapsePrefeitura" class="nav-link has-submenu <?php echo $prefeitura_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
                         <span><i class="bi bi-building"></i> Prefeitura</span>
                         <i class="bi bi-chevron-down submenu-arrow"></i>
                     </a>
                     <div class="collapse <?php echo $prefeitura_active ? 'show' : ''; ?>" id="collapsePrefeitura">
                         <ul class="submenu">
-                            <?php if (tem_permissao('configuracoes', 'ver')): ?>
-                                <li><a href="informacoes_prefeitura.php" class="nav-link <?php echo isActive('informacoes_prefeitura.php'); ?>">Configurações</a></li>
-                            <?php endif; ?>
-                            <?php if (tem_permissao('usuarios', 'ver')): ?>
-                                <li><a href="gerenciar_usuarios.php" class="nav-link <?php echo isActive(['gerenciar_usuarios.php', 'editar_usuario.php']); ?>">Usuários</a></li>
-                            <?php endif; ?>
-                            <?php if ($_SESSION['admin_user_perfil'] === 'admin'): ?>
-                                <li><a href="gerenciar_perfis.php" class="nav-link <?php echo isActive(['gerenciar_perfis.php', 'editar_permissoes_perfil.php']); ?>">Perfis e Acessos</a></li>
-                            <?php endif; ?>
+                            <li><a href="informacoes_prefeitura.php" class="nav-link <?php echo isActive('informacoes_prefeitura.php'); ?>">Configurações da Prefeitura</a></li>
                         </ul>
                     </div>
                 </li>
@@ -158,17 +150,24 @@ function isActive($pageName) {
                 <?php endif; ?>
 
                 <!-- CONFIGURAÇÕES (Geral) -->
-                <?php if ($_SESSION['admin_user_perfil'] === 'admin'): ?>
+                <?php if (tem_permissao('usuarios', 'ver') || $_SESSION['admin_user_perfil'] === 'admin'): ?>
                 <li>
-                    <?php $entrada_active = isActive(['importar_xml.php', 'mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>
+                    <?php $entrada_active = isActive(['importar_xml.php', 'mapear_xml.php', 'gerenciar_tipos_xml.php', 'gerenciar_usuarios.php', 'gerenciar_perfis.php', 'editar_usuario.php', 'editar_permissoes_perfil.php']); ?>
                     <a href="#collapseConfig" class="nav-link has-submenu <?php echo $entrada_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
                         <span><i class="bi bi-gear-fill"></i> CONFIGURAÇÕES</span>
                         <i class="bi bi-chevron-down submenu-arrow"></i>
                     </a>
                     <div class="collapse <?php echo $entrada_active ? 'show' : ''; ?>" id="collapseConfig">
                         <ul class="submenu">
-                            <li><a href="mapear_xml.php" class="nav-link <?php echo isActive(['mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>">Gerenciar XML</a></li>
-                            <li><a href="importar_xml.php" class="nav-link <?php echo isActive('importar_xml.php'); ?>">Importar XML</a></li>
+                            <?php if (tem_permissao('usuarios', 'ver')): ?>
+                                <li><a href="gerenciar_usuarios.php" class="nav-link <?php echo isActive(['gerenciar_usuarios.php', 'editar_usuario.php']); ?>">Usuários</a></li>
+                            <?php endif; ?>
+                            <?php if ($_SESSION['admin_user_perfil'] === 'admin'): ?>
+                                <li><a href="gerenciar_perfis.php" class="nav-link <?php echo isActive(['gerenciar_perfis.php', 'editar_permissoes_perfil.php']); ?>">Perfis e Acessos</a></li>
+                                <li class="border-top my-1 opacity-25"></li>
+                                <li><a href="mapear_xml.php" class="nav-link <?php echo isActive(['mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>">Gerenciar XML</a></li>
+                                <li><a href="importar_xml.php" class="nav-link <?php echo isActive('importar_xml.php'); ?>">Importar XML</a></li>
+                            <?php endif; ?>
                         </ul>
                     </div>
                 </li>
@@ -195,6 +194,8 @@ function isActive($pageName) {
                         </div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                        <li><a class="dropdown-item" href="editar_usuario.php?id=<?php echo $id_usuario_logado; ?>"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
                     </ul>
                 </div>
