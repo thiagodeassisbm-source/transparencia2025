@@ -5,7 +5,7 @@ require_once 'functions_logs.php';
 
 // Se o usuário já está logado, redireciona para o painel
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header("Location: index.php");
+    header("Location: /sistemas/transparencia2026/admin/index.php");
     exit;
 }
 
@@ -67,9 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             registrar_log($pdo, 'LOGIN', 'usuarios_admin', "Usuário logou com sucesso.");
 
             if ($_SESSION['is_superadmin'] === 1) {
-                header("Location: super_dashboard.php");
+                header("Location: /sistemas/transparencia2026/admin/super_dashboard.php");
             } else {
-                header("Location: dashboard.php");
+                header("Location: /sistemas/transparencia2026/admin/dashboard.php");
             }
             exit;
         }
