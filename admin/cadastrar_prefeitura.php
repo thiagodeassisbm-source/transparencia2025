@@ -26,6 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $admin_pass = $_POST['admin_pass'];
 
     try {
+        // 1. Validar se o usuário já existe no sistema global (Multi-tenant)
+        $stmt_check = $pdo->prepare("SELECT id FROM usuarios_admin WHERE usuario = ?");
+        $stmt_check->execute([$admin_user]);
+        if ($stmt_check->fetch()) {
+            throw new Exception("O nome de usuário '<strong>$admin_user</strong>' já está em uso em outra prefeitura. Escolha um nome exclusivo (ex: admin_".str_replace(' ', '', strtolower($nome)).").");
+        }
+
         $pdo->beginTransaction();
 
         // 1. Cria a Prefeitura
