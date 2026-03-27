@@ -51,7 +51,7 @@ function isActive($pageName) {
         </div>
         <nav class="sidebar-nav">
             <?php 
-            $super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'switch_pref.php', 'alterar_status_pref.php'];
+            $super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php', 'gerenciar_prefeituras.php', 'switch_pref.php', 'alterar_status_pref.php'];
             $is_super_context = in_array(basename($_SERVER['PHP_SELF']), $super_pages);
             
             if ($is_super_context && isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1): 
