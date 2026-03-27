@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 // Se o usuário já está logado, redireciona para o painel
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
@@ -31,9 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['admin_user_nome_real'] = $user['nome']; 
         $_SESSION['admin_user_perfil']    = $user['perfil'];
 
+        registrar_log($pdo, 'LOGIN', 'usuarios_admin', "Usuário logou com sucesso.");
+
         header("Location: dashboard.php");
         exit;
     } else {
+        registrar_log($pdo, 'FALHA-LOGIN', 'usuarios_admin', "Tentativa de login falhou para usuário: $usuario");
         $erro = "Usuário ou senha inválidos!";
     }
 }

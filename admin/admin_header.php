@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Re-carrega permissões se necessário (opcional, para refletir mudanças imediatas)
 require_once 'auth_check.php';
+require_once 'functions_logs.php';
 
 $nome_usuario_logado = $_SESSION['admin_user_nome'] ?? 'Usuário';
 $id_usuario_logado = $_SESSION['admin_user_id'] ?? 0;
@@ -152,7 +153,7 @@ function isActive($pageName) {
                 <!-- CONFIGURAÇÕES (Geral) -->
                 <?php if (tem_permissao('usuarios', 'ver') || $_SESSION['admin_user_perfil'] === 'admin'): ?>
                 <li>
-                    <?php $entrada_active = isActive(['importar_xml.php', 'mapear_xml.php', 'gerenciar_tipos_xml.php', 'gerenciar_usuarios.php', 'gerenciar_perfis.php', 'editar_usuario.php', 'editar_permissoes_perfil.php']); ?>
+                    <?php $entrada_active = isActive(['importar_xml.php', 'mapear_xml.php', 'gerenciar_tipos_xml.php', 'gerenciar_usuarios.php', 'gerenciar_perfis.php', 'editar_usuario.php', 'editar_permissoes_perfil.php', 'logs_gerais.php']); ?>
                     <a href="#collapseConfig" class="nav-link has-submenu <?php echo $entrada_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
                         <span><i class="bi bi-gear-fill"></i> CONFIGURAÇÕES</span>
                         <i class="bi bi-chevron-down submenu-arrow"></i>
@@ -165,8 +166,11 @@ function isActive($pageName) {
                             <?php if ($_SESSION['admin_user_perfil'] === 'admin'): ?>
                                 <li><a href="gerenciar_perfis.php" class="nav-link <?php echo isActive(['gerenciar_perfis.php', 'editar_permissoes_perfil.php']); ?>">Perfis e Acessos</a></li>
                                 <li class="border-top my-1 opacity-25"></li>
+                                <li class="border-top my-1 opacity-25"></li>
                                 <li><a href="mapear_xml.php" class="nav-link <?php echo isActive(['mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>">Gerenciar XML</a></li>
                                 <li><a href="importar_xml.php" class="nav-link <?php echo isActive('importar_xml.php'); ?>">Importar XML</a></li>
+                                <li class="border-top my-1 opacity-25"></li>
+                                <li><a href="logs_gerais.php" class="nav-link <?php echo isActive('logs_gerais.php'); ?>">Logs Gerais</a></li>
                             <?php endif; ?>
                         </ul>
                     </div>
