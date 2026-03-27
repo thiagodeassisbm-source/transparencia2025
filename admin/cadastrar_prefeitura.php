@@ -1,6 +1,6 @@
 <?php
 require_once 'auth_check.php';
-require_once 'conexao.php';
+require_once '../conexao.php';
 require_once 'functions_logs.php';
 require_once 'functions_demo.php'; // Adiciona motor de clonagem demo
 
