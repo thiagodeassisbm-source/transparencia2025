@@ -27,19 +27,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $card_titulo = trim($_POST['card_titulo'] ?? '');
         $card_subtitulo = trim($_POST['card_subtitulo'] ?? '');
         $card_ordem = (int)($_POST['card_ordem'] ?? 0);
+        $tipo_icone = $_POST['tipo_icone'] ?? 'imagem';
 
-        if (empty($card_titulo) || !isset($_FILES['card_icone']) || $_FILES['card_icone']['error'] !== UPLOAD_ERR_OK) {
-            throw new Exception("Para criar um card, Título e Ícone são obrigatórios.");
+        if (empty($card_titulo)) {
+            throw new Exception("O título do card é obrigatório.");
         }
         
         $caminho_icone = '';
-        $upload_dir = '../uploads/';
-        $nome_arquivo = 'card-' . uniqid() . '-' . basename($_FILES['card_icone']['name']);
-        $caminho_destino = $upload_dir . $nome_arquivo;
-        if (!move_uploaded_file($_FILES['card_icone']['tmp_name'], $caminho_destino)) {
-            throw new Exception("Falha ao fazer upload do ícone do card.");
+        if ($tipo_icone === 'imagem') {
+            if (!isset($_FILES['card_icone']) || $_FILES['card_icone']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception("Para o tipo 'Imagem', o upload do arquivo é obrigatório.");
+            }
+            $upload_dir = '../uploads/';
+            $nome_arquivo = 'card-' . uniqid() . '-' . basename($_FILES['card_icone']['name']);
+            $caminho_destino = $upload_dir . $nome_arquivo;
+            if (!move_uploaded_file($_FILES['card_icone']['tmp_name'], $caminho_destino)) {
+                throw new Exception("Falha ao fazer upload do ícone do card.");
+            }
+            $caminho_icone = $caminho_destino;
+        } else {
+            $caminho_icone = trim($_POST['icone_bootstrap'] ?? 'bi-info-circle');
         }
-        $caminho_icone = $caminho_destino;
 
         $id_secao = null;
         $link_url = null;
@@ -67,8 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_secao = $pdo->lastInsertId();
         }
         
-        $stmt_card = $pdo->prepare("INSERT INTO cards_informativos (id_categoria, id_secao, link_url, titulo, subtitulo, caminho_icone, ordem) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt_card->execute([$id_categoria, $id_secao, $link_url, $card_titulo, $card_subtitulo, $caminho_icone, $card_ordem]);
+        $stmt_card = $pdo->prepare("INSERT INTO cards_informativos (id_categoria, id_secao, link_url, titulo, subtitulo, caminho_icone, tipo_icone, ordem) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt_card->execute([$id_categoria, $id_secao, $link_url, $card_titulo, $card_subtitulo, $caminho_icone, $tipo_icone, $card_ordem]);
         
         $pdo->commit();
         $_SESSION['mensagem_sucesso'] = "Card criado com sucesso!";
@@ -95,9 +103,34 @@ include 'admin_header.php';
                     <div class="row">
                         <div class="col-md-6 mb-3"><label for="card_titulo" class="form-label">Título do Card*</label><input type="text" class="form-control" id="card_titulo" name="card_titulo" required></div>
                         <div class="col-md-6 mb-3"><label for="card_subtitulo" class="form-label">Subtítulo do Card*</label><input type="text" class="form-control" id="card_subtitulo" name="card_subtitulo" required></div>
-                        <div class="col-md-6 mb-3"><label for="card_icone" class="form-label">Ícone do Card*</label><input type="file" class="form-control" id="card_icone" name="card_icone" accept="image/*" required></div>
                         <div class="col-md-6 mb-3"><label for="id_categoria" class="form-label">Categoria*</label><select class="form-select" id="id_categoria" name="id_categoria" required><option value="">-- Selecione uma Categoria --</option><?php foreach ($categorias as $categoria): ?><option value="<?php echo $categoria['id']; ?>"><?php echo htmlspecialchars($categoria['nome']); ?></option><?php endforeach; ?></select></div>
                         <div class="col-md-6 mb-3"><label for="card_ordem" class="form-label">Ordem de Exibição</label><input type="number" class="form-control" id="card_ordem" name="card_ordem" value="0"></div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-bold">Tipo de Ícone</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="tipo_icone" id="tipo_imagem" value="imagem" checked>
+                                    <label class="form-check-label" for="tipo_imagem">Imagem (Upload)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="tipo_icone" id="tipo_bootstrap" value="bootstrap">
+                                    <label class="form-check-label" for="tipo_bootstrap">Ícone do Sistema (Bootstrap)</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3" id="campo_upload_icone">
+                            <label for="card_icone" class="form-label">Arquivo de Ícone*</label>
+                            <input type="file" class="form-control" id="card_icone" name="card_icone" accept="image/*">
+                        </div>
+                        <div class="col-md-6 mb-3" id="campo_bootstrap_icone" style="display: none;">
+                            <label for="icone_bootstrap" class="form-label">Classe do Ícone Bootstrap (ex: bi-star)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-info-circle" id="preview_bi"></i></span>
+                                <input type="text" class="form-control" id="icone_bootstrap" name="icone_bootstrap" placeholder="bi-gear">
+                            </div>
+                            <small class="text-muted"><a href="https://icons.getbootstrap.com/" target="_blank">Ver catálogo de ícones</a></small>
+                        </div>
+                    </div>
                     </div>
                     <hr>
                     <p class="fw-bold">Tipo de Link do Card:</p>
@@ -194,6 +227,34 @@ document.addEventListener('DOMContentLoaded', function () {
     switchExterno.addEventListener('change', function() { if (this.checked) { switchConteudo.checked = false; switchSistema.checked = false; } updateFormState(); });
 
     updateFormState();
+
+    // Lógica para Troca de Tipo de Ícone
+    const radioImagem = document.getElementById('tipo_imagem');
+    const radioBootstrap = document.getElementById('tipo_bootstrap');
+    const fieldUpload = document.getElementById('campo_upload_icone');
+    const fieldBootstrap = document.getElementById('campo_bootstrap_icone');
+    const inputBootstrap = document.getElementById('icone_bootstrap');
+    const inputUpload = document.getElementById('card_icone');
+    const previewBI = document.getElementById('preview_bi');
+
+    radioImagem.addEventListener('change', () => {
+        fieldUpload.style.display = 'block';
+        fieldBootstrap.style.display = 'none';
+        inputUpload.required = true;
+        inputBootstrap.required = false;
+    });
+
+    radioBootstrap.addEventListener('change', () => {
+        fieldUpload.style.display = 'none';
+        fieldBootstrap.style.display = 'block';
+        inputUpload.required = false;
+        inputBootstrap.required = true;
+    });
+
+    inputBootstrap.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        previewBI.className = 'bi ' + (val || 'bi-info-circle');
+    });
 });
 </script>
 </body>
