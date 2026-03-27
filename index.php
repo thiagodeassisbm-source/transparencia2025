@@ -1,3 +1,4 @@
+<?php
 require_once 'conexao.php';
 require_once 'bootstrap_portal.php'; // Carrega o contexto da prefeitura ativa (SaaS)
 
