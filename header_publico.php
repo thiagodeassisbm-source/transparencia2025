@@ -2,17 +2,18 @@
 // /header_publico.php (Cabeçalho Centralizado para o Portal Público)
 require_once 'conexao.php';
 
-// Busca configurações globais da prefeitura
+// Busca configurações da prefeitura ativa (SaaS)
 try {
-    $stmt_conf = $pdo->query("SELECT chave, valor FROM configuracoes WHERE chave IN ('prefeitura_titulo', 'prefeitura_logo', 'prefeitura_cor_principal', 'prefeitura_cor_secundaria')");
+    $stmt_conf = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE id_prefeitura = ? AND chave IN ('prefeitura_titulo', 'prefeitura_logo', 'prefeitura_cor_principal', 'prefeitura_cor_secundaria')");
+    $stmt_conf->execute([$id_prefeitura_ativa]);
     $conf_data = $stmt_conf->fetchAll(PDO::FETCH_KEY_PAIR);
     
-    $prefeitura_titulo = !empty($conf_data['prefeitura_titulo']) ? $conf_data['prefeitura_titulo'] : 'Portal da Transparência Municipal';
+    $prefeitura_titulo = !empty($conf_data['prefeitura_titulo']) ? $conf_data['prefeitura_titulo'] : 'Portal da Transparência de ' . $nome_prefeitura_ativa;
     $prefeitura_logo = !empty($conf_data['prefeitura_logo']) ? $conf_data['prefeitura_logo'] : '';
     $cor_p = $conf_data['prefeitura_cor_principal'] ?? '#2ca444';
     $cor_s = $conf_data['prefeitura_cor_secundaria'] ?? '#1a4d1a';
 } catch (Exception $e) { 
-    $prefeitura_titulo = 'Portal da Transparência Municipal'; 
+    $prefeitura_titulo = 'Portal da Transparência'; 
     $prefeitura_logo = ''; 
     $cor_p = '#2ca444';
     $cor_s = '#1a4d1a';
@@ -64,7 +65,7 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
         <div class="container-fluid container-custom-padding d-flex justify-content-between align-items-center">
             <div class="breadcrumb-utility text-white small">
                 <span>VOCÊ ESTÁ AQUI:</span> 
-                <a href="index.php" class="text-white fw-600 text-decoration-none ms-1">INÍCIO</a>
+                <a href="portal/<?php echo $slug_prefeitura_ativa; ?>" class="text-white fw-600 text-decoration-none ms-1">INÍCIO</a>
                 <?php if (isset($page_title) && $page_title !== 'Transparência'): ?>
                     <span class="mx-1">/</span>
                     <span class="text-white opacity-75"><?php echo mb_strtoupper(htmlspecialchars($page_title)); ?></span>

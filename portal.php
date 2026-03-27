@@ -1,5 +1,5 @@
-<?php
 require_once 'conexao.php';
+require_once 'bootstrap_portal.php'; // Carrega o contexto da prefeitura (SaaS)
 
 // --- CONFIGURAÇÕES DA PAGINAÇÃO ---
 $itens_por_pagina = 10;
@@ -11,10 +11,10 @@ $slug_portal = filter_input(INPUT_GET, 'slug', FILTER_SANITIZE_FULL_SPECIAL_CHAR
 if (!$slug_portal) { die("Seção não especificada."); }
 
 // --- Busca de dados básicos da seção ---
-$stmt_portal = $pdo->prepare("SELECT id, nome, id_categoria FROM portais WHERE slug = ?");
-$stmt_portal->execute([$slug_portal]);
+$stmt_portal = $pdo->prepare("SELECT id, nome, id_categoria FROM portais WHERE slug = ? AND id_prefeitura = ?");
+$stmt_portal->execute([$slug_portal, $id_prefeitura_ativa]);
 $secao = $stmt_portal->fetch();
-if (!$secao) { die("Seção não encontrada."); }
+if (!$secao) { die("Seção não encontrada ou não pertence a esta prefeitura."); }
 $id_portal = $secao['id'];
 $page_title = $secao['nome'];
 $_GET['id'] = $secao['id_categoria'];
@@ -109,7 +109,7 @@ include 'header_publico.php';
             <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-header bg-white py-3"><h4><i class="bi bi-funnel-fill text-primary me-2"></i>Filtros de Pesquisa</h4></div>
                 <div class="card-body">
-                    <form method="GET" action="portal.php">
+                    <form method="GET" action="portal/<?php echo $slug_prefeitura_ativa; ?>/<?php echo $slug_portal; ?>">
                         <input type="hidden" name="slug" value="<?php echo htmlspecialchars($slug_portal); ?>">
                         <div class="row">
                             <?php foreach ($campos_pesquisaveis as $campo): ?>
@@ -127,7 +127,7 @@ include 'header_publico.php';
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i> Filtrar</button>
-                            <a href="portal.php?slug=<?php echo htmlspecialchars($slug_portal); ?>" class="btn btn-outline-secondary"><i class="bi bi-eraser-fill"></i> Limpar</a>
+                            <a href="portal/<?php echo $slug_prefeitura_ativa; ?>/<?php echo $slug_portal; ?>" class="btn btn-outline-secondary"><i class="bi bi-eraser-fill"></i> Limpar</a>
                             
                             <div class="dropdown ms-auto">
                                 <button class="btn btn-dynamic-primary dropdown-toggle" type="button" id="dropdownExport" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-download me-1"></i> Exportar Dados</button>

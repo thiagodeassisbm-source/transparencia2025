@@ -1,18 +1,18 @@
-<?php
 require_once 'conexao.php';
+require_once 'bootstrap_portal.php'; // Carrega o contexto da prefeitura (SaaS)
 
 $registro_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$registro_id) { die("Registro não especificado."); }
 
-// Busca os dados da seção a qual o registro pertence
+// Busca os dados da seção a qual o registro pertence e valida prefeitura
 $stmt_info = $pdo->prepare(
     "SELECT p.nome as nome_secao, p.slug 
      FROM registros r 
      JOIN portais p ON r.id_portal = p.id 
-     WHERE r.id = ?");
-$stmt_info->execute([$registro_id]);
+     WHERE r.id = ? AND p.id_prefeitura = ?");
+$stmt_info->execute([$registro_id, $id_prefeitura_ativa]);
 $secao_info = $stmt_info->fetch();
-if (!$secao_info) { die("Registro não encontrado ou inválido."); }
+if (!$secao_info) { die("Registro não encontrado ou não pertence a esta prefeitura."); }
 
 // Busca todos os campos e valores para este registro específico
 $stmt_detalhes = $pdo->prepare(
@@ -66,7 +66,7 @@ include 'header_publico.php';
             
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0 fw-bold">Detalhes do Registro</h2>
-                <a href="portal.php?slug=<?php echo $secao_info['slug']; ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
+                <a href="portal/<?php echo $slug_prefeitura_ativa; ?>/<?php echo $secao_info['slug']; ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
             </div>
 
             <div class="card border-0 shadow-sm mb-4">

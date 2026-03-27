@@ -1,6 +1,5 @@
-<?php
-// /index.php (Página Inicial Pública)
 require_once 'conexao.php';
+require_once 'bootstrap_portal.php'; // Carrega o contexto da prefeitura ativa (SaaS)
 
 // --- 1. CONFIGURAÇÕES DA PAGINAÇÃO ---
 $itens_por_pagina = 12;
@@ -22,12 +21,12 @@ if (empty($categoria_id) && !empty($categoria_slug)) {
 
 $ordem_atual = $_GET['sort'] ?? 'padrao';
 
-$sql_base = "FROM cards_informativos c LEFT JOIN portais p ON c.id_secao = p.id";
-$sql_where = "";
-$params_where = [];
+// Filtro por Prefeitura (Obrigatório no SaaS)
+$sql_where = " WHERE p.id_prefeitura = ?";
+$params_where[] = $id_prefeitura_ativa;
 
 if ($categoria_id) {
-    $sql_where = " WHERE c.id_categoria = ?";
+    $sql_where .= " AND c.id_categoria = ?";
     $params_where[] = $categoria_id;
 }
 
@@ -116,7 +115,7 @@ include 'header_publico.php';
                 <?php else: ?>
                     <?php foreach ($cards as $card): ?>
                         <?php
-                        $link = !empty($card['link_url']) ? htmlspecialchars($card['link_url']) : (!empty($card['slug']) ? 'portal.php?slug=' . htmlspecialchars($card['slug']) : '#');
+                        $link = !empty($card['link_url']) ? htmlspecialchars($card['link_url']) : (!empty($card['slug']) ? 'portal/' . $slug_prefeitura_ativa . '/' . htmlspecialchars($card['slug']) : '#');
                         $target = !empty($card['link_url']) ? '_blank' : '_self';
                         ?>
                         <div class="info-card border-0 shadow-sm">
