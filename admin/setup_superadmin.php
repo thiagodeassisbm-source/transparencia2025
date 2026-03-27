@@ -26,11 +26,23 @@ try {
         $pref_id = $pdo->lastInsertId();
     }
 
-    // --- CORREÇÃO DE DUPLICIDADE ---
-    // Limpamos o email do usuário 'admin' para liberar para o novo superadmin
-    $pdo->exec("UPDATE usuarios_admin SET email = 'admin@sistema.com' WHERE usuario = 'admin'");
+    // Adicionar id_prefeitura em TODAS as tabelas críticas para isolamento
+    $tables = ['portais', 'categorias', 'configuracoes', 'ouvidoria_manifestacoes', 'paginas', 'tipos_documento'];
+    foreach ($tables as $table) {
+        // Verifica se a tabela existe
+        $res = $pdo->query("SHOW TABLES LIKE '$table'");
+        if ($res->rowCount() > 0) {
+            $cols_t = $pdo->query("SHOW COLUMNS FROM $table")->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('id_prefeitura', $cols_t)) {
+                $pdo->exec("ALTER TABLE $table ADD COLUMN id_prefeitura INT DEFAULT NULL;");
+            }
+            // Garante que os dados antigos pertençam à prefeitura principal
+            $pdo->exec("UPDATE $table SET id_prefeitura = $pref_id WHERE id_prefeitura IS NULL");
+        }
+    }
 
-    // 3. RETIRAR superadmin do usuário "admin" comum (ele vira apenas admin da prefeitura principal)
+    // 3. RETIRAR superadmin do usuário "admin" comum
+    $pdo->exec("UPDATE usuarios_admin SET email = 'admin@sistema.com' WHERE usuario = 'admin'");
     $pass_comum = password_hash('123456789', PASSWORD_DEFAULT);
     $pdo->prepare("UPDATE usuarios_admin SET is_superadmin = 0, id_prefeitura = ?, senha = ? WHERE usuario = 'admin'")
         ->execute([$pref_id, $pass_comum]);
@@ -40,7 +52,6 @@ try {
     $super_email = 'superadmin@sistema.com';
     $super_pass = password_hash('123456789', PASSWORD_DEFAULT);
 
-    // Se o usuário 'superadmin' já existe, atualizamos, se não, inserimos.
     $stmt_super = $pdo->prepare("SELECT id FROM usuarios_admin WHERE usuario = ?");
     $stmt_super->execute([$super_user]);
     $super_id = $stmt_super->fetchColumn();
@@ -53,13 +64,12 @@ try {
             ->execute([$super_user, $super_email, $super_pass, 1, 1, null, 'Super Gestor']);
     }
 
-    echo "<h1>Separação Concluída com Sucesso! (Sem Duplicidade)</h1>";
+    echo "<h1>Migração Finalizada com Sucesso!</h1>";
     echo "<ul>
-            <li>Usuário <b>admin</b> agora é Administrador Local (Prefeitura Principal).</li>
-            <li>Usuário <b>superadmin</b> criado/atualizado com acesso Global.</li>
-            <li>Senha para ambos: <b>123456789</b></li>
+            <li>Isolamento de dados aplicado em Ouvidoria, Páginas e Portais.</li>
+            <li>Acessos configurados para Separar Admin de SuperAdmin.</li>
           </ul>";
-    echo "<p><a href='login.php'>Voltar para o Login</a></p>";
+    echo "<p><a href='login.php'>Ir para o Login</a></p>";
 
 } catch (Exception $e) {
     die("Erro ao configurar usuários: " . $e->getMessage());
