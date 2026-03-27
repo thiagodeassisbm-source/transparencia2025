@@ -12,13 +12,8 @@ if (!isset($_SESSION['is_superadmin']) || $_SESSION['is_superadmin'] !== 1) {
 $total_clientes = $pdo->query("SELECT COUNT(*) FROM prefeituras")->fetchColumn();
 $receita_mensal = $pdo->query("SELECT SUM(valor_mensalidade) FROM prefeituras WHERE status = 'ativo'")->fetchColumn() ?: 0;
 
-// 2. Busca lista de prefeituras com a cidade configurada se existir
-$stmt = $pdo->query("
-    SELECT p.*, 
-    (SELECT valor FROM configuracoes WHERE chave = 'prefeitura_cidade' AND id_prefeitura = p.id LIMIT 1) as cidade_config 
-    FROM prefeituras p 
-    ORDER BY p.criado_em DESC
-");
+// 2. Busca lista de prefeituras
+$stmt = $pdo->query("SELECT * FROM prefeituras ORDER BY criado_em DESC");
 $prefeituras = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $page_title_for_header = 'Gestão de Prefeituras SaaS';
@@ -85,19 +80,7 @@ include 'admin_header.php';
                                         <i class="bi bi-building text-primary"></i>
                                     </div>
                                     <div>
-                                        <?php 
-                                            // Pega a cidade (ex: Goiânia / GO) e limpa o Estado se houver barra
-                                            $cidade_full = $pref['cidade_config'] ?: $pref['nome'];
-                                            $cidade_nome = explode('/', $cidade_full)[0]; // Pega só o que vem antes da /
-                                            $cidade_nome = trim($cidade_nome);
-
-                                            if (stripos($cidade_nome, 'Prefeitura') === false) {
-                                                $exibir_nome = 'Prefeitura de ' . $cidade_nome;
-                                            } else {
-                                                $exibir_nome = $cidade_nome;
-                                            }
-                                        ?>
-                                        <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($exibir_nome); ?></h6>
+                                        <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($pref['nome']); ?></h6>
                                         <span class="text-muted small">Resp: <?php echo htmlspecialchars($pref['responsavel_nome'] ?? '---'); ?> (<?php echo htmlspecialchars($pref['responsavel_contato'] ?? '---'); ?>)</span>
                                     </div>
                                 </div>
