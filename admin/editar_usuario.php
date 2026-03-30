@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Busca os dados atuais do usuário (Aplicando Travas SaaS)
-$sql_user = "SELECT id, usuario, nome, id_perfil FROM usuarios_admin WHERE id = ?";
+$sql_user = "SELECT id, usuario, nome, id_perfil, is_superadmin FROM usuarios_admin WHERE id = ?";
 $params_user = [$usuario_id_para_editar];
 
 if (!$_SESSION['is_superadmin']) {
@@ -130,16 +130,26 @@ include 'admin_header.php';
                             </div>
                         </div>
                         
-                        <?php if ($_SESSION['admin_user_perfil'] === 'admin'): ?>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Perfil de Acesso</label>
-                            <select class="form-select" name="id_perfil">
-                                <?php foreach ($perfis as $p): ?>
-                                    <option value="<?php echo $p['id']; ?>" <?php echo ($usuario_atual['id_perfil'] == $p['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($p['nome']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Perfil de Acesso</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-shield-check"></i></span>
+                                    <select class="form-select bg-light border-start-0" name="id_perfil" <?php echo ($usuario_atual['is_superadmin'] == 1) ? 'disabled' : ''; ?>>
+                                        <?php if ($usuario_atual['is_superadmin'] == 1): ?>
+                                            <option value="0" selected>Super Administrador</option>
+                                        <?php else: ?>
+                                            <?php foreach ($perfis as $p): ?>
+                                                <option value="<?php echo $p['id']; ?>" <?php echo ($usuario_atual['id_perfil'] == $p['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($p['nome']); ?></option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
+                                </div>
+                                <?php if ($usuario_atual['is_superadmin'] == 1): ?>
+                                    <div class="form-text text-primary small mt-1"><i class="bi bi-info-circle me-1"></i> Perfil mestre do sistema (SaaS).</div>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                        <?php endif; ?>
 
                         <div class="bg-light p-4 rounded-3 mb-4">
                             <h6 class="fw-bold mb-3"><i class="bi bi-shield-lock me-2"></i> Alteração de Senha</h6>
