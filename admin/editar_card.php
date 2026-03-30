@@ -89,7 +89,7 @@ if (!$card) { header("Location: gerenciar_cards.php"); exit; }
 // Lógica para determinar o estado inicial dos switchers
 $is_pagina_conteudo = !empty($card['link_url']) && strpos($card['link_url'], 'pagina.php?slug=') === 0;
 // CORREÇÃO: Adicionado 'faq.php' à lista de páginas do sistema
-$is_pagina_sistema = !empty($card['link_url']) && in_array($card['link_url'], ['estrutura.php', 'ouvidoria.php', 'relatorio_publicacoes.php', 'faq.php']);
+$is_pagina_sistema = !empty($card['link_url']) && in_array($card['link_url'], ['estrutura.php', 'ouvidoria.php', 'relatorio_publicacoes.php', 'faq.php', 'sic.php']);
 $is_link_externo = !empty($card['link_url']) && !$is_pagina_conteudo && !$is_pagina_sistema;
 $slug_pagina_atual = $is_pagina_conteudo ? str_replace('pagina.php?slug=', '', $card['link_url']) : '';
 $pagina_sistema_atual = $is_pagina_sistema ? $card['link_url'] : '';
@@ -207,7 +207,9 @@ include 'admin_header.php';
                         <option value="">-- Selecione --</option>
                         <option value="estrutura.php" <?php if($pagina_sistema_atual == 'estrutura.php') echo 'selected'; ?>>Estrutura Organizacional</option>
                         <option value="ouvidoria.php" <?php if($pagina_sistema_atual == 'ouvidoria.php') echo 'selected'; ?>>Ouvidoria</option>
+                        <option value="sic.php" <?php if($pagina_sistema_atual == 'sic.php') echo 'selected'; ?>>e-Sic (Informação ao Cidadão)</option>
                         <option value="faq.php" <?php if($pagina_sistema_atual == 'faq.php') echo 'selected'; ?>>Perguntas Frequentes (FAQ)</option>
+                        <option value="relatorio_publicacoes.php" <?php if($pagina_sistema_atual == 'relatorio_publicacoes.php') echo 'selected'; ?>>Relatório de Publicações</option>
                     </select>
                 </div>
                 <div class="form-check form-switch mb-3">
