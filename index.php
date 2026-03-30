@@ -112,12 +112,13 @@ include 'header_publico.php';
 
 <div class="container-fluid">
     <div class="row">
-        <?php
-// Passa o ID da categoria ativa para o menu.php
-$_GET['categoria_id'] = $categoria_id;
-include 'menu.php';
-?>
-        <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
+        <div class="col-lg-3 pt-4 mb-4">
+            <?php 
+            $_GET['categoria_id'] = $categoria_id;
+            include 'menu.php'; 
+            ?>
+        </div>
+        <main class="col-lg-9 pt-4">
             
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0 fw-bold"><?php echo htmlspecialchars($page_title); ?></h2>
