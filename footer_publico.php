@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
             starIcon.classList.toggle('bi-star');
             starIcon.classList.toggle('bi-star-fill');
             starIcon.classList.toggle('text-warning');
-            fetch('favoritar_publico.php', {
+            fetch('<?php echo $base_url; ?>favoritar_publico.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ card_id: cardId })

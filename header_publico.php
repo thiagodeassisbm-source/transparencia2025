@@ -40,8 +40,15 @@ try {
     $cor_s = '#1a4d1a';
 }
 
-// Normaliza o caminho do logo para o frontend
-$logo_src = str_replace('../', '', $prefeitura_logo);
+// Normaliza o caminho do logo para o frontend usando a BASE URL
+$logo_src = '';
+if (!empty($prefeitura_logo)) {
+    $caminho_limpo = str_replace('../', '', $prefeitura_logo);
+    $logo_src = $base_url . $caminho_limpo;
+}
+
+// Helper para links dentro do portal da prefeitura ativa
+$portal_home = $base_url . "portal/" . $slug_pref_header;
 ?>
 <style>
     :root {
@@ -85,8 +92,8 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
         <div class="container-fluid container-custom-padding d-flex justify-content-between align-items-center">
             <div class="breadcrumb-utility text-white small">
                 <span>VOCÊ ESTÁ AQUI:</span> 
-                <a href="portal/<?php echo $slug_pref_header; ?>" class="text-white fw-600 text-decoration-none ms-1">INÍCIO</a>
-                <?php if (isset($page_title) && $page_title !== 'Transparência'): ?>
+                <a href="<?php echo $portal_home; ?>" class="text-white fw-600 text-decoration-none ms-1">INÍCIO</a>
+                <?php if (isset($page_title) && $page_title !== 'Transparência' && $page_title !== 'Início'): ?>
                     <span class="mx-1">/</span>
                     <span class="text-white opacity-75"><?php echo mb_strtoupper(htmlspecialchars($page_title)); ?></span>
                 <?php endif; ?>
@@ -104,7 +111,7 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
                 </div>
 
                 <div class="ms-3 login-utility">
-                    <a href="admin/login.php" class="acc-btn login-btn" title="Acesso Administrativo">
+                    <a href="<?php echo $base_url; ?>admin/login.php" class="acc-btn login-btn" title="Acesso Administrativo">
                         <i class="bi bi-lock-fill"></i>
                     </a>
                 </div>
