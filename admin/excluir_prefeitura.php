@@ -47,8 +47,8 @@ try {
     $pdo->prepare("DELETE FROM configuracoes WHERE id_prefeitura = ?")
         ->execute([$id_prefeitura]);
 
-    // 8. Apaga os Logs
-    $pdo->prepare("DELETE FROM logs WHERE id_prefeitura = ?")
+    // 8. Apaga os Logs do sistema desta prefeitura
+    $pdo->prepare("DELETE FROM logs_sistema WHERE id_prefeitura = ?")
         ->execute([$id_prefeitura]);
 
     // 9. Por fim, apaga a prefeitura
