@@ -81,11 +81,10 @@ function isActive($pageName) {
                             <i class="bi bi-activity"></i> Auditoria Global
                         </a>
                     </li>
-                    <li class="mt-3 px-3 mb-2 small text-muted text-uppercase fw-bold">Página Principal</li>
                     <li>
                         <?php $landing_active = isActive(['gerenciar_landing_recursos.php', 'editar_landing_recurso.php']); ?>
                         <a href="#collapseLanding" class="nav-link has-submenu <?php echo $landing_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
-                            <span><i class="bi bi-window-stack"></i> Admin Landing</span>
+                            <span><i class="bi bi-window-stack"></i> Página Principal</span>
                             <i class="bi bi-chevron-down submenu-arrow"></i>
                         </a>
                         <div class="collapse <?php echo $landing_active ? 'show' : ''; ?>" id="collapseLanding">
@@ -94,16 +93,15 @@ function isActive($pageName) {
                             </ul>
                         </div>
                     </li>
-                    <li class="mt-3 px-3 mb-2 small text-muted text-uppercase fw-bold">Comunicação</li>
                     <li>
                         <?php $comm_active = isActive(['gerenciar_mensagens.php', 'enviar_mensagem.php']); ?>
                         <a href="#collapseComm" class="nav-link has-submenu <?php echo $comm_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
-                            <span><i class="bi bi-chat-left-text"></i> Mensagens</span>
+                            <span><i class="bi bi-chat-left-text"></i> Comunicação</span>
                             <i class="bi bi-chevron-down submenu-arrow"></i>
                         </a>
                         <div class="collapse <?php echo $comm_active ? 'show' : ''; ?>" id="collapseComm">
                             <ul class="submenu">
-                                <li><a href="gerenciar_mensagens.php" class="nav-link <?php echo isActive(['gerenciar_mensagens.php', 'enviar_mensagem.php']); ?>">Gestão de Avisos</a></li>
+                                <li><a href="gerenciar_mensagens.php" class="nav-link <?php echo isActive(['gerenciar_mensagens.php', 'enviar_mensagem.php']); ?>">Mensagens</a></li>
                             </ul>
                         </div>
                     </li>
