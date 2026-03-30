@@ -12,7 +12,9 @@ if (!$id_prefeitura_ativa) {
 // --- 1. CONFIGURAÇÕES DA PAGINAÇÃO ---
 $itens_por_pagina = 12;
 $pagina_atual = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT) ?: 1;
-if ($pagina_atual < 1) { $pagina_atual = 1; }
+if ($pagina_atual < 1) {
+    $pagina_atual = 1;
+}
 $offset = ($pagina_atual - 1) * $itens_por_pagina;
 
 // --- 2. LÓGICA DE FILTROS, ORDENAÇÃO E FAVORITOS ---
@@ -57,7 +59,8 @@ $sql_select = "SELECT c.id, c.titulo, c.subtitulo, c.caminho_icone, c.tipo_icone
 $sql_order = "";
 if ($ordem_atual === 'alpha') {
     $sql_order = " ORDER BY favorito DESC, c.titulo ASC";
-} else {
+}
+else {
     $sql_order = " ORDER BY favorito DESC, c.ordem ASC";
 }
 $sql_limit = " LIMIT ? OFFSET ?";
@@ -75,7 +78,9 @@ if ($categoria_id) {
     $stmt_cat = $pdo->prepare("SELECT nome FROM categorias WHERE id = ?");
     $stmt_cat->execute([$categoria_id]);
     $categoria_atual = $stmt_cat->fetch();
-    if ($categoria_atual) { $page_title = $categoria_atual['nome']; }
+    if ($categoria_atual) {
+        $page_title = $categoria_atual['nome'];
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -95,52 +100,58 @@ if ($categoria_id) {
 </head>
 <body class="bg-light">
 
-<?php 
-include 'header_publico.php'; 
+<?php
+
+include 'header_publico.php';
+
 ?>
 
 <div class="container-fluid">
     <div class="row">
-        <?php 
-        // Passa o ID da categoria ativa para o menu.php
-        $_GET['categoria_id'] = $categoria_id; 
-        include 'menu.php'; 
-        ?>
+        <?php
+// Passa o ID da categoria ativa para o menu.php
+$_GET['categoria_id'] = $categoria_id;
+include 'menu.php';
+?>
         <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
             
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0 fw-bold"><?php echo htmlspecialchars($page_title); ?></h2>
                 <div class="btn-group shadow-sm">
-                    <?php 
-                        $query_params_sort = $_GET;
-                        unset($query_params_sort['sort'], $query_params_sort['page']);
-                    ?>
-                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo ($ordem_atual === 'padrao') ? 'btn-dynamic-primary' : 'btn-outline-secondary'; ?>">Mais Acessados</a>
+                    <?php
+$query_params_sort = $_GET;
+unset($query_params_sort['sort'], $query_params_sort['page']);
+?>
+                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo($ordem_atual === 'padrao') ? 'btn-dynamic-primary' : 'btn-outline-secondary'; ?>">Mais Acessados</a>
                     <?php $query_params_sort['sort'] = 'alpha'; ?>
-                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo ($ordem_atual === 'alpha') ? 'btn-dynamic-primary' : 'btn-outline-secondary'; ?>">Ordem Alfabética</a>
+                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo($ordem_atual === 'alpha') ? 'btn-dynamic-primary' : 'btn-outline-secondary'; ?>">Ordem Alfabética</a>
                 </div>
             </div>
 
             <div class="info-card-list">
                 <?php if (empty($cards)): ?>
                     <div class="alert alert-light border shadow-sm"><i class="bi bi-info-circle me-2"></i>Nenhum serviço disponível no momento para esta categoria.</div>
-                <?php else: ?>
+                <?php
+else: ?>
                     <?php foreach ($cards as $card): ?>
                         <?php
-                        $link = !empty($card['link_url']) ? htmlspecialchars($card['link_url']) : (!empty($card['slug']) ? 'portal/' . $slug_prefeitura_ativa . '/' . htmlspecialchars($card['slug']) : '#');
-                        $target = !empty($card['link_url']) ? '_blank' : '_self';
-                        ?>
+        $link = !empty($card['link_url']) ? htmlspecialchars($card['link_url']) : (!empty($card['slug']) ? 'portal/' . $slug_prefeitura_ativa . '/' . htmlspecialchars($card['slug']) : '#');
+        $target = !empty($card['link_url']) ? '_blank' : '_self';
+?>
                         <div class="info-card border-0 shadow-sm">
                             <div class="icon-container position-relative">
                                 <div class="dynamic-icon shadow-sm"></div>
                                 <div class="dynamic-icon-text">
                                     <?php if (($card['tipo_icone'] ?? 'imagem') === 'bootstrap'): ?>
                                         <i class="bi <?php echo htmlspecialchars($card['caminho_icone']); ?>"></i>
-                                    <?php elseif (!empty($card['caminho_icone'])): ?>
+                                    <?php
+        elseif (!empty($card['caminho_icone'])): ?>
                                         <img src="<?php echo htmlspecialchars($card['caminho_icone']); ?>" alt="" style="width: 24px; height: 24px; object-fit: contain;">
-                                    <?php else: ?>
+                                    <?php
+        else: ?>
                                         <i class="bi bi-info-circle"></i>
-                                    <?php endif; ?>
+                                    <?php
+        endif; ?>
                                 </div>
                             </div>
                             <div class="text-container">
@@ -160,36 +171,47 @@ include 'header_publico.php';
                                 <div class="demo-badge position-absolute top-0 end-0 bg-danger text-white px-2 py-1 small rounded-bottom-0 rounded-start-2 shadow-sm" style="font-size: 0.65rem; font-weight: 700;">
                                     <i class="bi bi-info-circle me-1"></i> DEMONSTRATIVO
                                 </div>
-                            <?php endif; ?>
+                            <?php
+        endif; ?>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                    <?php
+    endforeach; ?>
+                <?php
+endif; ?>
             </div>
 
             <?php if ($total_paginas > 1): ?>
             <nav aria-label="Navegação das páginas" class="mt-5 d-flex justify-content-center">
                 <ul class="pagination shadow-sm">
                     <?php $query_params_page = $_GET; ?>
-                    <li class="page-item <?php if($pagina_atual <= 1){ echo 'disabled'; } ?>">
+                    <li class="page-item <?php if ($pagina_atual <= 1) {
+        echo 'disabled';
+    }?>">
                         <?php $query_params_page['page'] = $pagina_atual - 1; ?>
                         <a class="page-link" href="?<?php echo http_build_query($query_params_page); ?>">Anterior</a>
                     </li>
                     <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
                         <?php $query_params_page['page'] = $i; ?>
-                        <li class="page-item <?php if($pagina_atual == $i) { echo 'active-dynamic'; } ?>">
+                        <li class="page-item <?php if ($pagina_atual == $i) {
+            echo 'active-dynamic';
+        }?>">
                             <a class="page-link" href="?<?php echo http_build_query($query_params_page); ?>"><?php echo $i; ?></a>
                         </li>
-                    <?php endfor; ?>
+                    <?php
+    endfor; ?>
                 </ul>
             </nav>
-            <?php endif; ?>
+            <?php
+endif; ?>
         </main>
     </div>
 </div>
 
-<?php 
+<?php
+
 $custom_container_class = "container-custom-padding";
-include 'footer_publico.php'; 
+include 'footer_publico.php';
+
 ?>
 </body>
 </html>

@@ -76,18 +76,19 @@ if ($id_portal) {
                             <input type="text" id="filtro-unidade" class="form-control" placeholder="Filtrar unidades...">
                         </div>
                         <div id="lista-de-unidades">
-                            <?php foreach($unidades as $unidade): ?>
+                            <?php foreach ($unidades as $unidade): ?>
                                 <a href="#unidade-<?php echo $unidade['id']; ?>" class="list-group-item list-group-item-action unidade-item">
                                     <?php echo htmlspecialchars($unidade['Unidade'] ?? 'Unidade sem nome'); ?>
                                 </a>
-                            <?php endforeach; ?>
+                            <?php
+endforeach; ?>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-8">
                     <?php if (!empty($unidades)): ?>
-                        <?php foreach($unidades as $index => $unidade): ?>
+                        <?php foreach ($unidades as $index => $unidade): ?>
                         <div class="card mb-3 unidade-detalhe" id="unidade-<?php echo $unidade['id']; ?>" style="<?php echo $index > 0 ? 'display:none;' : ''; ?>">
                             <div class="card-header">
                                 <h5><?php echo htmlspecialchars($unidade['Unidade'] ?? 'Detalhes da Unidade'); ?></h5>
@@ -102,10 +103,13 @@ if ($id_portal) {
                                 <p><strong>Competências:</strong><br><?php echo nl2br(htmlspecialchars($unidade['Competências'] ?? 'Não informado')); ?></p>
                             </div>
                         </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
+                        <?php
+    endforeach; ?>
+                    <?php
+else: ?>
                         <p class="text-muted">Nenhuma unidade cadastrada na Estrutura Organizacional.</p>
-                    <?php endif; ?>
+                    <?php
+endif; ?>
                 </div>
             </div>
         </main>

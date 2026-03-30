@@ -20,7 +20,8 @@ try {
         $stats[$tipo] = $stats_raw[$tipo] ?? 0;
     }
     $total_manifestacoes = array_sum($stats);
-} catch (Exception $e) {
+}
+catch (Exception $e) {
     // Se houver erro (ex: tabela não existe), o relatório não será exibido
     $stats = [];
     $total_manifestacoes = 0;
@@ -31,8 +32,9 @@ $config_ouvidoria = [];
 try {
     $stmt_config = $pdo->query("SELECT chave, valor FROM configuracoes WHERE chave LIKE 'ouvidoria_%'");
     $config_ouvidoria = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
-} catch (Exception $e) {
-    // Ignora o erro se a tabela de configurações não existir
+}
+catch (Exception $e) {
+// Ignora o erro se a tabela de configurações não existir
 }
 ?>
 <!DOCTYPE html>
@@ -52,9 +54,12 @@ try {
 </head>
 <body class="bg-light">
 
-<?php 
-$page_title = "Ouvidoria"; 
-include 'header_publico.php'; 
+<?php
+
+$page_title = "Ouvidoria";
+
+include 'header_publico.php';
+
 ?>
 
 <div class="container-fluid">
@@ -70,7 +75,8 @@ include 'header_publico.php';
                     <p>Sua manifestação foi registrada com sucesso. Anote o número do seu protocolo para acompanhar:</p>
                     <p class="h5"><strong>Protocolo:</strong> <?php echo htmlspecialchars($_GET['protocolo']); ?></p>
                 </div>
-            <?php endif; ?>
+            <?php
+endif; ?>
 
             <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-body">
@@ -132,14 +138,19 @@ include 'header_publico.php';
                     <hr>
                     <?php if ($total_manifestacoes > 0): ?>
                         <?php foreach ($stats as $tipo => $quantidade):
-                            $percentual = ($quantidade / $total_manifestacoes) * 100;
-                            $cor_barra = 'bg-secondary';
-                            if ($tipo == 'Elogio') $cor_barra = 'bg-success';
-                            if ($tipo == 'Sugestão') $cor_barra = 'bg-primary';
-                            if ($tipo == 'Reclamação') $cor_barra = 'bg-warning';
-                            if ($tipo == 'Denúncia') $cor_barra = 'bg-danger';
-                            if ($tipo == 'Solicitação') $cor_barra = 'bg-info';
-                        ?>
+        $percentual = ($quantidade / $total_manifestacoes) * 100;
+        $cor_barra = 'bg-secondary';
+        if ($tipo == 'Elogio')
+            $cor_barra = 'bg-success';
+        if ($tipo == 'Sugestão')
+            $cor_barra = 'bg-primary';
+        if ($tipo == 'Reclamação')
+            $cor_barra = 'bg-warning';
+        if ($tipo == 'Denúncia')
+            $cor_barra = 'bg-danger';
+        if ($tipo == 'Solicitação')
+            $cor_barra = 'bg-info';
+?>
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="fw-bold"><?php echo htmlspecialchars($tipo); ?></span>
@@ -149,13 +160,16 @@ include 'header_publico.php';
                                 <div class="progress-bar <?php echo $cor_barra; ?> progress-bar-striped" role="progressbar" style="width: <?php echo $percentual; ?>%;" aria-valuenow="<?php echo $percentual; ?>" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </div>
-                        <?php endforeach; ?>
+                        <?php
+    endforeach; ?>
                          <div class="text-end mt-3">
                             <a href="ouvidoria_relatorio.php" class="btn btn-outline-primary">Ver mais detalhes <i class="bi bi-arrow-right-circle ms-1"></i></a>
                          </div>
-                    <?php else: ?>
+                    <?php
+else: ?>
                         <p class="text-muted italic"><i class="bi bi-info-circle me-1"></i>Ainda não há dados suficientes para gerar um gráfico estatístico.</p>
-                    <?php endif; ?>
+                    <?php
+endif; ?>
                 </div>
             </div>
 
@@ -163,9 +177,11 @@ include 'header_publico.php';
     </div>
 </div>
 
-<?php 
+<?php
+
 $custom_container_class = "container-custom-padding";
-include 'footer_publico.php'; 
+include 'footer_publico.php';
+
 ?>
 </body>
 </html>

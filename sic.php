@@ -7,7 +7,8 @@ $info_sic = [];
 try {
     $stmt = $pdo->query("SELECT chave, valor FROM configuracoes WHERE chave LIKE 'sic_%'");
     $info_sic = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-} catch (Exception $e) {
+}
+catch (Exception $e) {
     $info_sic = [
         'sic_setor' => 'Não informado', 'sic_endereco' => 'Não informado',
         'sic_responsavel' => 'Não informado', 'sic_email' => 'Não informado',
@@ -32,9 +33,12 @@ try {
 </head>
 <body class="bg-light">
 
-<?php 
-$page_title = "SIC"; 
-include 'header_publico.php'; 
+<?php
+
+$page_title = "SIC";
+
+include 'header_publico.php';
+
 ?>
 
 <div class="container-fluid">
@@ -49,7 +53,8 @@ include 'header_publico.php';
                     <p>Seu pedido de informação foi registrado. Anote o número do seu protocolo para acompanhar:</p>
                     <p class="h5"><strong>Protocolo:</strong> <?php echo htmlspecialchars($_GET['protocolo']); ?></p>
                 </div>
-            <?php endif; ?>
+            <?php
+endif; ?>
 
             <div class="row">
                 <div class="col-lg-4 mb-4">
@@ -119,9 +124,11 @@ include 'header_publico.php';
     </div>
 </div>
 
-<?php 
+<?php
+
 $custom_container_class = "container-custom-padding";
-include 'footer_publico.php'; 
+include 'footer_publico.php';
+
 ?>
 </body>
 </html>

@@ -109,72 +109,81 @@ if ($id_portal) {
                                 <div class="col-md-4 mb-3">
                                     <label for="filtro_<?php echo $campo['id']; ?>" class="form-label"><?php echo htmlspecialchars($campo['nome_campo']); ?></label>
                                     <?php
-                                    $valor_filtro_atual = $filtros_ativos[$campo['id']] ?? '';
+        $valor_filtro_atual = $filtros_ativos[$campo['id']] ?? '';
 
-                                    if ($campo['tipo_campo'] == 'select') {
-                                        $stmt_opcoes = $pdo->prepare("SELECT opcoes_campo FROM campos_portal WHERE id = ?");
-                                        $stmt_opcoes->execute([$campo['id']]);
-                                        $opcoes_str = $stmt_opcoes->fetchColumn();
+        if ($campo['tipo_campo'] == 'select') {
+            $stmt_opcoes = $pdo->prepare("SELECT opcoes_campo FROM campos_portal WHERE id = ?");
+            $stmt_opcoes->execute([$campo['id']]);
+            $opcoes_str = $stmt_opcoes->fetchColumn();
 
-                                        echo '<select class="form-select" name="filtros['. $campo['id'] .']" id="filtro_'. $campo['id'] .'">';
-                                        echo '<option value="">-- Todos --</option>';
+            echo '<select class="form-select" name="filtros[' . $campo['id'] . ']" id="filtro_' . $campo['id'] . '">';
+            echo '<option value="">-- Todos --</option>';
 
-                                        $opcoes = [];
-                                        if (strpos($opcoes_str, 'tabela:') === 0) {
-                                            list(, $nome_tabela) = explode(':', $opcoes_str);
-                                            $nome_tabela = trim($nome_tabela);
-                                            
-                                            $stmt_tabela_externa = $pdo->query("SELECT DISTINCT nome FROM " . preg_replace("/[^a-zA-Z0-9_]+/", "", $nome_tabela) . " ORDER BY nome");
-                                            if($stmt_tabela_externa) {
-                                                $opcoes_tabela = $stmt_tabela_externa->fetchAll(PDO::FETCH_COLUMN);
-                                                foreach($opcoes_tabela as $opt) {
-                                                    $opcoes[] = trim($opt);
-                                                }
-                                            }
-                                        } else {
-                                            $opcoes = array_map('trim', explode(',', $opcoes_str));
-                                        }
+            $opcoes = [];
+            if (strpos($opcoes_str, 'tabela:') === 0) {
+                list(, $nome_tabela) = explode(':', $opcoes_str);
+                $nome_tabela = trim($nome_tabela);
 
-                                        foreach ($opcoes as $opcao) {
-                                            if (!empty($opcao)) {
-                                                $selected = ($valor_filtro_atual == $opcao) ? 'selected' : '';
-                                                echo '<option value="'. htmlspecialchars($opcao) .'" '. $selected .'>'. htmlspecialchars($opcao) .'</option>';
-                                            }
-                                        }
-                                        echo '</select>';
-                                    } else {
-                                        echo '<input type="text" class="form-control" name="filtros['. $campo['id'] .']" id="filtro_'. $campo['id'] .'" value="'. htmlspecialchars($valor_filtro_atual) .'">';
-                                    }
-                                    ?>
+                $stmt_tabela_externa = $pdo->query("SELECT DISTINCT nome FROM " . preg_replace("/[^a-zA-Z0-9_]+/", "", $nome_tabela) . " ORDER BY nome");
+                if ($stmt_tabela_externa) {
+                    $opcoes_tabela = $stmt_tabela_externa->fetchAll(PDO::FETCH_COLUMN);
+                    foreach ($opcoes_tabela as $opt) {
+                        $opcoes[] = trim($opt);
+                    }
+                }
+            }
+            else {
+                $opcoes = array_map('trim', explode(',', $opcoes_str));
+            }
+
+            foreach ($opcoes as $opcao) {
+                if (!empty($opcao)) {
+                    $selected = ($valor_filtro_atual == $opcao) ? 'selected' : '';
+                    echo '<option value="' . htmlspecialchars($opcao) . '" ' . $selected . '>' . htmlspecialchars($opcao) . '</option>';
+                }
+            }
+            echo '</select>';
+        }
+        else {
+            echo '<input type="text" class="form-control" name="filtros[' . $campo['id'] . ']" id="filtro_' . $campo['id'] . '" value="' . htmlspecialchars($valor_filtro_atual) . '">';
+        }
+?>
                                 </div>
-                            <?php endforeach; ?>
+                            <?php
+    endforeach; ?>
                         </div>
                         <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Filtrar</button>
                         <a href="faq.php" class="btn btn-secondary ms-2"><i class="bi bi-eraser-fill"></i> Limpar Filtros</a>
                     </form>
                 </div>
             </div>
-            <?php endif; ?>
+            <?php
+endif; ?>
 
             <div class="accordion" id="faqAccordion">
                 <?php if (!empty($faqs)): ?>
                     <?php foreach ($faqs as $index => $faq): ?>
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="heading-<?php echo $faq['id']; ?>">
-                                <button class="accordion-button <?php if ($index > 0) echo 'collapsed'; ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?php echo $faq['id']; ?>" aria-expanded="<?php echo $index === 0 ? 'true' : 'false'; ?>" aria-controls="collapse-<?php echo $faq['id']; ?>">
+                                <button class="accordion-button <?php if ($index > 0)
+            echo 'collapsed'; ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?php echo $faq['id']; ?>" aria-expanded="<?php echo $index === 0 ? 'true' : 'false'; ?>" aria-controls="collapse-<?php echo $faq['id']; ?>">
                                     <i class="bi bi-plus-circle me-2"></i><strong><?php echo htmlspecialchars($faq['Pergunta'] ?? 'Pergunta não disponível'); ?></strong>
                                     </button>
                             </h2>
-                            <div id="collapse-<?php echo $faq['id']; ?>" class="accordion-collapse collapse <?php if ($index === 0) echo 'show'; ?>" aria-labelledby="heading-<?php echo $faq['id']; ?>" data-bs-parent="#faqAccordion">
+                            <div id="collapse-<?php echo $faq['id']; ?>" class="accordion-collapse collapse <?php if ($index === 0)
+            echo 'show'; ?>" aria-labelledby="heading-<?php echo $faq['id']; ?>" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
                                     <?php echo $faq['Resposta'] ?? 'Resposta não disponível.'; ?>
                                 </div>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
+                    <?php
+    endforeach; ?>
+                <?php
+else: ?>
                     <div class="alert alert-light">Nenhuma pergunta encontrada para os filtros selecionados.</div>
-                <?php endif; ?>
+                <?php
+endif; ?>
             </div>
         </main>
     </div>

@@ -7,14 +7,15 @@ try {
     $stmt_conf = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE id_prefeitura = ? AND chave IN ('prefeitura_titulo', 'prefeitura_logo', 'prefeitura_cor_principal', 'prefeitura_cor_secundaria')");
     $stmt_conf->execute([$id_prefeitura_ativa]);
     $conf_data = $stmt_conf->fetchAll(PDO::FETCH_KEY_PAIR);
-    
+
     $prefeitura_titulo = !empty($conf_data['prefeitura_titulo']) ? $conf_data['prefeitura_titulo'] : 'Portal da Transparência de ' . $nome_prefeitura_ativa;
     $prefeitura_logo = !empty($conf_data['prefeitura_logo']) ? $conf_data['prefeitura_logo'] : '';
     $cor_p = $conf_data['prefeitura_cor_principal'] ?? '#2ca444';
     $cor_s = $conf_data['prefeitura_cor_secundaria'] ?? '#1a4d1a';
-} catch (Exception $e) { 
-    $prefeitura_titulo = 'Portal da Transparência'; 
-    $prefeitura_logo = ''; 
+}
+catch (Exception $e) {
+    $prefeitura_titulo = 'Portal da Transparência';
+    $prefeitura_logo = '';
     $cor_p = '#2ca444';
     $cor_s = '#1a4d1a';
 }
@@ -69,7 +70,8 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
                 <?php if (isset($page_title) && $page_title !== 'Transparência'): ?>
                     <span class="mx-1">/</span>
                     <span class="text-white opacity-75"><?php echo mb_strtoupper(htmlspecialchars($page_title)); ?></span>
-                <?php endif; ?>
+                <?php
+endif; ?>
             </div>
             <div class="accessibility-bar d-flex align-items-center">
                 <span class="accessibility-label me-3">ACESSIBILIDADE</span>
@@ -97,7 +99,8 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
         <div class="container-fluid container-custom-padding">
             <?php if ($logo_src): ?>
                 <img src="<?php echo htmlspecialchars($logo_src); ?>" alt="Brasão Prefeitura" class="prefeitura-logo-header mb-2">
-            <?php endif; ?>
+            <?php
+endif; ?>
             <h1 class="portal-main-title mb-1"><?php echo htmlspecialchars($prefeitura_titulo); ?></h1>
             <p class="portal-subtitle mb-0">Acesso rápido e transparente às publicações municipais</p>
         </div>
