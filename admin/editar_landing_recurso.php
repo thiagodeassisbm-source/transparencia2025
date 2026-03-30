@@ -58,7 +58,7 @@ include 'admin_header.php';
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Ordem de Exibição</label>
-                            <input type="number" name="ordem" class="form-control" value="<?php echo $recurso['ordem'] ?? '10'; ?>" required>
+                            <input type="number" name="ordem" class="form-control" value="<?php echo $recurso['ordem'] ?? '1'; ?>" required>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted">Ícone (Classe Bootstrap Icons)</label>

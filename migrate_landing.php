@@ -22,8 +22,8 @@ try {
         
         $recursos = [
             ['Dados Abertos', 'Informações detalhadas sobre receitas, despesas, folha de pagamento e contratos em formato acessível.', 'bi-clipboard-data', 1],
-            ['Diário Oficial', 'Publicações oficiais diárias, decretos, leis e atos administrativos com certificação digital.', 'bi-journal-text', 20],
-            ['Conformidade Legal', 'Integralmente adequado à Lei de Acesso à Informação (LAI) e Lei de Responsabilidade Fiscal.', 'bi-shield-check', 30]
+            ['Diário Oficial', 'Publicações oficiais diárias, decretos, leis e atos administrativos com certificação digital.', 'bi-journal-text', 2],
+            ['Conformidade Legal', 'Integralmente adequado à Lei de Acesso à Informação (LAI) e Lei de Responsabilidade Fiscal.', 'bi-shield-check', 3]
         ];
 
         foreach ($recursos as $r) {
