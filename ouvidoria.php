@@ -58,7 +58,7 @@ $config_ouvidoria['ouvidoria_telefone'] = $config_ouvidoria['ouvidoria_telefone'
 include 'header_publico.php'; 
 ?>
 
-<div class="container-fluid container-custom-padding py-4">
+<div class="container-fluid">
     <div class="row">
         <!-- Menu Lateral -->
         <div class="col-lg-3 mb-4">

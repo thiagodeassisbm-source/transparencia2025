@@ -46,7 +46,7 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
 include 'header_publico.php'; 
 ?>
 
-<div class="container-fluid container-custom-padding py-4">
+<div class="container-fluid py-4">
     <div class="row">
         <!-- Menu Lateral -->
         <div class="col-lg-3 mb-4">
