@@ -12,6 +12,8 @@ if (!$pref_slug && isset($_SESSION['id_prefeitura'])) {
     $pref_slug = $stmt_pref->fetchColumn();
 }
 
+$prefeitura_ativa = null;
+
 // 3. Busca os dados da prefeitura ativa pelo slug
 if ($pref_slug) {
     $stmt_pref_val = $pdo->prepare("SELECT * FROM prefeituras WHERE slug = ?");
