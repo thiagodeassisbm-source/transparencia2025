@@ -260,7 +260,7 @@ $accent_color = "#3b82f6";  // Blue 500
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin: 0 auto 1.5rem; /* Centralizado horizontalmente */
         }
 
         .feature-title {
@@ -394,7 +394,7 @@ $accent_color = "#3b82f6";  // Blue 500
                 foreach ($recursos_db as $res): 
                 ?>
                 <div class="col-md-4">
-                    <div class="feature-item">
+                    <div class="feature-item text-center">
                         <div class="feature-icon"><i class="bi <?php echo htmlspecialchars($res['icone']); ?>"></i></div>
                         <h4 class="feature-title"><?php echo htmlspecialchars($res['titulo']); ?></h4>
                         <p class="feature-text"><?php echo htmlspecialchars($res['descricao']); ?></p>
