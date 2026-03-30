@@ -60,10 +60,15 @@ $page_title = "Detalhes";
 include 'header_publico.php'; 
 ?>
 
-<div class="container-fluid">
+<div class="container-fluid container-custom-padding py-4">
     <div class="row">
-        <?php include 'menu.php'; ?>
-        <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
+        <!-- Menu Lateral -->
+        <div class="col-md-3 col-lg-2 d-md-block p-0 mb-4">
+            <?php include 'menu.php'; ?>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <main class="col-md-9 ms-auto col-lg-10 px-md-4">
             
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0 fw-bold">Detalhes do Registro</h2>

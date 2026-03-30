@@ -28,7 +28,11 @@ if (file_exists($menu_path)) {
     echo "ERRO: O arquivo menu.php NÃO foi encontrado na pasta raiz!\n";
 }
 
-echo "\n4. CONEXÃO COM O BANCO:\n";
+echo "4. ESTADO DO GIT NO SERVIDOR:\n";
+exec('git log -n 1 --pretty=format:"%h - %s (%ad)" --date=short', $git_log);
+echo ($git_log[0] ?? 'Comando git não disponível ou erro na execução') . "\n\n";
+
+echo "5. CONEXÃO COM O BANCO:\n";
 try {
     $stmt = $pdo->query("SELECT nome FROM prefeituras LIMIT 1");
     $pref = $stmt->fetch();
@@ -36,4 +40,5 @@ try {
 } catch (Exception $e) {
     echo "ERRO DE BANCO: " . $e->getMessage() . "\n";
 }
+echo "\nNota: Se o commit acima não for o seu último, o servidor não puxou as mudanças.";
 ?>

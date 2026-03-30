@@ -61,12 +61,12 @@ include 'header_publico.php';
 <div class="container-fluid container-custom-padding py-4">
     <div class="row">
         <!-- Menu Lateral -->
-        <div class="col-lg-3 mb-4">
+        <div class="col-md-3 col-lg-2 d-md-block p-0 mb-4">
             <?php include 'menu.php'; ?>
         </div>
 
         <!-- Conteúdo Principal -->
-        <main class="col-lg-9">
+        <main class="col-md-9 ms-auto col-lg-10 px-md-4">
             <h2 class="mb-4 fw-bold text-dark border-bottom pb-2">Ouvidoria Municipal</h2>
             
             <?php if (isset($_GET['protocolo'])): ?>

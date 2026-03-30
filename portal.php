@@ -99,10 +99,15 @@ $page_title = $secao['nome'];
 include 'header_publico.php'; 
 ?>
 
-<div class="container-fluid">
+<div class="container-fluid container-custom-padding py-4">
     <div class="row">
-        <?php include 'menu.php'; ?>
-        <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
+        <!-- Menu Lateral -->
+        <div class="col-md-3 col-lg-2 d-md-block p-0 mb-4">
+            <?php include 'menu.php'; ?>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <main class="col-md-9 ms-auto col-lg-10 px-md-4">
             
             <h2 class="mb-4 fw-bold"><?php echo htmlspecialchars($secao['nome']); ?></h2>
 

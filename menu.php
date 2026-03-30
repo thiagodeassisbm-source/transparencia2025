@@ -14,11 +14,9 @@ if (!isset($slug_prefeitura_ativa)) {
 $categorias = $pdo->query("SELECT id, nome, slug FROM categorias ORDER BY ordem ASC")->fetchAll();
 $categoria_ativa_id = $categoria_id ?? ($_GET['categoria_id'] ?? 0); 
 ?>
-<nav class="col-md-3 col-lg-2 d-md-block p-0 shadow-sm bg-white" style="z-index: 100; min-height: 100vh;">
-    <div class="sidebar position-sticky">
+<div class="sidebar-v2 bg-white shadow-sm h-100" style="border-radius: 12px; overflow: hidden;">
+    <div class="sidebar-content">
         <div class="search-box p-3">
-            <!-- DEBUG: REMOVER DEPOIS -->
-            <div style="background: red; color: white; font-size: 10px; padding: 2px; text-align: center; border-radius: 4px; margin-bottom: 5px;">SISTEMA ATUALIZADO 15:06</div>
             <h5 class="text-white small fw-bold text-uppercase mb-2">Buscar</h5>
             <form action="<?php echo $base_url; ?>busca.php" method="GET" class="d-flex bg-white rounded-pill overflow-hidden p-1 shadow-sm">
                 <input class="form-control border-0 ps-3" type="search" name="q" placeholder="Buscar..." style="box-shadow: none; font-size: 0.8rem;">
@@ -53,7 +51,7 @@ $categoria_ativa_id = $categoria_id ?? ($_GET['categoria_id'] ?? 0);
             </div>
         </div>
     </div>
-</nav>
+</div>
 
 <style>
 /* Estilos específicos para o menu lateral sem listas (DIV based) */
