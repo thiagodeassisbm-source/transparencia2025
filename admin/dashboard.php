@@ -58,17 +58,24 @@ include 'admin_header.php';
     <!-- Mensagens do Sistema (Super Admin) -->
     <?php
     $id_usuario_atual = $_SESSION['admin_user_id'];
-    $stmt_msg = $pdo->prepare("
-        SELECT m.* 
-        FROM mensagens_sistema m
-        LEFT JOIN mensagens_vistas v ON m.id = v.id_mensagem AND v.id_usuario = ?
-        WHERE (m.id_prefeitura IS NULL OR m.id_prefeitura = ?)
-        AND m.ativa = 1
-        AND v.id IS NULL
-        ORDER BY m.criado_em DESC
-    ");
-    $stmt_msg->execute([$id_usuario_atual, $pref_id]);
-    $mensagens_admin = $stmt_msg->fetchAll();
+    $mensagens_admin = [];
+    
+    try {
+        $stmt_msg = $pdo->prepare("
+            SELECT m.* 
+            FROM mensagens_sistema m
+            LEFT JOIN mensagens_vistas v ON m.id = v.id_mensagem AND v.id_usuario = ?
+            WHERE (m.id_prefeitura IS NULL OR m.id_prefeitura = ?)
+            AND m.ativa = 1
+            AND v.id IS NULL
+            ORDER BY m.criado_em DESC
+        ");
+        $stmt_msg->execute([$id_usuario_atual, $pref_id]);
+        $mensagens_admin = $stmt_msg->fetchAll();
+    } catch (Exception $e) {
+        // Tabela ainda não existe ou erro de query - Silencia para não quebrar o painel
+        $mensagens_admin = [];
+    }
 
     foreach ($mensagens_admin as $msg): 
         $cor = $msg['cor'] ?? 'primary';
