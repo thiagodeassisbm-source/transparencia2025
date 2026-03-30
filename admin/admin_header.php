@@ -51,7 +51,7 @@ function isActive($pageName) {
         </div>
         <nav class="sidebar-nav">
             <?php 
-            $super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php', 'gerenciar_prefeituras.php', 'switch_pref.php', 'alterar_status_pref.php', 'gerenciar_landing_recursos.php', 'editar_landing_recurso.php', 'gerenciar_mensagens.php', 'enviar_mensagem.php'];
+            $super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php', 'gerenciar_prefeituras.php', 'switch_pref.php', 'alterar_status_pref.php', 'gerenciar_landing_recursos.php', 'editar_landing_recurso.php', 'gerenciar_mensagens.php', 'enviar_mensagem.php', 'configurar_copyright.php'];
             $is_super_context = in_array(basename($_SERVER['PHP_SELF']), $super_pages);
             
             if ($is_super_context && isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1): 
@@ -102,6 +102,18 @@ function isActive($pageName) {
                         <div class="collapse <?php echo $comm_active ? 'show' : ''; ?>" id="collapseComm">
                             <ul class="submenu">
                                 <li><a href="gerenciar_mensagens.php" class="nav-link <?php echo isActive(['gerenciar_mensagens.php', 'enviar_mensagem.php']); ?>">Mensagens</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <?php $config_active = isActive(['configurar_copyright.php']); ?>
+                        <a href="#collapseConfigGlobal" class="nav-link has-submenu <?php echo $config_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
+                            <span><i class="bi bi-gear"></i> Configurações</span>
+                            <i class="bi bi-chevron-down submenu-arrow"></i>
+                        </a>
+                        <div class="collapse <?php echo $config_active ? 'show' : ''; ?>" id="collapseConfigGlobal">
+                            <ul class="submenu">
+                                <li><a href="configurar_copyright.php" class="nav-link <?php echo isActive('configurar_copyright.php'); ?>">Copyright / Rodapé</a></li>
                             </ul>
                         </div>
                     </li>

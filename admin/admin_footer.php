@@ -2,7 +2,7 @@
         
         <footer class="admin-footer text-center p-3 bg-white border-top mt-auto">
             <div class="container-fluid">
-                <span class="text-muted small">&copy; <?php echo date('Y'); ?> - Desenvolvido por <a href="https://www.upgyn.com.br" target="_blank" class="fw-bold text-decoration-none" style="color: var(--primary-color);">UpGyn</a> | Todos os Direitos Reservados.</span>
+                <span class="text-muted small">&copy; <?php echo get_config_global($pdo, 'copyright_ano', date('Y')); ?> - Desenvolvido por <a href="<?php echo get_config_global($pdo, 'copyright_dev_site', 'https://www.upgyn.com.br'); ?>" target="_blank" class="fw-bold text-decoration-none" style="color: var(--primary-color);"><?php echo get_config_global($pdo, 'copyright_dev_nome', 'UpGyn'); ?></a> | <?php echo get_config_global($pdo, 'copyright_texto', 'Todos os Direitos Reservados'); ?>.</span>
             </div>
         </footer>
     </div> <!-- .admin-main -->

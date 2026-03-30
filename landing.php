@@ -423,7 +423,7 @@ $accent_color = "#3b82f6";  // Blue 500
             </div>
             <hr class="footer-hr">
             <div class="text-center small">
-                &copy; <?php echo date('Y'); ?> UP GYN Sistemas. Todos os direitos reservados.
+                &copy; <?php echo get_config_global($pdo, 'copyright_ano', date('Y')); ?> - Desenvolvido por <a href="<?php echo get_config_global($pdo, 'copyright_dev_site', 'https://www.upgyn.com.br'); ?>" target="_blank" class="fw-bold text-decoration-none" style="color: #60a5fa;"><?php echo get_config_global($pdo, 'copyright_dev_nome', 'UpGyn'); ?></a> | <?php echo get_config_global($pdo, 'copyright_texto', 'Todos os Direitos Reservados'); ?>.
             </div>
         </div>
     </footer>

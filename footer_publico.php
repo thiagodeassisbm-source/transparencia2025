@@ -1,15 +1,7 @@
 <footer class="p-3 mt-4 border-top bg-white">
     <div class="container-fluid <?php echo (isset($custom_container_class)) ? $custom_container_class : ''; ?>">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-muted">
-            <div class="mb-2 mb-md-0">
-                &copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($prefeitura_titulo ?? 'Portal da Transparência'); ?>. Todos os direitos reservados.
-            </div>
-            <div class="d-flex align-items-center">
-                <span class="me-2">Desenvolvido por |</span>
-                <a href="https://www.upgyn.com.br" target="_blank" title="UPGYN Tecnologia">
-                    <img src="imagens/logo-up.png" alt="UPGYN" style="height: 35px; filter: grayscale(1); opacity: 0.7;" onmouseover="this.style.filter='none'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.7'">
-                </a>
-            </div>
+        <div class="text-center small text-muted">
+            &copy; <?php echo get_config_global($pdo, 'copyright_ano', date('Y')); ?> - Desenvolvido por <a href="<?php echo get_config_global($pdo, 'copyright_dev_site', 'https://www.upgyn.com.br'); ?>" target="_blank" class="fw-bold text-decoration-none" style="color: #0d6efd;"><?php echo get_config_global($pdo, 'copyright_dev_nome', 'UpGyn'); ?></a> | <?php echo get_config_global($pdo, 'copyright_texto', 'Todos os Direitos Reservados'); ?>.
         </div>
     </div>
 </footer>

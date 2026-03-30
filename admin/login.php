@@ -515,7 +515,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="footer-links">
                         <p class="mb-1"><i class="bi bi-shield-check me-1"></i> Conexão segura e criptografada</p>
-                        <p>Desenvolvido por <a href="https://upgyn.com.br" target="_blank">UPGYN</a></p>
+                        <p>Desenvolvido por <a href="<?php echo get_config_global($pdo, 'copyright_dev_site', 'https://upgyn.com.br'); ?>" target="_blank"><?php echo get_config_global($pdo, 'copyright_dev_nome', 'UPGYN'); ?></a></p>
                     </div>
                 </div>
             </div>
