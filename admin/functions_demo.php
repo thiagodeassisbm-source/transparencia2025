@@ -5,8 +5,13 @@
  * Clona toda a estrutura e dados de uma prefeitura para outra como "Demonstração".
  */
 function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
+    // Verifica se já existe uma transação ativa para evitar o erro de "Nested Transactions"
+    $should_manage_transaction = !$pdo->inTransaction();
+    
     try {
-        $pdo->beginTransaction();
+        if ($should_manage_transaction) {
+            $pdo->beginTransaction();
+        }
 
         // 1. Clona os Portais (Seções) e mapeia IDs
         $stmt_p = $pdo->prepare("SELECT * FROM portais WHERE id_prefeitura = ?");
@@ -14,7 +19,6 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $portais_origem = $stmt_p->fetchAll();
         
         $map_portais = []; // old_id => new_id
-        
         $ins_p = $pdo->prepare("INSERT INTO portais (id_prefeitura, id_categoria, nome, slug, ordem, is_demo) VALUES (?, ?, ?, ?, ?, 1)");
         
         foreach ($portais_origem as $p) {
@@ -75,7 +79,7 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             }
         }
 
-        // 2. Clona os Cards da Home (que agora pertencem a prefeitura via id_secao)
+        // 2. Clona os Cards da Home
         foreach ($map_portais as $old_pid => $new_pid) {
             $stmt_card = $pdo->prepare("SELECT * FROM cards_informativos WHERE id_secao = ?");
             $stmt_card->execute([$old_pid]);
@@ -96,10 +100,14 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             }
         }
 
-        $pdo->commit();
+        if ($should_manage_transaction) {
+            $pdo->commit();
+        }
         return true;
     } catch (Exception $e) {
-        if ($pdo->inTransaction()) { $pdo->rollBack(); }
+        if ($should_manage_transaction && $pdo->inTransaction()) { 
+            $pdo->rollBack(); 
+        }
         throw new Exception("Falha na clonagem (Banco de Dados): " . $e->getMessage());
     }
 }
