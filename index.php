@@ -32,7 +32,9 @@ $ordem_atual = $_GET['sort'] ?? 'padrao';
 $sql_base = "FROM cards_informativos c LEFT JOIN portais p ON c.id_secao = p.id";
 
 // Filtro por Prefeitura (Obrigatório no SaaS)
-$sql_where = " WHERE p.id_prefeitura = ?";
+// Prioriza o id_prefeitura do Card (novo) ou o da Seção vinculada (legado)
+$sql_where = " WHERE (c.id_prefeitura = ? OR (c.id_secao IS NOT NULL AND p.id_prefeitura = ?))";
+$params_where[] = $id_prefeitura_ativa;
 $params_where[] = $id_prefeitura_ativa;
 
 if ($categoria_id) {

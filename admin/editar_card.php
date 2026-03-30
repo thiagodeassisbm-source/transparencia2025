@@ -63,8 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $caminho_icone_final = trim($_POST['icone_bootstrap'] ?? 'bi-info-circle');
         }
         
-        $stmt = $pdo->prepare("UPDATE cards_informativos SET id_categoria = ?, id_secao = ?, link_url = ?, titulo = ?, subtitulo = ?, caminho_icone = ?, tipo_icone = ?, ordem = ? WHERE id = ?");
-        $stmt->execute([$id_categoria, $id_secao, $link_url, $titulo, $subtitulo, $caminho_icone_final, $tipo_icone, $ordem, $card_id]);
+        $stmt = $pdo->prepare("UPDATE cards_informativos SET id_categoria = ?, id_secao = ?, link_url = ?, titulo = ?, subtitulo = ?, caminho_icone = ?, tipo_icone = ?, ordem = ?, id_prefeitura = ? WHERE id = ?");
+        $stmt->execute([$id_categoria, $id_secao, $link_url, $titulo, $subtitulo, $caminho_icone_final, $tipo_icone, $ordem, ($_SESSION['id_prefeitura'] ?? 0), $card_id]);
         
         registrar_log($pdo, 'EDIÇÃO', 'cards_informativos', "Editou o card: $titulo (ID: $card_id)");
         

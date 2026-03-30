@@ -76,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_secao = $pdo->lastInsertId();
         }
         
-        $stmt_card = $pdo->prepare("INSERT INTO cards_informativos (id_categoria, id_secao, link_url, titulo, subtitulo, caminho_icone, tipo_icone, ordem) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt_card->execute([$id_categoria, $id_secao, $link_url, $card_titulo, $card_subtitulo, $caminho_icone, $tipo_icone, $card_ordem]);
+        $stmt_card = $pdo->prepare("INSERT INTO cards_informativos (id_categoria, id_secao, link_url, titulo, subtitulo, caminho_icone, tipo_icone, ordem, id_prefeitura) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt_card->execute([$id_categoria, $id_secao, $link_url, $card_titulo, $card_subtitulo, $caminho_icone, $tipo_icone, $card_ordem, ($_SESSION['id_prefeitura'] ?? 0)]);
         $card_new_id = $pdo->lastInsertId();
         
         registrar_log($pdo, 'ADIÇÃO', 'cards_informativos', "Criou novo card: $card_titulo (ID: $card_new_id)");
