@@ -151,6 +151,11 @@ include 'admin_header.php';
                                     <div class="mt-3 p-2 bg-light rounded text-center small text-primary">
                                         <i class="bi bi-info-circle-fill me-1"></i> Com estes 3 passos, o servidor reconhecerá quem está chegando e mostrará o portal correto automaticamente!
                                     </div>
+                                    <div class="mt-3 text-center">
+                                        <a href="tutorial_dns.php" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-bold shadow-sm" style="border-width: 2px;">
+                                            <i class="bi bi-book-half me-2"></i> Ver Tutorial Completo de Configuração (Guia Definitivo)
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
