@@ -1,7 +1,7 @@
 <footer class="p-3 mt-4 border-top bg-white">
     <div class="container-fluid <?php echo (isset($custom_container_class)) ? $custom_container_class : ''; ?>">
         <div class="text-center small text-muted">
-            &copy; <?php echo get_config_global($pdo, 'copyright_ano', date('Y')); ?> - Desenvolvido por <a href="<?php echo get_config_global($pdo, 'copyright_dev_site', 'https://www.upgyn.com.br'); ?>" target="_blank" class="fw-bold text-decoration-none" style="color: #0d6efd;"><?php echo get_config_global($pdo, 'copyright_dev_nome', 'UpGyn'); ?></a> | <?php echo get_config_global($pdo, 'copyright_texto', 'Todos os Direitos Reservados'); ?>.
+            &copy; <?php echo (function_exists('get_config_global') ? get_config_global($pdo, 'copyright_ano', date('Y')) : date('Y')); ?> - Desenvolvido por <a href="<?php echo (function_exists('get_config_global') ? get_config_global($pdo, 'copyright_dev_site', 'https://www.upgyn.com.br') : 'https://www.upgyn.com.br'); ?>" target="_blank" class="fw-bold text-decoration-none" style="color: #0d6efd;"><?php echo (function_exists('get_config_global') ? get_config_global($pdo, 'copyright_dev_nome', 'UpGyn') : 'UpGyn'); ?></a> | <?php echo (function_exists('get_config_global') ? get_config_global($pdo, 'copyright_texto', 'Todos os Direitos Reservados') : 'Todos os Direitos Reservados'); ?>.
         </div>
     </div>
 </footer>

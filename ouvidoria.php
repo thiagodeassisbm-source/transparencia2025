@@ -122,11 +122,11 @@ include 'header_publico.php';
                             <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-fill text-success me-2"></i> Manifestar</h5>
                         </div>
                         <div class="card-body d-grid gap-2">
-                            <a href="portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Sugestão" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-lightbulb-fill me-2 text-warning"></i> Sugestão</a>
-                            <a href="portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Elogio" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-hand-thumbs-up-fill me-2 text-success"></i> Elogio</a>
-                            <a href="portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Solicitação" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-chat-left-dots-fill me-2 text-info"></i> Solicitação</a>
-                            <a href="portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Reclamação" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i> Reclamação</a>
-                            <a href="portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Denúncia" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-shield-fill-exclamation me-2 text-danger"></i> Denúncia</a>
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Sugestão" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-lightbulb-fill me-2 text-warning"></i> Sugestão</a>
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Elogio" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-hand-thumbs-up-fill me-2 text-success"></i> Elogio</a>
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Solicitação" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-chat-left-dots-fill me-2 text-info"></i> Solicitação</a>
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Reclamação" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i> Reclamação</a>
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Denúncia" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-shield-fill-exclamation me-2 text-danger"></i> Denúncia</a>
                         </div>
                     </div>
                 </div>
@@ -139,7 +139,7 @@ include 'header_publico.php';
                         </div>
                         <div class="card-body">
                             <p class="text-muted small mb-4">Acompanhe sua manifestação digitando o número do protocolo abaixo.</p>
-                            <form action="portal/<?php echo $slug_pref_header; ?>/consulta_protocolo.php" method="GET">
+                            <form action="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/consulta_protocolo.php" method="GET">
                                 <div class="mb-3">
                                     <input type="text" name="protocolo" class="form-control rounded-start-pill rounded-end-pill px-4" placeholder="Ex: 2024.030.001" required>
                                 </div>
@@ -181,7 +181,7 @@ include 'header_publico.php';
                         <?php endforeach; ?>
                     </div>
                     <div class="text-center mt-3 pt-3 border-top">
-                        <a href="portal/<?php echo $slug_pref_header; ?>/ouvidoria_relatorio.php" class="text-primary text-decoration-none fw-bold small">Ver Relatório Completo Detalhado <i class="bi bi-arrow-right"></i></a>
+                        <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/ouvidoria_relatorio.php" class="text-primary text-decoration-none fw-bold small">Ver Relatório Completo Detalhado <i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
