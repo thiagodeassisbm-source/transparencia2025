@@ -177,9 +177,9 @@
     padding: 1rem 1rem 0.5rem 1rem;
 }
 .sidebar-menu {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin: 0 !important;
 }
 .sidebar-menu a {
     display: block;
