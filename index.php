@@ -135,9 +135,29 @@ unset($query_params_sort['sort'], $query_params_sort['page']);
 else: ?>
                     <?php foreach ($cards as $card): ?>
                         <?php
-        $link = !empty($card['link_url']) ? htmlspecialchars($card['link_url']) : (!empty($card['slug']) ? 'portal/' . $slug_prefeitura_ativa . '/' . htmlspecialchars($card['slug']) : '#');
-        $target = !empty($card['link_url']) ? '_blank' : '_self';
-?>
+                        $is_external = !empty($card['link_url']);
+                        $link = '#';
+                        $target = '_self';
+
+                        // Se tiver link externo (como sic.php)
+                        if ($is_external) {
+                            $link_raw = $card['link_url'];
+                            // Se for uma página interna do sistema (ex: sic.php ou ouvidoria.php)
+                            if (strpos($link_raw, '.php') !== false && strpos($link_raw, 'http') === false) {
+                                // Força o contexto da prefeitura na URL
+                                $link = 'portal/' . $slug_prefeitura_ativa . '/' . ltrim($link_raw, '/');
+                                $target = '_self';
+                            } else {
+                                $link = htmlspecialchars($link_raw);
+                                $target = '_blank';
+                            }
+                        } 
+                        // Se for uma seção criada no portal
+                        elseif (!empty($card['slug'])) {
+                            $link = 'portal/' . $slug_prefeitura_ativa . '/' . htmlspecialchars($card['slug']);
+                            $target = '_self';
+                        }
+                        ?>
                         <div class="info-card border-0 shadow-sm">
                             <div class="icon-container position-relative">
                                 <div class="dynamic-icon shadow-sm"></div>
