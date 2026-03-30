@@ -80,13 +80,16 @@ include 'admin_header.php';
                                     </a>
                                     <?php if ($pref['status'] == 'ativo'): ?>
                                         <a href="alterar_status_pref.php?id=<?php echo $pref['id']; ?>&status=suspenso" class="btn btn-white btn-sm px-3 border-start" onclick="return confirm('Confirma bloqueio?')" title="Bloquear">
-                                            <i class="bi bi-lock-fill text-danger"></i>
+                                            <i class="bi bi-lock-fill text-warning"></i>
                                         </a>
                                     <?php else: ?>
                                         <a href="alterar_status_pref.php?id=<?php echo $pref['id']; ?>&status=ativo" class="btn btn-white btn-sm px-3 border-start" title="Desbloquear">
                                             <i class="bi bi-unlock-fill text-success"></i>
                                         </a>
                                     <?php endif; ?>
+                                    <a href="excluir_prefeitura.php?id=<?php echo $pref['id']; ?>" class="btn btn-white btn-sm px-3 border-start" onclick="return confirm('ATENÇÃO: Isso apagará TODOS os dados desta prefeitura (seções, usuários, registros, etc). Deseja continuar?')" title="Excluir Permanentemente">
+                                        <i class="bi bi-trash3-fill text-danger"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
