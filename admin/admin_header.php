@@ -60,10 +60,9 @@ function isActive($pageName) {
                 <ul>
                     <li>
                         <a href="super_dashboard.php" class="nav-link <?php echo isActive('super_dashboard.php'); ?>">
-                            <i class="bi bi-buildings"></i> Central de Inteligência
+                            <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
                     </li>
-                    <li class="mt-3 px-3 mb-2 small text-muted text-uppercase fw-bold">Gestão SaaS</li>
                     <li>
                         <?php $cad_active = isActive(['gerenciar_prefeituras.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php']); ?>
                         <a href="#collapseSuperCad" class="nav-link has-submenu <?php echo $cad_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">

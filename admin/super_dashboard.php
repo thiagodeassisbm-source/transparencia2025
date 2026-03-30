@@ -30,13 +30,13 @@ $stmt_dados = $pdo->query("
 ");
 $volume_dados = $stmt_dados->fetchAll();
 
-$page_title_for_header = 'Central de Inteligência SaaS';
+$page_title_for_header = 'Dashboard SaaS';
 include 'admin_header.php';
 ?>
 
 <div class="container-fluid py-4">
     <div class="mb-4">
-        <h4 class="fw-bold text-dark mt-2">Bem-vindo à Central de Gerencimaneto de Prefeituras</h4>
+        <h4 class="fw-bold text-dark mt-2">Dashboard de Gestão de Prefeituras</h4>
     </div>
 
     <!-- Row de Stats Principais -->
