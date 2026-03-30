@@ -16,12 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_card'])) {
 
 // Busca os cards existentes para listar na página
 $pref_id = $_SESSION['id_prefeitura'] ?? 0;
-// Debug: Versão 2026.03.30.2
+// Debug: Versão 2026.03.30.3 (Inclusiva para órfãos)
 $stmt = $pdo->prepare("SELECT c.*, cat.nome as nome_categoria, p.nome as nome_secao 
                       FROM cards_informativos c 
                       LEFT JOIN categorias cat ON c.id_categoria = cat.id 
                       LEFT JOIN portais p ON c.id_secao = p.id 
-                      WHERE (c.id_prefeitura = ? OR (c.id_secao IS NOT NULL AND p.id_prefeitura = ?))
+                      WHERE (c.id_prefeitura = ? OR p.id_prefeitura = ? OR c.id_prefeitura IS NULL OR c.id_prefeitura = 0)
                       ORDER BY c.ordem ASC, c.id DESC");
 $stmt->execute([$pref_id, $pref_id]);
 $cards = $stmt->fetchAll();
