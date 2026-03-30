@@ -15,11 +15,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_card'])) {
 }
 
 // Busca os cards existentes para listar na página
-$cards = $pdo->query("SELECT c.*, cat.nome as nome_categoria, p.nome as nome_secao 
+$pref_id = $_SESSION['id_prefeitura'] ?? 0;
+// Debug: Versão 2026.03.30.2
+$stmt = $pdo->prepare("SELECT c.*, cat.nome as nome_categoria, p.nome as nome_secao 
                       FROM cards_informativos c 
                       LEFT JOIN categorias cat ON c.id_categoria = cat.id 
                       LEFT JOIN portais p ON c.id_secao = p.id 
-                      ORDER BY c.ordem ASC, c.id DESC")->fetchAll();
+                      WHERE (c.id_prefeitura = ? OR (c.id_secao IS NOT NULL AND p.id_prefeitura = ?))
+                      ORDER BY c.ordem ASC, c.id DESC");
+$stmt->execute([$pref_id, $pref_id]);
+$cards = $stmt->fetchAll();
+
+// Lista oficial de páginas do sistema para o badge
+$paginas_sistema_nomes = [
+    'estrutura.php' => 'Estrutura Org.',
+    'ouvidoria.php' => 'Ouvidoria',
+    'sic.php' => 'e-Sic',
+    'faq.php' => 'FAQ',
+    'relatorio_publicacoes.php' => 'Relat. Publicações'
+];
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -85,16 +99,19 @@ include 'admin_header.php';
                                 <td><span class="badge bg-dark"><?php echo htmlspecialchars($card['nome_categoria'] ?? 'N/A'); ?></span></td>
                                 <td>
                                     <?php
+                                    $link_atual = trim($card['link_url'] ?? '');
                                     if (!empty($card['id_secao'])) {
                                         echo '<span class="badge bg-info text-dark">' . htmlspecialchars($card['nome_secao'] ?? 'Seção Interna') . '</span>';
-                                    } elseif (!empty($card['link_url'])) {
-                                        if (strpos($card['link_url'], 'pagina.php?slug=') !== false) {
+                                    } elseif (!empty($link_atual)) {
+                                        if (strpos($link_atual, 'pagina.php?slug=') !== false) {
                                             echo '<span class="badge bg-success">Página Interna</span>';
+                                        } elseif (isset($paginas_sistema_nomes[$link_atual])) {
+                                            echo '<span class="badge bg-warning text-dark"><i class="bi bi-cpu-fill me-1"></i>Página do Sistema: ' . $paginas_sistema_nomes[$link_atual] . '</span>';
                                         } else {
-                                            echo '<span class="badge bg-primary">Link Externo</span>';
+                                            echo '<span class="badge bg-secondary">Link Externo</span>';
                                         }
                                     } else {
-                                        echo '<span class="badge bg-secondary">Nenhum</span>';
+                                        echo '<span class="badge bg-light text-dark border">Nenhum Link</span>';
                                     }
                                     ?>
                                 </td>
