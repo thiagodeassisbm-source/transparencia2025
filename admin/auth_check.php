@@ -19,15 +19,19 @@ if (!isset($_SESSION['permissoes_sessao']) || !isset($_SESSION['admin_user_perfi
     $id_perfil = $_SESSION['admin_user_id_perfil'] ?? 0;
     
     // Busca o nome do perfil
-    $stmt_p = $pdo->prepare("SELECT nome FROM perfis WHERE id = ?");
-    $stmt_p->execute([$id_perfil]);
-    $perfil_info = $stmt_p->fetch();
-    
-    // Fallback se não encontrar perfil (usuário não migrado)
-    if (!$perfil_info) {
-        $_SESSION['admin_user_perfil_nome'] = ($_SESSION['admin_user_perfil'] == 'admin' ? 'Administrador' : 'Editor');
+    if (isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1) {
+        $_SESSION['admin_user_perfil_nome'] = 'Super Administrador';
     } else {
-        $_SESSION['admin_user_perfil_nome'] = $perfil_info['nome'];
+        $stmt_p = $pdo->prepare("SELECT nome FROM perfis WHERE id = ?");
+        $stmt_p->execute([$id_perfil]);
+        $perfil_info = $stmt_p->fetch();
+        
+        // Fallback se não encontrar perfil (usuário não migrado)
+        if (!$perfil_info) {
+            $_SESSION['admin_user_perfil_nome'] = ($_SESSION['admin_user_perfil'] == 'admin' ? 'Administrador' : 'Editor');
+        } else {
+            $_SESSION['admin_user_perfil_nome'] = $perfil_info['nome'];
+        }
     }
 
     // Busca as permissões
