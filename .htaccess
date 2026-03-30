@@ -9,6 +9,9 @@ RewriteRule ^portal/[a-zA-Z0-9_-]+/admin/?$ admin/login.php [R=301,L]
 # 2. Suporte para index.php (Ex: /portal/jatai/index.php  ->  home da cidade)
 RewriteRule ^portal/([a-zA-Z0-9_-]+)/index\.php$ index.php?pref_slug=$1 [QSA,L]
 
+# 2. Suporte para arquivos do sistema (.php) dentro da pasta da prefeitura
+RewriteRule ^portal/([^/]+)/([^/]+\.php)$ $2?pref_slug=$1 [QSA,L]
+
 # 3. Redireciona para o portal da prefeitura pelo slug
 # Ex: /portal/goiania  ->  index.php?pref_slug=goiania
 RewriteRule ^portal/([a-zA-Z0-9_-]+)/?$ index.php?pref_slug=$1 [QSA,L]
