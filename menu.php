@@ -18,14 +18,15 @@ $categoria_ativa_id = $categoria_id ?? ($_GET['categoria_id'] ?? 0); // Usa $cat
         
         <h4 class="sidebar-heading">Filtrar</h4>
         <ul class="sidebar-menu">
-            <li><a class="<?php echo ($categoria_ativa_id == 0) ? 'active' : ''; ?>" href="portal/<?php echo $slug_prefeitura_ativa; ?>">Todas</a></li>
+            <li><a class="<?php echo ($categoria_ativa_id == 0) ? 'active' : ''; ?>" href="portal/<?php echo $slug_prefeitura_ativa ?? 'home'; ?>">Todas</a></li>
             
             <?php foreach ($categorias as $categoria): ?>
                 <?php 
+                    $slug_contexto = $slug_prefeitura_ativa ?? 'home';
                     // Se tiver slug, usa a URL amigável, senão usa o parâmetro ID (fallback)
                     $link_cat = !empty($categoria['slug']) 
-                        ? "portal/$slug_prefeitura_ativa/categoria/" . $categoria['slug'] 
-                        : "portal/$slug_prefeitura_ativa/?categoria_id=" . $categoria['id'];
+                        ? "portal/$slug_contexto/categoria/" . $categoria['slug'] 
+                        : "portal/$slug_contexto/?categoria_id=" . $categoria['id'];
                 ?>
                 <li>
                     <a class="<?php echo ($categoria['id'] == $categoria_ativa_id) ? 'active' : ''; ?>" href="<?php echo $link_cat; ?>">
