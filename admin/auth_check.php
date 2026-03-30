@@ -60,4 +60,21 @@ function tem_permissao($recurso, $acao = 'ver') {
 
     return false; // Negado por padrão
 }
+
+/**
+ * Busca configurações dinâmicas da tabela config_global
+ * Duplicado aqui por redundância para garantir que o admin_footer não quebre se o conexao.php demorar a sincronizar
+ */
+if (!function_exists('get_config_global')) {
+    function get_config_global($pdo, $chave, $padrao = '') {
+        static $config_cache = null;
+        if ($config_cache === null) {
+            try {
+                $stmt_config = $pdo->query("SELECT chave, valor FROM config_global");
+                $config_cache = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
+            } catch (Exception $e) { $config_cache = []; }
+        }
+        return isset($config_cache[$chave]) ? $config_cache[$chave] : $padrao;
+    }
+}
 ?>
