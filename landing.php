@@ -337,7 +337,7 @@ $accent_color = "#3b82f6";  // Blue 500
     <!-- Cities Showcase -->
     <section class="cities-section">
         <div class="container px-4">
-            <div id="cityGrid" class="row g-4">
+            <div id="cityGrid" class="row g-4 justify-content-center">
                 <?php if (!empty($prefeituras)): ?>
                     <?php foreach ($prefeituras as $pref): ?>
                         <div class="col-6 col-md-4 col-lg-3 city-item" data-name="<?php echo strtolower($pref['nome']); ?>">
