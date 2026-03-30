@@ -2,15 +2,15 @@
 // migrate_cards_refactor.php
 require 'conexao.php';
 
+// 1. Adiciona a coluna id_prefeitura se não existir (ALTER TABLE causa commit implícito no MySQL)
+$stmt_check = $pdo->query("SHOW COLUMNS FROM cards_informativos LIKE 'id_prefeitura'");
+if (!$stmt_check->fetch()) {
+    $pdo->exec("ALTER TABLE cards_informativos ADD COLUMN id_prefeitura INT AFTER id, ADD INDEX (id_prefeitura)");
+    echo "Coluna id_prefeitura adicionada em cards_informativos.<br>";
+}
+
 try {
     $pdo->beginTransaction();
-
-    // 1. Adiciona a coluna id_prefeitura se não existir
-    $stmt_check = $pdo->query("SHOW COLUMNS FROM cards_informativos LIKE 'id_prefeitura'");
-    if (!$stmt_check->fetch()) {
-        $pdo->exec("ALTER TABLE cards_informativos ADD COLUMN id_prefeitura INT AFTER id, ADD INDEX (id_prefeitura)");
-        echo "Coluna id_prefeitura adicionada em cards_informativos.<br>";
-    }
 
     // 2. Preenche id_prefeitura baseado no relacionamento atual com portais
     $pdo->exec("
@@ -21,9 +21,6 @@ try {
     ");
     echo "Cards existentes vinculados a prefeituras via seção.<br>";
 
-    // 3. (Opcional) Tentar vincular cards via categoria se portais falhar e categoria tiver prefeitura?
-    // Mas categorias parecem globais neste sistema.
-    
     $pdo->commit();
     echo "Refatoração de propriedade de cards concluída com sucesso!";
 } catch (Exception $e) {
