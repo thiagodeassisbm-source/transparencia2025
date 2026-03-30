@@ -55,6 +55,53 @@ include 'admin_header.php';
 ?>
 
 <div class="container-fluid">
+    <!-- Mensagens do Sistema (Super Admin) -->
+    <?php
+    $id_usuario_atual = $_SESSION['admin_user_id'];
+    $stmt_msg = $pdo->prepare("
+        SELECT m.* 
+        FROM mensagens_sistema m
+        LEFT JOIN mensagens_vistas v ON m.id = v.id_mensagem AND v.id_usuario = ?
+        WHERE (m.id_prefeitura IS NULL OR m.id_prefeitura = ?)
+        AND m.ativa = 1
+        AND v.id IS NULL
+        ORDER BY m.criado_em DESC
+    ");
+    $stmt_msg->execute([$id_usuario_atual, $pref_id]);
+    $mensagens_admin = $stmt_msg->fetchAll();
+
+    foreach ($mensagens_admin as $msg): 
+        $cor = $msg['cor'] ?? 'primary';
+        $icon = 'bi-info-circle-fill';
+        if($cor == 'warning') $icon = 'bi-exclamation-triangle-fill';
+        if($cor == 'danger') $icon = 'bi-exclamation-octagon-fill';
+        if($cor == 'success') $icon = 'bi-megaphone-fill';
+    ?>
+    <div class="alert alert-<?php echo $cor; ?> alert-dismissible fade show shadow-sm border-0 mb-4 rounded-4 p-4" role="alert">
+        <div class="d-flex align-items-center">
+            <div class="bg-white bg-opacity-25 rounded-circle p-3 me-4 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                <i class="bi <?php echo $icon; ?> fs-3"></i>
+            </div>
+            <div>
+                <h5 class="alert-heading fw-bold mb-1"><?php echo htmlspecialchars($msg['titulo']); ?></h5>
+                <div class="opacity-75"><?php echo nl2br(htmlspecialchars($msg['mensagem'])); ?></div>
+            </div>
+        </div>
+        <button type="button" class="btn-close p-4" data-bs-dismiss="alert" aria-label="Close" onclick="marcarComoLida(<?php echo $msg['id']; ?>)"></button>
+    </div>
+    <?php endforeach; ?>
+
+    <script>
+    function marcarComoLida(id) {
+        fetch('marcar_mensagem_lida.php?id=' + id)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) { console.log('Mensagem marcada como lida!'); }
+            });
+    }
+    </script>
+    <!-- Fim Mensagens -->
+
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card stat-card vibrant-card bg-vibrant-blue shadow h-100 border-0">

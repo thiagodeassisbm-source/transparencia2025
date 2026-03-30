@@ -51,7 +51,7 @@ function isActive($pageName) {
         </div>
         <nav class="sidebar-nav">
             <?php 
-            $super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php', 'gerenciar_prefeituras.php', 'switch_pref.php', 'alterar_status_pref.php', 'gerenciar_landing_recursos.php', 'editar_landing_recurso.php'];
+            $super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php', 'gerenciar_prefeituras.php', 'switch_pref.php', 'alterar_status_pref.php', 'gerenciar_landing_recursos.php', 'editar_landing_recurso.php', 'gerenciar_mensagens.php', 'enviar_mensagem.php'];
             $is_super_context = in_array(basename($_SERVER['PHP_SELF']), $super_pages);
             
             if ($is_super_context && isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1): 
@@ -91,6 +91,19 @@ function isActive($pageName) {
                         <div class="collapse <?php echo $landing_active ? 'show' : ''; ?>" id="collapseLanding">
                             <ul class="submenu">
                                 <li><a href="gerenciar_landing_recursos.php" class="nav-link <?php echo isActive(['gerenciar_landing_recursos.php', 'editar_landing_recurso.php']); ?>">Recursos</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="mt-3 px-3 mb-2 small text-muted text-uppercase fw-bold">Comunicação</li>
+                    <li>
+                        <?php $comm_active = isActive(['gerenciar_mensagens.php', 'enviar_mensagem.php']); ?>
+                        <a href="#collapseComm" class="nav-link has-submenu <?php echo $comm_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
+                            <span><i class="bi bi-chat-left-text"></i> Mensagens</span>
+                            <i class="bi bi-chevron-down submenu-arrow"></i>
+                        </a>
+                        <div class="collapse <?php echo $comm_active ? 'show' : ''; ?>" id="collapseComm">
+                            <ul class="submenu">
+                                <li><a href="gerenciar_mensagens.php" class="nav-link <?php echo isActive(['gerenciar_mensagens.php', 'enviar_mensagem.php']); ?>">Gestão de Avisos</a></li>
                             </ul>
                         </div>
                     </li>
