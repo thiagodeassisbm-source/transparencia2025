@@ -13,16 +13,17 @@ try {
     $pdo->beginTransaction();
 
     // 2. Preenche id_prefeitura baseado no relacionamento atual com portais
+    // Esta consulta é a chave para os cards voltarem a aparecer
     $pdo->exec("
         UPDATE cards_informativos c
-        JOIN portais p ON c.id_secao = p.id
+        INNER JOIN portais p ON c.id_secao = p.id
         SET c.id_prefeitura = p.id_prefeitura
         WHERE c.id_prefeitura IS NULL OR c.id_prefeitura = 0
     ");
-    echo "Cards existentes vinculados a prefeituras via seção.<br>";
+    echo "Sincronização de propriedade (Cards -> Seções) concluída.<br>";
 
     $pdo->commit();
-    echo "Refatoração de propriedade de cards concluída com sucesso!";
+    echo "<strong>Refatoração concluída com sucesso!</strong> Agora todos os seus cards devem estar visíveis novamente.";
 } catch (Exception $e) {
     if ($pdo->inTransaction()) { $pdo->rollBack(); }
     echo "Erro na migração: " . $e->getMessage();
