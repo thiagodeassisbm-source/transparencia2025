@@ -366,34 +366,41 @@ $accent_color = "#3b82f6";  // Blue 500
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Resources Section (Dynamic) -->
     <section class="features-grid">
         <div class="container">
             <div class="section-header">
                 <h2>Recursos do Sistema</h2>
             </div>
             <div class="row g-4">
+                <?php 
+                // 3. Busca recursos da landing page do banco
+                try {
+                    $stmt_res = $pdo->query("SELECT * FROM landing_recursos ORDER BY ordem ASC, id DESC");
+                    $recursos_db = $stmt_res->fetchAll();
+                } catch (Exception $e) {
+                    $recursos_db = []; // Fallback if table doesn't exist
+                }
+
+                // Fallback hardcoded caso a tabela ainda não exista ou esteja vazia
+                if (empty($recursos_db)) {
+                    $recursos_db = [
+                        ['titulo' => 'Dados Abertos', 'descricao' => 'Informações detalhadas sobre receitas, despesas, folha de pagamento e contratos em formato acessível.', 'icone' => 'bi-clipboard-data'],
+                        ['titulo' => 'Diário Oficial', 'descricao' => 'Publicações oficiais diárias, decretos, leis e atos administrativos com certificação digital.', 'icone' => 'bi-journal-text'],
+                        ['titulo' => 'Conformidade Legal', 'descricao' => 'Integralmente adequado à Lei de Acesso à Informação (LAI) e Lei de Responsabilidade Fiscal.', 'icone' => 'bi-shield-check']
+                    ];
+                }
+
+                foreach ($recursos_db as $res): 
+                ?>
                 <div class="col-md-4">
                     <div class="feature-item">
-                        <div class="feature-icon"><i class="bi bi-clipboard-data"></i></div>
-                        <h4 class="feature-title">Dados Abertos</h4>
-                        <p class="feature-text">Informações detalhadas sobre receitas, despesas, folha de pagamento e contratos em formato acessível.</p>
+                        <div class="feature-icon"><i class="bi <?php echo htmlspecialchars($res['icone']); ?>"></i></div>
+                        <h4 class="feature-title"><?php echo htmlspecialchars($res['titulo']); ?></h4>
+                        <p class="feature-text"><?php echo htmlspecialchars($res['descricao']); ?></p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="feature-item">
-                        <div class="feature-icon"><i class="bi bi-journal-text"></i></div>
-                        <h4 class="feature-title">Diário Oficial</h4>
-                        <p class="feature-text">Publicações oficiais diárias, decretos, leis e atos administrativos com certificação digital.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-item">
-                        <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
-                        <h4 class="feature-title">Conformidade Legal</h4>
-                        <p class="feature-text">Integralmente adequado à Lei de Acesso à Informação (LAI) e Lei de Responsabilidade Fiscal.</p>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
