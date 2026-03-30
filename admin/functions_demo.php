@@ -13,7 +13,20 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             $pdo->beginTransaction();
         }
 
-        // 1. Clona os Portais (Seções) e mapeia IDs
+        // --- 1. Clona as Configurações (Branding: Cores, Logos, Títulos) ---
+        // Primeiro limpamos o que o cadastrar_prefeitura.php inseriu de básico
+        $pdo->prepare("DELETE FROM configuracoes WHERE id_prefeitura = ?")->execute([$id_destino]);
+        
+        $stmt_conf = $pdo->prepare("SELECT * FROM configuracoes WHERE id_prefeitura = ?");
+        $stmt_conf->execute([$id_origem]);
+        $configs_origem = $stmt_conf->fetchAll();
+        
+        $ins_conf = $pdo->prepare("INSERT INTO configuracoes (chave, valor, id_prefeitura) VALUES (?, ?, ?)");
+        foreach ($configs_origem as $conf) {
+             $ins_conf->execute([$conf['chave'], $conf['valor'], $id_destino]);
+        }
+
+        // --- 2. Clona os Portais (Seções) e mapeia IDs ---
         $stmt_p = $pdo->prepare("SELECT * FROM portais WHERE id_prefeitura = ?");
         $stmt_p->execute([$id_origem]);
         $portais_origem = $stmt_p->fetchAll();
@@ -79,25 +92,31 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             }
         }
 
-        // 2. Clona os Cards da Home
-        foreach ($map_portais as $old_pid => $new_pid) {
-            $stmt_card = $pdo->prepare("SELECT * FROM cards_informativos WHERE id_secao = ?");
-            $stmt_card->execute([$old_pid]);
-            $card = $stmt_card->fetch();
-            
-            if ($card) {
-                $ins_card = $pdo->prepare("INSERT INTO cards_informativos (id_secao, id_categoria, titulo, subtitulo, caminho_icone, tipo_icone, link_url, ordem, is_demo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)");
-                $ins_card->execute([
-                    $new_pid,
-                    $card['id_categoria'],
-                    $card['titulo'],
-                    $card['subtitulo'],
-                    $card['caminho_icone'],
-                    $card['tipo_icone'],
-                    $card['link_url'],
-                    $card['ordem']
-                ]);
+        // --- 3. Clona TODOS os Cards da Home (Incluindo SIC, Ouvidoria, etc) ---
+        $stmt_cards_all = $pdo->prepare("SELECT * FROM cards_informativos WHERE id_prefeitura = ?");
+        $stmt_cards_all->execute([$id_origem]);
+        $all_cards = $stmt_cards_all->fetchAll();
+        
+        $ins_card = $pdo->prepare("INSERT INTO cards_informativos (id_prefeitura, id_secao, id_categoria, titulo, subtitulo, caminho_icone, tipo_icone, link_url, ordem, is_demo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
+        
+        foreach ($all_cards as $card) {
+            // Mapeia o ID da seção se o card estiver vinculado a uma seção clonada
+            $nova_secao = null;
+            if (!empty($card['id_secao']) && isset($map_portais[$card['id_secao']])) {
+                $nova_secao = $map_portais[$card['id_secao']];
             }
+            
+            $ins_card->execute([
+                $id_destino,
+                $nova_secao,
+                $card['id_categoria'],
+                $card['titulo'],
+                $card['subtitulo'],
+                $card['caminho_icone'],
+                $card['tipo_icone'],
+                $card['link_url'],
+                $card['ordem']
+            ]);
         }
 
         if ($should_manage_transaction) {
