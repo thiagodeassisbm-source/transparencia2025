@@ -149,11 +149,20 @@ include 'header_publico.php';
                 <div class="btn-group shadow-sm">
                     <?php
 $query_params_sort = $_GET;
-unset($query_params_sort['sort'], $query_params_sort['page']);
+unset($query_params_sort['sort'], $query_params_sort['page'], $query_params_sort['favoritos']);
 ?>
-                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo($ordem_atual === 'padrao') ? 'btn-dynamic-primary' : 'btn-outline-secondary'; ?>">Mais Acessados</a>
+                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo($ordem_atual === 'padrao' && !isset($_GET['favoritos'])) ? 'btn-dynamic-primary' : 'btn-outline-secondary'; ?>">Mais Acessados</a>
+                    
                     <?php $query_params_sort['sort'] = 'alpha'; ?>
-                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo($ordem_atual === 'alpha') ? 'btn-dynamic-primary' : 'btn-outline-secondary'; ?>">Ordem Alfabética</a>
+                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm <?php echo($ordem_atual === 'alpha' && !isset($_GET['favoritos'])) ? 'btn-dynamic-primary' : 'btn-outline-secondary'; ?>">Ordem Alfabética</a>
+                    
+                    <?php 
+                    unset($query_params_sort['sort']);
+                    $query_params_sort['favoritos'] = 1; 
+                    ?>
+                    <a href="?<?php echo http_build_query($query_params_sort); ?>" class="btn btn-sm d-flex align-items-center <?php echo isset($_GET['favoritos']) ? 'btn-warning text-dark fw-bold' : 'btn-outline-warning text-dark'; ?>">
+                        <i class="bi bi-star-fill me-1 text-warning" style="<?php echo isset($_GET['favoritos']) ? 'color: #000 !important;' : ''; ?>"></i> Favoritos <span class="badge bg-dark text-white rounded-pill ms-1 border" id="badge-favoritos-count" style="font-size: 0.7rem;">0</span>
+                    </a>
                 </div>
             </div>
 
