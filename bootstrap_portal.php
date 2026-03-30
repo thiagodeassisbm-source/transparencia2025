@@ -2,8 +2,12 @@
 // /bootstrap_portal.php
 require_once 'conexao.php';
 
-// 1. Detecta o Slug da Prefeitura na URL (passado via .htaccess)
-$pref_slug = filter_input(INPUT_GET, 'pref_slug', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+// 1. Detecta o Slug da Prefeitura na URL (ou injetado via Whitelabel pelo conexao.php)
+$pref_slug = $_GET['pref_slug'] ?? null;
+if ($pref_slug) {
+    // Sanitiza manualmente caso venha direto da URL
+    $pref_slug = htmlspecialchars(strip_tags($pref_slug), ENT_QUOTES, 'UTF-8');
+}
 
 // 2. Se não houver slug na URL, tenta pegar da sessão (caso o admin esteja alternando prefeituras)
 if (!$pref_slug && isset($_SESSION['id_prefeitura'])) {
