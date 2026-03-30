@@ -26,7 +26,7 @@ $categoria_ativa_id = $categoria_id ?? ($_GET['categoria_id'] ?? 0);
         
         <div class="p-3">
             <h4 class="sidebar-heading text-muted small fw-bold text-uppercase mb-3">Categorias</h4>
-            <ul class="sidebar-menu list-unstyled">
+            <ul class="sidebar-menu list-unstyled" style="list-style: none !important; padding-left: 0 !important;">
                 <li>
                     <a class="<?php echo ($categoria_ativa_id == 0) ? 'active' : ''; ?>" href="<?php echo $base_url; ?>portal/<?php echo $slug_contexto; ?>">
                         <i class="bi bi-grid-fill me-2 opacity-50"></i> Todas
