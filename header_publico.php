@@ -40,6 +40,23 @@ try {
     $cor_s = '#1a4d1a';
 }
 
+// Helper para converter Hex em RGB para o CSS
+function hexToRgb($hex) {
+    $hex = str_replace("#", "", $hex);
+    if(strlen($hex) == 3) {
+        $r = hexdec(substr($hex,0,1).substr($hex,0,1));
+        $g = hexdec(substr($hex,1,1).substr($hex,1,1));
+        $b = hexdec(substr($hex,2,1).substr($hex,2,1));
+    } else {
+        $r = hexdec(substr($hex,0,2));
+        $g = hexdec(substr($hex,2,2));
+        $b = hexdec(substr($hex,4,2));
+    }
+    return "$r, $g, $b";
+}
+$cor_p_rgb = hexToRgb($cor_p);
+$cor_s_rgb = hexToRgb($cor_s);
+
 // Normaliza o caminho do logo para o frontend usando a BASE URL
 $logo_src = '';
 if (!empty($prefeitura_logo)) {
@@ -54,6 +71,8 @@ $portal_home = $base_url . "portal/" . $slug_pref_header;
     :root {
         --cor-principal: <?php echo $cor_p; ?>;
         --cor-secundaria: <?php echo $cor_s; ?>;
+        --cor-principal-rgb: <?php echo $cor_p_rgb; ?>;
+        --cor-secundaria-rgb: <?php echo $cor_s_rgb; ?>;
     }
     .portal-main-banner { 
         background-color: var(--cor-principal) !important; 
