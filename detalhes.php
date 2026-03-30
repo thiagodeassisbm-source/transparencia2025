@@ -46,7 +46,7 @@ foreach ($detalhes as $detalhe) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>css/style.css?v=<?php echo time(); ?>">
     <style>
         .detail-label { font-size: 0.75rem; font-weight: 700; color: #6c757d; text-transform: uppercase; margin-bottom: 2px; }
         .detail-value { font-size: 1rem; color: #212529; padding-bottom: 8px; border-bottom: 1px solid #f1f3f5; font-family: 'Poppins', sans-serif; font-weight: 500; }

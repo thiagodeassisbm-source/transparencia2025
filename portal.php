@@ -86,7 +86,7 @@ if (!empty($registros_ids)) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>css/style.css?v=<?php echo time(); ?>">
     <style>
         .table-custom tbody tr:hover { background-color: #f8f9fa; cursor: pointer; }
         .table-custom thead th { border-bottom: 2px solid #dee2e6; }

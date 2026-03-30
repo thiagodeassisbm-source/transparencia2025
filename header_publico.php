@@ -122,7 +122,7 @@ $portal_home = $base_url . "portal/" . $slug_pref_header;
     <div class="portal-main-banner text-center py-4">
         <div class="container-fluid container-custom-padding">
             <?php if ($logo_src): ?>
-                <img src="<?php echo htmlspecialchars($logo_src); ?>" alt="Brasão Prefeitura" class="prefeitura-logo-header mb-2">
+                <img src="<?php echo htmlspecialchars($logo_src); ?>" alt="Brasão Prefeitura" class="prefeitura-logo-header mb-2" style="max-height: 150px; width: auto; object-fit: contain;">
             <?php endif; ?>
             <h1 class="portal-main-title mb-1"><?php echo htmlspecialchars($prefeitura_titulo); ?></h1>
             <p class="portal-subtitle mb-0">Acesso rápido e transparente às publicações municipais</p>
