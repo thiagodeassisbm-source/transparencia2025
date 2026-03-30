@@ -31,29 +31,60 @@ document.addEventListener('DOMContentLoaded', function () {
     
     applySettings();
 
-    // Lógica de Favoritos (se existirem na página)
+    // --- NOVA LÓGICA DE FAVORITOS (LOCAL STORAGE) ---
+    // Inicializa o array de IDs favoritados a partir do LocalStorage
+    let favoritosLocal = JSON.parse(localStorage.getItem('favoritos_maquina')) || [];
+    
+    function atualizarBadge() {
+        const badge = document.getElementById('badge-favoritos-count');
+        if (badge) {
+            badge.textContent = favoritosLocal.length;
+        }
+    }
+    atualizarBadge();
+
     const favoriteIcons = document.querySelectorAll('.favorite-icon');
+    
+    // Na leitura inicial dos ícones, podemos garantir que os visuais batem com o local storage
     favoriteIcons.forEach(iconDiv => {
+        const cardId = parseInt(iconDiv.dataset.cardId);
+        const starIcon = iconDiv.querySelector('i');
+        
+        // Se estiver no local storage, forçamos o ícone aceso
+        if (favoritosLocal.includes(cardId)) {
+            starIcon.classList.remove('bi-star');
+            starIcon.classList.add('bi-star-fill', 'text-warning');
+        }
+
         iconDiv.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            const cardId = this.dataset.cardId;
-            const starIcon = this.querySelector('i');
-            starIcon.classList.toggle('bi-star');
-            starIcon.classList.toggle('bi-star-fill');
-            starIcon.classList.toggle('text-warning');
+            
+            const cid = parseInt(this.dataset.cardId);
+            const isFav = favoritosLocal.includes(cid);
+            
+            // Toggle local
+            if (isFav) {
+                favoritosLocal = favoritosLocal.filter(id => id !== cid);
+                starIcon.classList.remove('bi-star-fill', 'text-warning');
+                starIcon.classList.add('bi-star');
+            } else {
+                favoritosLocal.push(cid);
+                starIcon.classList.remove('bi-star');
+                starIcon.classList.add('bi-star-fill', 'text-warning');
+            }
+            
+            localStorage.setItem('favoritos_maquina', JSON.stringify(favoritosLocal));
+            atualizarBadge();
+            
+            // Grava em Cookie também para o PHP ler (1 ano de validade)
+            document.cookie = "maquina_favoritos=" + JSON.stringify(favoritosLocal) + "; path=/; max-age=31536000";
+
+            // Envia para o backend para fins estatísticos
             fetch('<?php echo $base_url; ?>favoritar_publico.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ card_id: cardId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    starIcon.classList.toggle('bi-star');
-                    starIcon.classList.toggle('bi-star-fill');
-                    starIcon.classList.toggle('text-warning');
-                }
+                body: JSON.stringify({ card_id: cid })
             }).catch(() => {});
         });
     });

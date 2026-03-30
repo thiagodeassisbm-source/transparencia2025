@@ -27,12 +27,12 @@ include 'header_publico.php';
 <div class="container-fluid container-custom-padding py-4">
     <div class="row">
         <!-- Menu Lateral -->
-        <div class="col-lg-3 mb-4">
+        <div class="col-md-3 col-lg-2 d-none d-md-block p-0 mb-4">
             <?php include 'menu.php'; ?>
         </div>
 
-        <!-- Formulário Content -->
-        <main class="col-lg-9">
+        <!-- Conteúdo Principal -->
+        <main class="col-md-9 ms-auto col-lg-10 px-md-4">
             <h2 class="mb-4 fw-bold text-dark border-bottom pb-2">Nova Manifestação: <span class="text-primary"><?php echo htmlspecialchars($tipo_manifestacao); ?></span></h2>
             
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">

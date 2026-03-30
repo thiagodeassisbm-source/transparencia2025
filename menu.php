@@ -27,8 +27,11 @@ $categoria_ativa_id = $categoria_id ?? ($_GET['categoria_id'] ?? 0);
         <div class="p-3">
             <h6 class="sidebar-heading text-muted small fw-bold text-uppercase mb-3 px-2">Navegação</h6>
             <div class="sidebar-menu-v2">
-                <a class="menu-item <?php echo ($categoria_ativa_id == 0) ? 'active' : ''; ?>" href="<?php echo $base_url; ?>portal/<?php echo $slug_contexto; ?>">
+                <a class="menu-item <?php echo ($categoria_ativa_id == 0 && !isset($_GET['favoritos'])) ? 'active' : ''; ?>" href="<?php echo $base_url; ?>portal/<?php echo $slug_contexto; ?>">
                     <i class="bi bi-grid-fill me-2 opacity-50"></i> Todas as Categorias
+                </a>
+                <a class="menu-item <?php echo isset($_GET['favoritos']) ? 'active' : ''; ?>" href="<?php echo $base_url; ?>portal/<?php echo $slug_contexto; ?>?favoritos=1" id="btn-menu-favoritos">
+                    <i class="bi bi-star-fill text-warning me-2"></i> Meus Favoritos <span class="badge bg-warning text-dark ms-auto rounded-pill" id="badge-favoritos-count">0</span>
                 </a>
                 
                 <?php foreach ($categorias as $categoria): ?>

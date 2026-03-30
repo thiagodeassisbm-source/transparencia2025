@@ -48,6 +48,25 @@ if ($categoria_id) {
     $params_where[] = $categoria_id;
 }
 
+if (isset($_GET['favoritos'])) {
+    $fav_cookie = $_COOKIE['maquina_favoritos'] ?? '[]';
+    $fav_ids = json_decode($fav_cookie, true);
+    if (!is_array($fav_ids) || empty($fav_ids)) {
+        $fav_ids = [0]; // Nenhum favorito, força retorno vazio
+    }
+    $fav_ids = array_map('intval', $fav_ids);
+    $placeholders = implode(',', array_fill(0, count($fav_ids), '?'));
+
+    if (strpos($sql_where, 'WHERE') === false) {
+        $sql_where = " WHERE c.id IN ($placeholders)";
+    } else {
+        $sql_where .= " AND c.id IN ($placeholders)";
+    }
+    foreach ($fav_ids as $fid) {
+        $params_where[] = $fid;
+    }
+}
+
 // --- 3. CONTAGEM TOTAL DE ITENS PARA A PAGINAÇÃO ---
 $stmt_total = $pdo->prepare("SELECT COUNT(c.id) " . $sql_base . $sql_where);
 $stmt_total->execute($params_where);
@@ -85,6 +104,8 @@ if ($categoria_id) {
     if ($categoria_atual) {
         $page_title = $categoria_atual['nome'];
     }
+} elseif (isset($_GET['favoritos'])) {
+    $page_title = 'Meus Favoritos';
 }
 ?>
 <!DOCTYPE html>
@@ -112,13 +133,16 @@ include 'header_publico.php';
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-lg-3 pt-4 mb-4">
+        <!-- Menu Lateral -->
+        <div class="col-md-3 col-lg-2 d-none d-md-block p-0 mb-4">
             <?php 
             $_GET['categoria_id'] = $categoria_id;
             include 'menu.php'; 
             ?>
         </div>
-        <main class="col-lg-9 pt-4">
+
+        <!-- Conteúdo Principal -->
+        <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
             
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0 fw-bold"><?php echo htmlspecialchars($page_title); ?></h2>
