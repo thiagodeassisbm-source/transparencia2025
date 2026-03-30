@@ -60,10 +60,13 @@ if ($pagina) {
     </div>
 </header>
 
-<div class="container-fluid container-custom-padding">
+<div class="container-fluid py-4">
     <div class="row">
-        <?php include 'menu.php'; ?>
-        <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
+        <!-- Menu Lateral -->
+        <div class="col-md-3 col-lg-2 d-none d-md-block p-0 mb-4">
+            <?php include 'menu.php'; ?>
+        </div>
+        <main class="col-md-9 ms-auto col-lg-10 px-md-4">
             <div class="card">
                 <div class="card-body">
                     <h2 class="h3 mb-4"><?php echo htmlspecialchars($pagina['titulo']); ?></h2>

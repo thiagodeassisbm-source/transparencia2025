@@ -24,7 +24,7 @@ $page_title = "Fazer Solicitação ao SIC";
 include 'header_publico.php'; 
 ?>
 
-<div class="container-fluid container-custom-padding py-4">
+<div class="container-fluid py-4">
     <div class="row">
         <!-- Menu Lateral -->
         <div class="col-md-3 col-lg-2 d-none d-md-block p-0 mb-4">
