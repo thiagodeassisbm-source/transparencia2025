@@ -19,16 +19,17 @@ if ($pref_slug) {
     $prefeitura_ativa = $stmt_pref_val->fetch();
 }
 
-// 4. Se não encontrou nenhuma prefeitura, usa uma padrão ou redireciona
+// 4. Se não encontrou nenhuma prefeitura, não define prefeitura ativa (permitindo landing page)
 if (!$prefeitura_ativa) {
-    // Busca a primeira cadastrada como fallback para não quebrar o site
-    $prefeitura_ativa = $pdo->query("SELECT * FROM prefeituras ORDER BY id ASC LIMIT 1")->fetch();
+    $id_prefeitura_ativa = null;
+    $nome_prefeitura_ativa = null;
+    $slug_prefeitura_ativa = null;
+} else {
+    // 5. Define as variáveis globais para uso em todo o portal
+    $id_prefeitura_ativa = $prefeitura_ativa['id'];
+    $nome_prefeitura_ativa = $prefeitura_ativa['nome'];
+    $slug_prefeitura_ativa = $prefeitura_ativa['slug'];
 }
-
-// 5. Define as variáveis globais para uso em todo o portal
-$id_prefeitura_ativa = $prefeitura_ativa['id'];
-$nome_prefeitura_ativa = $prefeitura_ativa['nome'];
-$slug_prefeitura_ativa = $prefeitura_ativa['slug'];
 
 // 6. Atualiza a URL base para as páginas públicas (Inteligente para Whitelabel)
 // Se for um domínio customizado, a base é a raiz. Se for via UP GYN, a base é /portal/slug/

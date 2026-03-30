@@ -2,6 +2,13 @@
 require_once 'conexao.php';
 require_once 'bootstrap_portal.php'; // Carrega o contexto da prefeitura ativa (SaaS)
 
+// --- 0. LANDING PAGE DO SISTEMA ---
+// Se não houver prefeitura ativa na URL nem na sessão, mostramos a página institucional
+if (!$id_prefeitura_ativa) {
+    include 'landing.php';
+    exit;
+}
+
 // --- 1. CONFIGURAÇÕES DA PAGINAÇÃO ---
 $itens_por_pagina = 12;
 $pagina_atual = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT) ?: 1;
