@@ -84,7 +84,7 @@ include 'admin_header.php';
         if($cor == 'danger') $icon = 'bi-exclamation-octagon-fill';
         if($cor == 'success') $icon = 'bi-megaphone-fill';
     ?>
-    <div class="alert alert-<?php echo $cor; ?> alert-dismissible fade show shadow-sm border-0 mb-4 rounded-4 p-4" role="alert">
+    <div class="alert alert-<?php echo $cor; ?> shadow-sm border-0 mb-4 rounded-4 p-4 d-flex align-items-center justify-content-between" role="alert">
         <div class="d-flex align-items-center">
             <div class="bg-white bg-opacity-25 rounded-circle p-3 me-4 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
                 <i class="bi <?php echo $icon; ?> fs-3"></i>
@@ -94,7 +94,11 @@ include 'admin_header.php';
                 <div class="opacity-75"><?php echo nl2br(htmlspecialchars($msg['mensagem'])); ?></div>
             </div>
         </div>
-        <button type="button" class="btn-close p-4" data-bs-dismiss="alert" aria-label="Close" onclick="marcarComoLida(<?php echo $msg['id']; ?>)"></button>
+        <div class="ms-3">
+             <button type="button" class="btn bg-white bg-opacity-50 border-0 rounded-pill px-4 py-2 small fw-bold text-dark shadow-sm" data-bs-dismiss="alert" onclick="marcarComoLida(<?php echo $msg['id']; ?>)">
+                <i class="bi bi-check-lg me-2"></i> Não mostrar mais
+            </button>
+        </div>
     </div>
     <?php endforeach; ?>
 
