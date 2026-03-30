@@ -3,19 +3,23 @@
 require_once 'conexao.php';
 
 // Busca configurações da prefeitura ativa (SaaS)
+// Usa coalescência nula para evitar warnings caso o contexto não esteja definido
+$id_pref_header = $id_prefeitura_ativa ?? 0;
+$nome_pref_header = $nome_prefeitura_ativa ?? 'sua Cidade';
+$slug_pref_header = $slug_prefeitura_ativa ?? 'home';
+
 try {
     $stmt_conf = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE id_prefeitura = ? AND chave IN ('prefeitura_titulo', 'prefeitura_logo', 'prefeitura_cor_principal', 'prefeitura_cor_secundaria')");
-    $stmt_conf->execute([$id_prefeitura_ativa]);
+    $stmt_conf->execute([$id_pref_header]);
     $conf_data = $stmt_conf->fetchAll(PDO::FETCH_KEY_PAIR);
-
-    $prefeitura_titulo = !empty($conf_data['prefeitura_titulo']) ? $conf_data['prefeitura_titulo'] : 'Portal da Transparência de ' . $nome_prefeitura_ativa;
+    
+    $prefeitura_titulo = !empty($conf_data['prefeitura_titulo']) ? $conf_data['prefeitura_titulo'] : 'Portal da Transparência de ' . $nome_pref_header;
     $prefeitura_logo = !empty($conf_data['prefeitura_logo']) ? $conf_data['prefeitura_logo'] : '';
     $cor_p = $conf_data['prefeitura_cor_principal'] ?? '#2ca444';
     $cor_s = $conf_data['prefeitura_cor_secundaria'] ?? '#1a4d1a';
-}
-catch (Exception $e) {
-    $prefeitura_titulo = 'Portal da Transparência';
-    $prefeitura_logo = '';
+} catch (Exception $e) { 
+    $prefeitura_titulo = 'Portal da Transparência'; 
+    $prefeitura_logo = ''; 
     $cor_p = '#2ca444';
     $cor_s = '#1a4d1a';
 }
@@ -30,7 +34,7 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
     }
     .portal-main-banner { 
         background-color: var(--cor-principal) !important; 
-        background-image: none !important; /* Remove o gradiente fixo para respeitar a cor principal */
+        background-image: none !important;
     }
     .top-utility-bar-wrapper { 
         background-color: var(--cor-secundaria) !important; 
@@ -61,17 +65,15 @@ $logo_src = str_replace('../', '', $prefeitura_logo);
     }
 </style>
 <header>
-    <!-- Barra Utilitária Superior (Verde Escuro) -->
     <div class="top-utility-bar-wrapper">
         <div class="container-fluid container-custom-padding d-flex justify-content-between align-items-center">
             <div class="breadcrumb-utility text-white small">
                 <span>VOCÊ ESTÁ AQUI:</span> 
-                <a href="portal/<?php echo $slug_prefeitura_ativa; ?>" class="text-white fw-600 text-decoration-none ms-1">INÍCIO</a>
+                <a href="portal/<?php echo $slug_pref_header; ?>" class="text-white fw-600 text-decoration-none ms-1">INÍCIO</a>
                 <?php if (isset($page_title) && $page_title !== 'Transparência'): ?>
                     <span class="mx-1">/</span>
                     <span class="text-white opacity-75"><?php echo mb_strtoupper(htmlspecialchars($page_title)); ?></span>
-                <?php
-endif; ?>
+                <?php endif; ?>
             </div>
             <div class="accessibility-bar d-flex align-items-center">
                 <span class="accessibility-label me-3">ACESSIBILIDADE</span>
@@ -94,13 +96,11 @@ endif; ?>
         </div>
     </div>
 
-    <!-- Banner Principal (Verde Claro) -->
     <div class="portal-main-banner text-center py-4">
         <div class="container-fluid container-custom-padding">
             <?php if ($logo_src): ?>
                 <img src="<?php echo htmlspecialchars($logo_src); ?>" alt="Brasão Prefeitura" class="prefeitura-logo-header mb-2">
-            <?php
-endif; ?>
+            <?php endif; ?>
             <h1 class="portal-main-title mb-1"><?php echo htmlspecialchars($prefeitura_titulo); ?></h1>
             <p class="portal-subtitle mb-0">Acesso rápido e transparente às publicações municipais</p>
         </div>
