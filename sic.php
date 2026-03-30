@@ -115,7 +115,7 @@ include 'header_publico.php';
                             <div class="mb-4">
                                 <h6 class="fw-bold">Fazer uma Solicitação</h6>
                                 <p class="text-muted small">Clique no botão abaixo para preencher o formulário do seu pedido de informação online.</p>
-                                <a href="portal/<?php echo $slug_pref_header; ?>/solicitacao_sic.php" class="btn btn-dynamic-primary btn-lg w-100 rounded-pill py-2 shadow-sm">
+                                <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/solicitacao_sic.php" class="btn btn-dynamic-primary btn-lg w-100 rounded-pill py-2 shadow-sm">
                                     <i class="bi bi-plus-circle me-2"></i> Iniciar Solicitação
                                 </a>
                             </div>
@@ -123,7 +123,7 @@ include 'header_publico.php';
                             <div class="mt-auto pt-4 border-top">
                                 <h6 class="fw-bold">Acompanhar Pedido</h6>
                                 <p class="text-muted small">Consulte o andamento de um pedido existente usando seu protocolo.</p>
-                                <form action="portal/<?php echo $slug_pref_header; ?>/consulta_sic.php" method="GET">
+                                <form action="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/consulta_sic.php" method="GET">
                                     <div class="input-group mb-2">
                                         <input type="text" name="protocolo" class="form-control rounded-start-pill ps-3" placeholder="Número do Protocolo" required>
                                         <button type="submit" class="btn btn-primary rounded-end-pill px-3">
