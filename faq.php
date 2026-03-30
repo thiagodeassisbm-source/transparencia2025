@@ -1,5 +1,8 @@
 <?php
+// /faq.php
 require_once 'conexao.php';
+require_once 'bootstrap_portal.php';
+
 $page_title = "Perguntas Frequentes";
 
 // Encontra o ID da seção "Perguntas Frequentes"
@@ -67,167 +70,108 @@ if ($id_portal) {
     <title><?php echo htmlspecialchars($page_title); ?> - Portal da Transparência</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="<?php echo $base_url; ?>css/style.css?v=<?php echo time(); ?>">
+    <style>
+        .faq-card .accordion-button:not(.collapsed) {
+            background-color: var(--cor-principal, #2ca444);
+            color: white;
+        }
+        .faq-card .accordion-button:after {
+            filter: grayscale(1) invert(1);
+        }
+    </style>
 </head>
-<body>
+<body class="bg-light">
 
-<header class="page-header">
-    <div class="container-fluid container-custom-padding">
-        <div class="d-flex justify-content-between align-items-start">
-            <div>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.php">Início</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($page_title); ?></li>
-                    </ol>
-                </nav>
-                <h1><?php echo htmlspecialchars($page_title); ?></h1>
-            </div>
-            <div class="accessibility-bar-header d-flex align-items-center pt-2">
-                <span class="me-2 d-none d-lg-inline text-white" style="font-size: 0.8rem;">ACESSIBILIDADE</span>
-                <button id="font-increase" class="btn btn-sm btn-outline-light me-1" title="Aumentar Fonte">A+</button>
-                <button id="font-reset" class="btn btn-sm btn-outline-light me-1" title="Fonte Padrão">A</button>
-                <button id="font-decrease" class="btn btn-sm btn-outline-light me-2" title="Diminuir Fonte">A-</button>
-                <button id="contrast-toggle" class="btn btn-sm btn-outline-light" title="Alto Contraste"><i class="bi bi-circle-half"></i></button>
-            </div>
-        </div>
-    </div>
-</header>
+<?php include 'header_publico.php'; ?>
 
 <div class="container-fluid">
     <div class="row">
         <?php include 'menu.php'; ?>
         <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
             
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0 fw-bold"><?php echo htmlspecialchars($page_title); ?></h2>
+            </div>
+            
             <?php if (!empty($campos_pesquisaveis)): ?>
-            <div class="card mb-4">
-                <div class="card-header"><i class="bi bi-funnel-fill"></i> Filtros de Pesquisa</div>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-funnel-fill me-2"></i> Filtros de Pesquisa</h6>
+                </div>
                 <div class="card-body">
                     <form method="GET" action="faq.php">
                         <div class="row">
                             <?php foreach ($campos_pesquisaveis as $campo): ?>
                                 <div class="col-md-4 mb-3">
-                                    <label for="filtro_<?php echo $campo['id']; ?>" class="form-label"><?php echo htmlspecialchars($campo['nome_campo']); ?></label>
+                                    <label for="filtro_<?php echo $campo['id']; ?>" class="form-label small fw-bold text-muted"><?php echo htmlspecialchars($campo['nome_campo']); ?></label>
                                     <?php
-        $valor_filtro_atual = $filtros_ativos[$campo['id']] ?? '';
-
-        if ($campo['tipo_campo'] == 'select') {
-            $stmt_opcoes = $pdo->prepare("SELECT opcoes_campo FROM campos_portal WHERE id = ?");
-            $stmt_opcoes->execute([$campo['id']]);
-            $opcoes_str = $stmt_opcoes->fetchColumn();
-
-            echo '<select class="form-select" name="filtros[' . $campo['id'] . ']" id="filtro_' . $campo['id'] . '">';
-            echo '<option value="">-- Todos --</option>';
-
-            $opcoes = [];
-            if (strpos($opcoes_str, 'tabela:') === 0) {
-                list(, $nome_tabela) = explode(':', $opcoes_str);
-                $nome_tabela = trim($nome_tabela);
-
-                $stmt_tabela_externa = $pdo->query("SELECT DISTINCT nome FROM " . preg_replace("/[^a-zA-Z0-9_]+/", "", $nome_tabela) . " ORDER BY nome");
-                if ($stmt_tabela_externa) {
-                    $opcoes_tabela = $stmt_tabela_externa->fetchAll(PDO::FETCH_COLUMN);
-                    foreach ($opcoes_tabela as $opt) {
-                        $opcoes[] = trim($opt);
-                    }
-                }
-            }
-            else {
-                $opcoes = array_map('trim', explode(',', $opcoes_str));
-            }
-
-            foreach ($opcoes as $opcao) {
-                if (!empty($opcao)) {
-                    $selected = ($valor_filtro_atual == $opcao) ? 'selected' : '';
-                    echo '<option value="' . htmlspecialchars($opcao) . '" ' . $selected . '>' . htmlspecialchars($opcao) . '</option>';
-                }
-            }
-            echo '</select>';
-        }
-        else {
-            echo '<input type="text" class="form-control" name="filtros[' . $campo['id'] . ']" id="filtro_' . $campo['id'] . '" value="' . htmlspecialchars($valor_filtro_atual) . '">';
-        }
-?>
+                                    $valor_filtro_atual = $filtros_ativos[$campo['id']] ?? '';
+                                    if ($campo['tipo_campo'] == 'select') {
+                                        $stmt_opcoes = $pdo->prepare("SELECT opcoes_campo FROM campos_portal WHERE id = ?");
+                                        $stmt_opcoes->execute([$campo['id']]);
+                                        $opcoes_str = $stmt_opcoes->fetchColumn();
+                                        echo '<select class="form-select" name="filtros[' . $campo['id'] . ']" id="filtro_' . $campo['id'] . '">';
+                                        echo '<option value="">-- Todos --</option>';
+                                        $opcoes = array_map('trim', explode(',', $opcoes_str));
+                                        foreach ($opcoes as $opcao) {
+                                            if (!empty($opcao)) {
+                                                $selected = ($valor_filtro_atual == $opcao) ? 'selected' : '';
+                                                echo '<option value="' . htmlspecialchars($opcao) . '" ' . $selected . '>' . htmlspecialchars($opcao) . '</option>';
+                                            }
+                                        }
+                                        echo '</select>';
+                                    } else {
+                                        echo '<input type="text" class="form-control" name="filtros[' . $campo['id'] . ']" id="filtro_' . $campo['id'] . '" value="' . htmlspecialchars($valor_filtro_atual) . '">';
+                                    }
+                                    ?>
                                 </div>
-                            <?php
-    endforeach; ?>
+                            <?php endforeach; ?>
                         </div>
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Filtrar</button>
-                        <a href="faq.php" class="btn btn-secondary ms-2"><i class="bi bi-eraser-fill"></i> Limpar Filtros</a>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-dynamic-primary px-4 shadow-sm"><i class="bi bi-search me-2"></i>Filtrar</button>
+                            <a href="faq.php" class="btn btn-light border px-4 shadow-sm"><i class="bi bi-eraser-fill me-2"></i>Limpar</a>
+                        </div>
                     </form>
                 </div>
             </div>
-            <?php
-endif; ?>
+            <?php endif; ?>
 
-            <div class="accordion" id="faqAccordion">
+            <div class="accordion faq-card shadow-sm rounded-3 border-0 bg-white" id="faqAccordion">
                 <?php if (!empty($faqs)): ?>
                     <?php foreach ($faqs as $index => $faq): ?>
-                        <div class="accordion-item">
+                        <div class="accordion-item border-0">
                             <h2 class="accordion-header" id="heading-<?php echo $faq['id']; ?>">
-                                <button class="accordion-button <?php if ($index > 0)
-            echo 'collapsed'; ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?php echo $faq['id']; ?>" aria-expanded="<?php echo $index === 0 ? 'true' : 'false'; ?>" aria-controls="collapse-<?php echo $faq['id']; ?>">
-                                    <i class="bi bi-plus-circle me-2"></i><strong><?php echo htmlspecialchars($faq['Pergunta'] ?? 'Pergunta não disponível'); ?></strong>
-                                    </button>
+                                <button class="accordion-button <?php if ($index > 0) echo 'collapsed'; ?> py-3 px-4 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?php echo $faq['id']; ?>" aria-expanded="<?php echo $index === 0 ? 'true' : 'false'; ?>" aria-controls="collapse-<?php echo $faq['id']; ?>">
+                                    <i class="bi bi-patch-question me-3 opacity-50"></i> <?php echo htmlspecialchars($faq['Pergunta'] ?? 'Pergunta não disponível'); ?>
+                                </button>
                             </h2>
-                            <div id="collapse-<?php echo $faq['id']; ?>" class="accordion-collapse collapse <?php if ($index === 0)
-            echo 'show'; ?>" aria-labelledby="heading-<?php echo $faq['id']; ?>" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
+                            <div id="collapse-<?php echo $faq['id']; ?>" class="accordion-collapse collapse <?php if ($index === 0) echo 'show'; ?>" aria-labelledby="heading-<?php echo $faq['id']; ?>" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body px-4 py-4 text-muted border-top bg-light-subtle">
                                     <?php echo $faq['Resposta'] ?? 'Resposta não disponível.'; ?>
                                 </div>
                             </div>
                         </div>
-                    <?php
-    endforeach; ?>
-                <?php
-else: ?>
-                    <div class="alert alert-light">Nenhuma pergunta encontrada para os filtros selecionados.</div>
-                <?php
-endif; ?>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="p-5 text-center bg-white rounded-3">
+                        <i class="bi bi-info-circle display-4 text-muted mb-3 d-block"></i>
+                        <p class="text-muted mb-0">Nenhuma pergunta encontrada para os filtros selecionados.</p>
+                    </div>
+                <?php endif; ?>
             </div>
         </main>
     </div>
 </div>
 
-<footer class="p-3 mt-4">
-    <div class="container-fluid container-custom-padding">
-        <div class="d-flex justify-content-between align-items-center" style="font-size: 14px;">
-            <div>&copy; <?php echo date('Y'); ?> - Todos os direitos reservados.</div>
-            <div>
-                Desenvolvido por |
-                <a href="https://www.upgyn.com.br" target="_blank" class="ms-2">
-                    <img src="imagens/logo-up.png" alt="UPGYN" style="height: 40px; vertical-align: middle;">
-                </a>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const body = document.body;
-    const btnIncrease = document.getElementById('font-increase');
-    const btnReset = document.getElementById('font-reset');
-    const btnDecrease = document.getElementById('font-decrease');
-    const btnContrast = document.getElementById('contrast-toggle');
-
-    let currentFontSize = parseInt(localStorage.getItem('fontSize') || 16);
-    let highContrast = localStorage.getItem('highContrast') === 'true';
-
-    function applySettings() {
-        body.style.fontSize = currentFontSize + 'px';
-        if (highContrast) { body.classList.add('high-contrast'); } 
-        else { body.classList.remove('high-contrast'); }
-    }
-
-    if(btnIncrease) { btnIncrease.addEventListener('click', function() { if (currentFontSize < 24) { currentFontSize += 2; localStorage.setItem('fontSize', currentFontSize); applySettings(); } }); }
-    if(btnDecrease) { btnDecrease.addEventListener('click', function() { if (currentFontSize > 12) { currentFontSize -= 2; localStorage.setItem('fontSize', currentFontSize); applySettings(); } }); }
-    if(btnReset) { btnReset.addEventListener('click', function() { currentFontSize = 16; localStorage.removeItem('fontSize'); applySettings(); }); }
-    if(btnContrast) { btnContrast.addEventListener('click', function() { highContrast = !highContrast; localStorage.setItem('highContrast', highContrast); applySettings(); }); }
-    
-    applySettings();
-});
-</script>
+<?php 
+$custom_container_class = "container-custom-padding";
+include 'footer_publico.php'; 
+?>
 </body>
 </html>
