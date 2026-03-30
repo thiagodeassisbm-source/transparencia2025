@@ -34,7 +34,8 @@ if (!$prefeitura_ativa) {
 }
 
 // 6. Atualiza a URL base para as páginas públicas (Inteligente para Whitelabel)
-// Se for um domínio customizado, a base é a raiz. Se for via UP GYN, a base é /portal/slug/
+// Se for um domínio customizado, a base é a raiz. Se for via UP GYN, a base é /portal/slug/ (ou raiz se for landing page)
 $is_custom_domain = ($domain != 'www.upgyn.com.br' && $domain != 'upgyn.com.br');
-$base_portal_url = $is_custom_domain ? $base_url : ($base_url . "portal/" . $slug_prefeitura_ativa . "/");
+$base_portal_url = $is_custom_domain ? $base_url : 
+                   ($slug_prefeitura_ativa ? $base_url . "portal/" . $slug_prefeitura_ativa . "/" : $base_url);
 ?>
