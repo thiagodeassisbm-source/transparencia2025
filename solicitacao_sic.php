@@ -1,60 +1,61 @@
 <?php
 require_once 'conexao.php';
 $page_title = "Fazer Solicitação ao SIC";
+
+// Detecta o ID da prefeitura para associar o pedido no futuro (se necessário)
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title><?php echo htmlspecialchars($page_title); ?> - Portal da Transparência</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $page_title; ?> - Portal da Transparência</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
 </head>
-<body>
+<body class="bg-light">
 
-<div class="accessibility-bar py-1">
-    <div class="container-fluid container-custom-padding">
-        <div class="d-flex justify-content-end align-items-center">
-            <span class="me-3 fw-bold d-none d-md-inline"><i class="bi bi-universal-access"></i> ACESSIBILIDADE</span>
-            <button id="font-increase" class="btn btn-sm btn-outline-dark me-1" title="Aumentar Fonte">A+</button>
-            <button id="font-reset" class="btn btn-sm btn-outline-dark me-1" title="Fonte Padrão">A</button>
-            <button id="font-decrease" class="btn btn-sm btn-outline-dark me-2" title="Diminuir Fonte">A-</button>
-            <button id="contrast-toggle" class="btn btn-sm btn-outline-dark" title="Alto Contraste"><i class="bi bi-circle-half"></i></button>
-        </div>
-    </div>
-</div>
+<?php 
+// O header detecta o pref_slug via URL (/portal/catalao/solicitacao_sic.php)
+include 'header_publico.php'; 
+?>
 
-<header class="page-header">
-    <div class="container-fluid container-custom-padding">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.php">Início</a></li>
-                <li class="breadcrumb-item"><a href="sic.php">SIC</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Fazer Solicitação</li>
-            </ol>
-        </nav>
-        <h1>Pedido de Acesso à Informação</h1>
-    </div>
-</header>
-
-<div class="container-fluid container-custom-padding">
+<div class="container-fluid container-custom-padding py-4">
     <div class="row">
-        <?php include 'menu.php'; ?>
-        <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
-            <div class="card">
-                <div class="card-header"><h4>Formulário de Solicitação</h4></div>
-                <div class="card-body">
-                    <p class="text-muted">Preencha os campos abaixo para registrar seu Pedido de Acesso à Informação (LAI).</p>
+        <!-- Menu Lateral -->
+        <div class="col-lg-3 mb-4">
+            <?php include 'menu.php'; ?>
+        </div>
+
+        <!-- Formulário Content -->
+        <main class="col-lg-9">
+            <h2 class="mb-4 fw-bold text-dark border-bottom pb-2">Pedido de Acesso à Informação (e-SIC)</h2>
+            
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square text-success me-2"></i> Formulário de Solicitação</h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted small">Preencha os campos abaixo para registrar seu Pedido de Acesso à Informação (LAI).</p>
+                    
                     <form action="processar_sic.php" method="POST">
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label for="nome_solicitante" class="form-label">Nome Completo*</label>
-                                <input type="text" name="nome_solicitante" id="nome_solicitante" class="form-control" required>
+                        <!-- Campo oculto para vincular a prefeitura ao pedido se o processador suportar -->
+                        <input type="hidden" name="pref_id" value="<?php echo $id_pref_header; ?>">
+                        <input type="hidden" name="pref_slug" value="<?php echo $slug_pref_header; ?>">
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="nome_solicitante" class="form-label fw-bold text-muted small mb-1">Cidadão / Nome Completo*</label>
+                                <input type="text" name="nome_solicitante" id="nome_solicitante" class="form-control rounded-3" placeholder="Digite seu nome completo" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="tipo_documento" class="form-label">Tipo de Documento*</label>
-                                <select name="tipo_documento" id="tipo_documento" class="form-select" required>
+                            
+                            <div class="col-md-6 mt-3">
+                                <label for="tipo_documento" class="form-label fw-bold text-muted small mb-1">Tipo de Documento*</label>
+                                <select name="tipo_documento" id="tipo_documento" class="form-select rounded-3" required>
                                     <option value="">-- Selecione --</option>
                                     <option value="CPF">CPF</option>
                                     <option value="CNPJ">CNPJ</option>
@@ -62,71 +63,62 @@ $page_title = "Fazer Solicitação ao SIC";
                                     <option value="Registro Profissional">Registro Profissional</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="numero_documento" class="form-label">Número do Documento*</label>
-                                <input type="text" name="numero_documento" id="numero_documento" class="form-control" required>
+                            
+                            <div class="col-md-6 mt-3">
+                                <label for="numero_documento" class="form-label fw-bold text-muted small mb-1">Número do Documento*</label>
+                                <input type="text" name="numero_documento" id="numero_documento" class="form-control rounded-3" placeholder="000.000.000-00" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">E-mail para Contato (opcional)</label>
-                                <input type="email" name="email" id="email" class="form-control" placeholder="seunome@email.com">
+
+                            <div class="col-md-6 mt-3">
+                                <label for="email" class="form-label fw-bold text-muted small mb-1">E-mail para Retorno (opcional)</label>
+                                <input type="email" name="email" id="email" class="form-control rounded-3" placeholder="seunome@email.com">
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="telefone" class="form-label">Telefone para Contato (opcional)</label>
-                                <input type="text" name="telefone" id="telefone" class="form-control" placeholder="(00) 00000-0000">
+
+                            <div class="col-md-6 mt-3">
+                                <label for="telefone" class="form-label fw-bold text-muted small mb-1">WhatsApp / Telefone (opcional)</label>
+                                <input type="text" name="telefone" id="telefone" class="form-control rounded-3" placeholder="(00) 0 0000-0000">
                             </div>
-                            <div class="col-md-12 mb-3">
-                                <label for="descricao_pedido" class="form-label">Descrição do Pedido de Informação*</label>
-                                <textarea name="descricao_pedido" id="descricao_pedido" class="form-control" rows="8" placeholder="Descreva de forma clara e objetiva a informação que você solicita." required></textarea>
+
+                            <div class="col-12 mt-4">
+                                <label for="descricao_pedido" class="form-label fw-bold text-muted small mb-1">Descrição Detalhada do Pedido*</label>
+                                <textarea name="descricao_pedido" id="descricao_pedido" class="form-control rounded-3" rows="6" placeholder="Descreva de forma clara e objetiva a informação que você solicita..." required></textarea>
+                            </div>
+
+                            <div class="col-12 mt-5 text-end border-top pt-4">
+                                <a href="portal/<?php echo $slug_pref_header; ?>/sic.php" class="btn btn-light rounded-pill px-4 me-2">Cancelar</a>
+                                <button type="submit" class="btn btn-dynamic-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+                                    <i class="bi bi-send-fill me-2 rotate-45"></i> Enviar Pedido ao SIC
+                                </button>
                             </div>
                         </div>
-                        <a href="sic.php" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Enviar Pedido</button>
                     </form>
                 </div>
             </div>
-            <div class="alert alert-light border mt-4" role="alert">
-                <h5 class="alert-heading small text-uppercase"><i class="bi bi-info-circle-fill"></i> Nota Importante</h5>
-                <p class="mb-0 small">Em atendimento ao Decreto Federal Nº 7.724/2012, é necessário que o requerente informe seu nome, número de um documento válido e que especifique de forma clara e precisa a informação requerida.</p>
+
+            <div class="alert alert-light border-0 shadow-sm rounded-4 p-4" role="alert">
+                <div class="d-flex">
+                    <i class="bi bi-info-circle-fill text-primary fs-3 me-3"></i>
+                    <div>
+                        <h6 class="alert-heading fw-bold">Compromisso com a Transparência</h6>
+                        <p class="mb-0 text-muted small">Em atendimento à <strong>Lei Federal Nº 12.527/2011 (LAI)</strong>, sua solicitação será processada dentro dos prazos legais. É essencial fornecer dados válidos para facilitar a localização da informação requerida pelo órgão responsável.</p>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
 </div>
 
-<footer class="text-center p-3 mt-4">
-    <div class="container-fluid container-custom-padding">
-        <div class="d-flex justify-content-between align-items-center" style="font-size: 14px;">
-            <div>&copy; <?php echo date('Y'); ?> - Todos os direitos reservados.</div>
-            <div>
-                Desenvolvido por |
-                <a href="https://www.upgyn.com.br" target="_blank" class="ms-2">
-                    <img src="imagens/logo-up.png" alt="UPGYN" style="height: 40px; vertical-align: middle;">
-                </a>
-            </div>
-        </div>
-    </div>
-</footer>
+<?php 
+$custom_container_class = "container-custom-padding";
+include 'footer_publico.php'; 
+?>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const body = document.body;
-    const btnIncrease = document.getElementById('font-increase');
-    const btnReset = document.getElementById('font-reset');
-    const btnDecrease = document.getElementById('font-decrease');
-    const btnContrast = document.getElementById('contrast-toggle');
-    let currentFontSize = parseInt(localStorage.getItem('fontSize') || 16);
-    let highContrast = localStorage.getItem('highContrast') === 'true';
-    function applySettings() {
-        body.style.fontSize = currentFontSize + 'px';
-        if (highContrast) { body.classList.add('high-contrast'); } 
-        else { body.classList.remove('high-contrast'); }
-    }
-    if(btnIncrease) { btnIncrease.addEventListener('click', function() { if (currentFontSize < 24) { currentFontSize += 2; localStorage.setItem('fontSize', currentFontSize); applySettings(); } }); }
-    if(btnDecrease) { btnDecrease.addEventListener('click', function() { if (currentFontSize > 12) { currentFontSize -= 2; localStorage.setItem('fontSize', currentFontSize); applySettings(); } }); }
-    if(btnReset) { btnReset.addEventListener('click', function() { currentFontSize = 16; localStorage.removeItem('fontSize'); applySettings(); }); }
-    if(btnContrast) { btnContrast.addEventListener('click', function() { highContrast = !highContrast; localStorage.setItem('highContrast', highContrast); applySettings(); }); }
-    applySettings();
-});
-</script>
+<style>
+.rotate-45 { display: inline-block; transform: rotate(-45deg); }
+.form-control:focus, .form-select:focus {
+    border-color: var(--cor-principal);
+    box-shadow: 0 0 0 0.25rem rgba(var(--cor-principal-rgb), 0.1);
+}
+</style>
 </body>
 </html>

@@ -1,107 +1,105 @@
 <?php
 require_once 'conexao.php';
-$page_title = "Abrir Manifestação";
-$tipo_selecionado = $_GET['tipo'] ?? ''; // Pega o tipo da URL para pré-selecionar
+$tipo_manifestacao = $_GET['tipo'] ?? 'Sugestão';
+$page_title = "Abrir Manifestação - " . $tipo_manifestacao;
 
-// Array com todas as opções para o campo "Assunto"
-$assuntos_ouvidoria = [
-    "Abastecimento", "Acumulação de Cargo Público", "Administração", "Administração e Planejamento", 
-    "Agente Público", "Agricultura e Meio Rural", "Agricultura e Produção Orgânica", "Agrotóxicos", 
-    "Alimentação Animal", "Alimentação Escolar", "Aposentadoria", "Armazenamento e Comercialização Agropecuária", 
-    "Assédio Sexual", "Assédio Moral", "Assessoria Jurídica", "Assistência à Criança e Adolescente", 
-    "Assistência ao Idoso", "Assistência ao Portador de Deficiência", "Assistência e Auxílio Estudantil", 
-    "Assistência Hospitalar e Ambulatorial", "Assistência Social", "Atendimento Básico", "Auditoria", 
-    "Bem Estar Animal", "Benefício e Auxilio", "Biblioteca", "Bolsas", "Brasil Carinhoso", 
-    "Certidões e Declarações", "Cidadania", "Combate e Epidemias", "Combustíveis", "Compras", 
-    "Comunicação e Marketing Institucional", "Concurso", "Conduta Administrativa", "Conservação do Solo e da Água", 
-    "Construção de Escolas", "Convênio", "Cooperativismo e Associativismo Rural", "Covid-19 (Novo Coronavírus)", 
-    "Cultura e Arte", "Desastre Ambiental", "Desenvolvimento Sustentável", "E-SIC", "Educação", 
-    "Empresa Simples", "Esporte", "Fertilizantes", "Frequência de Servidores", "FUNDEB", "Gestão", 
-    "Habitação", "Igualdade Racial", "Iluminação Pública", "Imposto", "Infraestrutura e Manutenção", 
-    "Inspeção de Estabelecimento ou Produto", "Laboratórios", "Lazer", "Legislação", 
-    "Licenciamento Ambiental", "Licitações", "Matrículas", "Medicamentos e Aparelhos", 
-    "MEI- Microempreendedor Individual", "Meio Ambiente", "MPE- Micro e Pequena Empresa", "Obras Públicas", 
-    "Ouvidoria", "Outros", "PAC- Programa de Aceleração do Crescimento", "Participação em Eventos", 
-    "Patrimônio", "Pecúaria", "Penitenciárias", "PETI - Programa de Erradicação do Trabalho Infantil", 
-    "Planejamento e Orçamento", "Planos de Saúde", "Política Agrícola", "Políticas para Mulheres", 
-    "Portador de Deficiência", "Preservação e Conservação Ambiental", "Prestação de Contas", "Previdencia", 
-    "Processo Seletivo", "Produção Agropecuária", "Programa Bolsa Família", "Programa Brasil Sorridente", 
-    "Programa Farmácia Popular", "Programa Luz para Todos", "Programa mais Educação", "Programa Mais Médico", 
-    "Programa Minha Casa Minha Vida", "Programa Saúde da Família", "Programa Viver Sem Limite", "PRONAF", 
-    "Pronatec", "Publicidade", "Qualidade de Alimentos", "Receita", "Recursos Públicos", "Remédios", 
-    "Recursos Hídricos", "Secretaria de Saúde", "Secretaria de Habitação", "Secretaria de Políticas para Mulheres", "Secretaria de Assistência Social e Direitos Humanos", "Secretaria de Cultura", "Secretaria de Esporte e Lazer", "Secretaria de Educação", "Secretaria de Eficiência", "Secretaria de Inovação e Transformação Digital", "Secretaria Municipal de Desenvolvimento, Indústria, Comércio, Agricultura e Serviços", "Secretaria de Engenharia de Trânsito", "Secretaria de Infraestrutura Urbana", "Secretaria de Comunicação", "Secretaria de Administração", "Secretaria da Fazenda", "Secretaria de Governo", "Secretaria de Gestão de Negócios e Parcerias", "Transparência", "Transportes", "Tributos", "Turismo", "Bebidas"
-];
-// Ordena a lista em ordem alfabética para facilitar a busca
-sort($assuntos_ouvidoria);
+// O header já identifica a prefeitura pelo slug na URL /portal/catalao/abrir_manifestacao.php
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title><?php echo htmlspecialchars($page_title); ?> - Ouvidoria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $page_title; ?> - Portal da Transparência</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
 </head>
-<body>
-<header class="page-header">
-    <div class="container-fluid container-custom-padding">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.php">Início</a></li>
-                <li class="breadcrumb-item"><a href="ouvidoria.php">Ouvidoria</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Abrir Manifestação</li>
-            </ol>
-        </nav>
-        <h1>Nova Manifestação</h1>
-    </div>
-</header>
-<div class="container-fluid container-custom-padding">
+<body class="bg-light">
+
+<?php 
+include 'header_publico.php'; 
+?>
+
+<div class="container-fluid container-custom-padding py-4">
     <div class="row">
-        <?php include 'menu.php'; ?>
-        <main class="col-md-9 ms-auto col-lg-10 px-md-4 pt-4">
-            <div class="card">
-                <div class="card-header"><h4>Formulário de Manifestação</h4></div>
-                <div class="card-body">
+        <!-- Menu Lateral -->
+        <div class="col-lg-3 mb-4">
+            <?php include 'menu.php'; ?>
+        </div>
+
+        <!-- Formulário Content -->
+        <main class="col-lg-9">
+            <h2 class="mb-4 fw-bold text-dark border-bottom pb-2">Nova Manifestação: <span class="text-primary"><?php echo htmlspecialchars($tipo_manifestacao); ?></span></h2>
+            
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-chat-right-text-fill text-success me-2"></i> Formulário de Ouvidoria</h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted small">Sua manifestação será analisada pela equipe competente. Você receberá um protocolo para acompanhar o andamento.</p>
+                    
                     <form action="processar_ouvidoria.php" method="POST">
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label for="tipo_manifestacao" class="form-label">Tipo de Manifestação*</label>
-                                <select name="tipo_manifestacao" id="tipo_manifestacao" class="form-select" required>
-                                    <option value="" <?php if(empty($tipo_selecionado)) echo 'selected';?>>-- Selecione --</option>
-                                    <option value="Sugestão" <?php if($tipo_selecionado == 'Sugestão') echo 'selected';?>>Sugestão</option>
-                                    <option value="Elogio" <?php if($tipo_selecionado == 'Elogio') echo 'selected';?>>Elogio</option>
-                                    <option value="Solicitação" <?php if($tipo_selecionado == 'Solicitação') echo 'selected';?>>Solicitação</option>
-                                    <option value="Reclamação" <?php if($tipo_selecionado == 'Reclamação') echo 'selected';?>>Reclamação</option>
-                                    <option value="Denúncia" <?php if($tipo_selecionado == 'Denúncia') echo 'selected';?>>Denúncia</option>
-                                </select>
+                        <input type="hidden" name="tipo_manifestacao" value="<?php echo htmlspecialchars($tipo_manifestacao); ?>">
+                        <input type="hidden" name="id_prefeitura" value="<?php echo $id_pref_header; ?>">
+
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="nome_solicitante" class="form-label fw-bold text-muted small mb-1">Cidadão / Nome Completo*</label>
+                                <input type="text" name="nome_solicitante" id="nome_solicitante" class="form-control rounded-3" placeholder="Seu nome completo" required>
                             </div>
-                            <div class="col-md-12 mb-3">
-                                <label for="assunto" class="form-label">Assunto*</label>
-                                <select name="assunto" id="assunto" class="form-select" required>
-                                    <option value="">-- Selecione o Assunto --</option>
-                                    <?php foreach ($assuntos_ouvidoria as $assunto): ?>
-                                        <option value="<?php echo htmlspecialchars($assunto); ?>"><?php echo htmlspecialchars($assunto); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                            
+                            <div class="col-md-6 mt-3">
+                                <label for="email" class="form-label fw-bold text-muted small mb-1">E-mail para Retorno (opcional)</label>
+                                <input type="email" name="email" id="email" class="form-control rounded-3" placeholder="seunome@email.com">
                             </div>
-                            <div class="col-md-12 mb-3">
-                                <label for="descricao" class="form-label">Descrição da Manifestação*</label>
-                                <textarea name="descricao" id="descricao" class="form-control" rows="5" required></textarea>
+
+                            <div class="col-md-6 mt-3">
+                                <label for="telefone" class="form-label fw-bold text-muted small mb-1">WhatsApp / Telefone (opcional)</label>
+                                <input type="text" name="telefone" id="telefone" class="form-control rounded-3" placeholder="(00) 0 0000-0000">
                             </div>
-                            <hr class="my-3">
-                            <p class="text-muted small">Informações de contato são opcionais.</p>
-                            <div class="col-md-12 mb-3"><label for="nome" class="form-label">Seu Nome</label><input type="text" name="nome_cidadao" id="nome" class="form-control"></div>
-                            <div class="col-md-6 mb-3"><label for="email" class="form-label">Seu E-mail</label><input type="email" name="email" id="email" class="form-control"></div>
-                            <div class="col-md-6 mb-3"><label for="telefone" class="form-label">Seu Telefone</label><input type="text" name="telefone" id="telefone" class="form-control"></div>
+
+                            <div class="col-12 mt-4">
+                                <label for="assunto" class="form-label fw-bold text-muted small mb-1">Assunto / Tópico*</label>
+                                <input type="text" name="assunto" id="assunto" class="form-control rounded-3" placeholder="Ex: Iluminação pública, Atendimento nas unidades de saúde..." required>
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <label for="mensagem" class="form-label fw-bold text-muted small mb-1">Descrição Detalhada*</label>
+                                <textarea name="mensagem" id="mensagem" class="form-control rounded-3" rows="8" placeholder="Descreva sua manifestação de forma clara e detalhada..." required></textarea>
+                            </div>
+
+                            <div class="col-12 mt-5 text-end border-top pt-4">
+                                <a href="portal/<?php echo $slug_pref_header; ?>/ouvidoria.php" class="btn btn-light rounded-pill px-4 me-2">Cancelar</a>
+                                <button type="submit" class="btn btn-dynamic-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+                                    <i class="bi bi-send-check-fill me-2"></i> Enviar Manifestação
+                                </button>
+                            </div>
                         </div>
-                        <a href="ouvidoria.php" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Enviar Manifestação</button>
                     </form>
+                </div>
+            </div>
+
+            <div class="alert alert-light border-0 shadow-sm rounded-4 p-4" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-shield-check text-success fs-3 me-3"></i>
+                    <div>
+                        <h6 class="alert-heading fw-bold mb-1">Privacidade Garantida</h6>
+                        <p class="mb-0 text-muted small">Suas informações de contato são utilizadas apenas para fins de retorno institucional e não são expostas publicamente no portal. Sua contribuição ajuda a melhorar os serviços públicos de <?php echo $nome_pref_header; ?>.</p>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 </div>
-<footer class="text-center p-3 mt-4"></footer>
+
+<?php 
+$custom_container_class = "container-custom-padding";
+include 'footer_publico.php'; 
+?>
+
 </body>
 </html>
