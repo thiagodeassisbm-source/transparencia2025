@@ -3,10 +3,26 @@
 require_once 'conexao.php';
 
 // Busca configurações da prefeitura ativa (SaaS)
-// Usa coalescência nula para evitar warnings caso o contexto não esteja definido
-$id_pref_header = $id_prefeitura_ativa ?? 0;
-$nome_pref_header = $nome_prefeitura_ativa ?? 'sua Cidade';
-$slug_pref_header = $slug_prefeitura_ativa ?? 'home';
+// REFORÇO: Se o id não veio pelo bootstrap, tenta encontrar pelo slug na URL
+if (!isset($id_prefeitura_ativa) || empty($id_prefeitura_ativa)) {
+    $slug_para_busca = filter_input(INPUT_GET, 'pref_slug', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    if ($slug_para_busca) {
+        $stmt_find = $pdo->prepare("SELECT id, nome, slug FROM prefeituras WHERE slug = ?");
+        $stmt_find->execute([$slug_para_busca]);
+        $pref_encontrada = $stmt_find->fetch();
+        if ($pref_encontrada) {
+            $id_pref_header = $pref_encontrada['id'];
+            $nome_pref_header = $pref_encontrada['nome'];
+            $slug_pref_header = $pref_encontrada['slug'];
+        }
+    }
+}
+
+if (!isset($id_pref_header)) {
+    $id_pref_header = $id_prefeitura_ativa ?? 0;
+    $nome_pref_header = $nome_prefeitura_ativa ?? 'sua Cidade';
+    $slug_pref_header = $slug_prefeitura_ativa ?? 'home';
+}
 
 try {
     $stmt_conf = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE id_prefeitura = ? AND chave IN ('prefeitura_titulo', 'prefeitura_logo', 'prefeitura_cor_principal', 'prefeitura_cor_secundaria')");
