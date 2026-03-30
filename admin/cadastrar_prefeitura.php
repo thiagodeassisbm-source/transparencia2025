@@ -13,6 +13,17 @@ if (!isset($_SESSION['is_superadmin']) || $_SESSION['is_superadmin'] !== 1) {
 $erro = '';
 $sucesso = '';
 
+// Inicializa variáveis para manter o formulário preenchido em caso de erro
+$nome = $_POST['nome'] ?? '';
+$slug = $_POST['slug'] ?? '';
+$responsavel_nome = $_POST['responsavel_nome'] ?? '';
+$responsavel_contato = $_POST['responsavel_contato'] ?? '';
+$dia_vencimento = $_POST['dia_vencimento'] ?? 10;
+$valor_mensalidade = $_POST['valor_mensalidade'] ?? '';
+$data_contratacao = $_POST['data_contratacao'] ?? date('Y-m-d');
+$dominio_customizado = $_POST['dominio_customizado'] ?? '';
+$admin_user = $_POST['admin_user'] ?? '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_SPECIAL_CHARS);
     $slug = filter_input(INPUT_POST, 'slug', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -63,6 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $pdo->commit();
         $sucesso = "Cliente cadastrado com sucesso$demo_status! O acesso já está liberado.";
+        
+        // Limpa campos após sucesso
+        $nome = $slug = $responsavel_nome = $responsavel_contato = $valor_mensalidade = $dominio_customizado = $admin_user = '';
+        $dia_vencimento = 10;
+        $data_contratacao = date('Y-m-d');
+
     } catch (Exception $e) {
         if ($pdo->inTransaction()) { $pdo->rollBack(); }
         $erro = "Erro ao cadastrar: " . $e->getMessage();
@@ -82,8 +99,8 @@ include 'admin_header.php';
                     <p class="mb-0 text-white-50 opacity-75">Configure os dados contratuais e o acesso administrativo inicial</p>
                 </div>
                 <div class="card-body p-4">
-                    <?php if ($erro): ?><div class="alert alert-danger"><?php echo $erro; ?></div><?php endif; ?>
-                    <?php if ($sucesso): ?><div class="alert alert-success"><?php echo $sucesso; ?></div><?php endif; ?>
+                    <?php if ($erro): ?><div class="alert alert-danger shadow-sm"><?php echo $erro; ?></div><?php endif; ?>
+                    <?php if ($sucesso): ?><div class="alert alert-success shadow-sm"><?php echo $sucesso; ?></div><?php endif; ?>
 
                     <form method="POST" class="row g-4">
                         <!-- SEÇÃO 1: DADOS MUNICIPAIS -->
@@ -92,20 +109,20 @@ include 'admin_header.php';
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted">Nome da Prefeitura</label>
-                            <input type="text" name="nome" class="form-control" placeholder="Ex: Prefeitura de Goiânia" required>
+                            <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($nome); ?>" placeholder="Ex: Prefeitura de Goiânia" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Slug (URL Amigável)</label>
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light">/portal/</span>
-                                <input type="text" name="slug" class="form-control" placeholder="goiania" required>
+                                <input type="text" name="slug" class="form-control" value="<?php echo htmlspecialchars($slug); ?>" placeholder="goiania" required>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Domínio Customizado (Whitelabel)</label>
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light"><i class="bi bi-globe"></i></span>
-                                <input type="text" name="dominio_customizado" class="form-control" placeholder="ex: transparencia.goiania.go.gov.br">
+                                <input type="text" name="dominio_customizado" class="form-control" value="<?php echo htmlspecialchars($dominio_customizado); ?>" placeholder="ex: transparencia.goiania.go.gov.br">
                             </div>
                             <small class="text-muted" style="font-size: 0.65rem;">Opcional. Exemplo: transparencia.cidade.com.br</small>
                         </div>
@@ -144,28 +161,28 @@ include 'admin_header.php';
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Nome do Responsável</label>
-                            <input type="text" name="responsavel_nome" class="form-control" placeholder="Nome completo" required>
+                            <input type="text" name="responsavel_nome" class="form-control" value="<?php echo htmlspecialchars($responsavel_nome); ?>" placeholder="Nome completo" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Contato (WhatsApp)</label>
-                            <input type="text" name="responsavel_contato" class="form-control" placeholder="(62) 99999-9999" required>
+                            <input type="text" name="responsavel_contato" class="form-control" value="<?php echo htmlspecialchars($responsavel_contato); ?>" placeholder="(62) 99999-9999" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Data de Contratação</label>
-                            <input type="date" name="data_contratacao" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
+                            <input type="date" name="data_contratacao" class="form-control" value="<?php echo htmlspecialchars($data_contratacao); ?>" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Valor da Mensalidade (R$)</label>
-                            <input type="number" step="0.01" name="valor_mensalidade" class="form-control" placeholder="0.00" required>
+                            <input type="number" step="0.01" name="valor_mensalidade" class="form-control" value="<?php echo htmlspecialchars($valor_mensalidade); ?>" placeholder="0.00" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Dia de Vencimento</label>
                             <select name="dia_vencimento" class="form-select">
-                                <option value="5">Dia 05</option>
-                                <option value="10" selected>Dia 10</option>
-                                <option value="15">Dia 15</option>
-                                <option value="20">Dia 20</option>
-                                <option value="25">Dia 25</option>
+                                <option value="5" <?php echo $dia_vencimento == 5 ? 'selected' : ''; ?>>Dia 05</option>
+                                <option value="10" <?php echo $dia_vencimento == 10 ? 'selected' : ''; ?>>Dia 10</option>
+                                <option value="15" <?php echo $dia_vencimento == 15 ? 'selected' : ''; ?>>Dia 15</option>
+                                <option value="20" <?php echo $dia_vencimento == 20 ? 'selected' : ''; ?>>Dia 20</option>
+                                <option value="25" <?php echo $dia_vencimento == 25 ? 'selected' : ''; ?>>Dia 25</option>
                             </select>
                         </div>
 
@@ -175,7 +192,7 @@ include 'admin_header.php';
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted">Usuário Admin Local</label>
-                            <input type="text" name="admin_user" class="form-control" placeholder="ex: admin_pref" required>
+                            <input type="text" name="admin_user" class="form-control" value="<?php echo htmlspecialchars($admin_user); ?>" placeholder="ex: admin_pref" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted">Senha Inicial</label>
@@ -197,7 +214,7 @@ include 'admin_header.php';
                         </div>
 
                         <div class="col-12 mt-5 text-end">
-                            <a href="super_dashboard.php" class="btn btn-light rounded-pill px-4 me-2">Cancelar</a>
+                            <a href="gerenciar_prefeituras.php" class="btn btn-light rounded-pill px-4 me-2">Cancelar</a>
                             <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow">
                                 <i class="bi bi-cloud-check me-2"></i> Ativar Cliente Agora
                             </button>
