@@ -40,7 +40,11 @@ $params_where[] = $id_prefeitura_ativa;
 $params_where[] = $id_prefeitura_ativa;
 
 if ($categoria_id) {
-    $sql_where .= " AND c.id_categoria = ?";
+    if (strpos($sql_where, 'WHERE') === false) {
+        $sql_where = " WHERE c.id_categoria = ?";
+    } else {
+        $sql_where .= " AND c.id_categoria = ?";
+    }
     $params_where[] = $categoria_id;
 }
 
