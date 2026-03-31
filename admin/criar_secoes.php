@@ -188,7 +188,6 @@ include 'admin_header.php';
                                         <div class="inner-section-item shadow-sm">
                                             <div class="d-flex flex-column">
                                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                                <div class="d-flex justify-content-between align-items-start mb-3">
                                                     <div>
                                                         <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
                                                             <h6 class="fw-bold mb-0 me-1" style="font-size: 1.15rem; color: #2d3748;"><?php echo htmlspecialchars($s['nome']); ?></h6>
