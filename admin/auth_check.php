@@ -51,8 +51,8 @@ if (!isset($_SESSION['permissoes_sessao']) || !isset($_SESSION['admin_user_perfi
 
 // 4. Função Global para Verificar Permissões
 function tem_permissao($recurso, $acao = 'ver') {
-    // Admin master (antigo) tem acesso total
-    if (isset($_SESSION['admin_user_perfil']) && $_SESSION['admin_user_perfil'] === 'admin') {
+    // Apenas Super Administrador (Master) ignora as regras granulares
+    if (isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1) {
         return true;
     }
 

@@ -22,6 +22,12 @@ $stmt_portal->execute($params_portal);
 $secao = $stmt_portal->fetch();
 if (!$secao) { header("Location: index.php"); exit; }
 
+// TRAVA DE SEGURANÇA: Verifica permissão granular de acesso à seção
+if (!tem_permissao('form_' . $portal_id, 'ver')) {
+    header("Location: index.php");
+    exit;
+}
+
 // --- LÓGICA DE PAGINAÇÃO ---
 $itens_por_pagina = 15;
 $pagina_atual = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT) ?: 1;
@@ -97,9 +103,11 @@ include 'admin_header.php';
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Total de <?php echo $total_itens; ?> registro(s) cadastrado(s)</span>
-                    <a href="lancar_dados.php?portal_id=<?php echo $portal_id; ?>" class="btn btn-success btn-sm">
-                        <i class="bi bi-plus-circle"></i> Novo Lançamento
-                    </a>
+                    <?php if (tem_permissao('form_' . $portal_id, 'lancar')): ?>
+                        <a href="lancar_dados.php?portal_id=<?php echo $portal_id; ?>" class="btn btn-success btn-sm">
+                            <i class="bi bi-plus-circle"></i> Novo Lançamento
+                        </a>
+                    <?php endif; ?>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-striped table-hover mb-0 align-middle">
@@ -144,10 +152,13 @@ include 'admin_header.php';
                                         ?>
 
                                         <td class="text-end">
-                                            <a href="editar_lancamento.php?registro_id=<?php echo $registro['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" title="Editar Lançamento">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <?php if ($perfil_usuario == 'admin'): ?>
+                                            <?php if (tem_permissao('form_' . $portal_id, 'editar')): ?>
+                                                <a href="editar_lancamento.php?registro_id=<?php echo $registro['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" title="Editar Lançamento">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            <?php endif; ?>
+                                            
+                                            <?php if (tem_permissao('form_' . $portal_id, 'excluir')): ?>
                                             <form method="POST" action="excluir_lancamento.php" class="d-inline ms-1" onsubmit="return confirm('Tem certeza que deseja excluir este lançamento?');">
                                                 <input type="hidden" name="registro_id" value="<?php echo $registro['id']; ?>">
                                                 <input type="hidden" name="portal_id" value="<?php echo $portal_id; ?>">

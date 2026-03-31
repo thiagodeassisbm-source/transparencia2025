@@ -11,6 +11,12 @@ $nome_usuario_logado = $_SESSION['admin_user_nome'] ?? 'Usuário';
 $portal_id = filter_input(INPUT_GET, 'portal_id', FILTER_VALIDATE_INT);
 if (!$portal_id) { header("Location: index.php"); exit; }
 
+// Trava de Segurança Granular
+if (!tem_permissao('form_' . $portal_id, 'lancar')) {
+    header("Location: dashboard.php");
+    exit;
+}
+
 // Busca dados para os dropdowns dos metadados
 $tipos_documento = $pdo->query("SELECT id, nome FROM tipos_documento ORDER BY nome ASC")->fetchAll();
 $categorias = $pdo->query("SELECT id, nome FROM categorias ORDER BY ordem ASC")->fetchAll();

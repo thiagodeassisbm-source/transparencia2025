@@ -18,6 +18,12 @@ $registro_info = $stmt_info->fetch();
 if (!$registro_info) { header("Location: index.php"); exit; }
 $portal_id = $registro_info['id_portal'];
 
+// Trava de Segurança Granular
+if (!tem_permissao('form_' . $portal_id, 'editar')) {
+    header("Location: dashboard.php");
+    exit;
+}
+
 // Busca dados para os dropdowns dos metadados
 $tipos_documento = $pdo->query("SELECT id, nome FROM tipos_documento ORDER BY nome ASC")->fetchAll();
 $categorias = $pdo->query("SELECT id, nome FROM categorias ORDER BY ordem ASC")->fetchAll();

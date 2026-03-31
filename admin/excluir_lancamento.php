@@ -1,15 +1,17 @@
 <?php
-// Habilita a exibição de todos os erros para depuração
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+require_once 'auth_check.php';
 
-session_start();
 require_once '../conexao.php';
 require_once 'functions_logs.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registro_id'])) {
     $registro_id = filter_input(INPUT_POST, 'registro_id', FILTER_VALIDATE_INT);
     $portal_id = filter_input(INPUT_POST, 'portal_id', FILTER_VALIDATE_INT);
+
+    // Trava de Segurança Granular
+    if (!tem_permissao('form_' . $portal_id, 'excluir')) {
+        die("Acesso negado. Você não tem permissão para excluir dados desta seção.");
+    }
 
     if ($registro_id && $portal_id) {
         try {
