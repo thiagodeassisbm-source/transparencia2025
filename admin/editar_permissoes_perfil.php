@@ -51,8 +51,19 @@ foreach ($permissoes_raw as $p) {
     $permissoes[$p['recurso']] = $p;
 }
 
-// Busca recursos dinâmicos (Seções/Portais)
-$secoes = $pdo->query("SELECT id, nome FROM portais ORDER BY nome")->fetchAll();
+// Busca recursos dinâmicos (Seções/Portais) agrupados por Categoria
+$sql_secoes = "
+    SELECT p.id, p.nome as portal_nome, c.nome as categoria_nome 
+    FROM portais p 
+    LEFT JOIN categorias c ON p.id_categoria = c.id 
+    ORDER BY c.ordem ASC, c.nome ASC, p.nome ASC
+";
+$secoes_raw = $pdo->query($sql_secoes)->fetchAll();
+$secoes_agrupadas = [];
+foreach ($secoes_raw as $s) {
+    $cat_nome = $s['categoria_nome'] ?? 'Outros / Sem Categoria';
+    $secoes_agrupadas[$cat_nome][] = $s;
+}
 
 $page_title_for_header = "Permissões: " . $perfil['nome'];
 include 'admin_header.php';
@@ -91,17 +102,22 @@ include 'admin_header.php';
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($secoes as $s): 
-                                                $slug_secao = 'form_' . $s['id'];
-                                                $p = $permissoes[$slug_secao] ?? ['p_ver'=>0,'p_lancar'=>0,'p_editar'=>0,'p_excluir'=>0];
-                                            ?>
-                                            <tr>
-                                                <td><i class="bi bi-file-earmark-text text-muted me-2"></i><?php echo htmlspecialchars($s['nome']); ?></td>
-                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][ver]" value="1" <?php if($p['p_ver']){ echo 'checked'; } ?>></div></td>
-                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][lancar]" value="1" <?php if($p['p_lancar']){ echo 'checked'; } ?>></div></td>
-                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][editar]" value="1" <?php if($p['p_editar']){ echo 'checked'; } ?>></div></td>
-                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][excluir]" value="1" <?php if($p['p_excluir']){ echo 'checked'; } ?>></div></td>
-                                            </tr>
+                                            <?php foreach ($secoes_agrupadas as $cat_nome => $lista_secoes): ?>
+                                                <tr class="table-secondary">
+                                                    <td colspan="5" class="fw-bold text-uppercase small py-2"><?php echo htmlspecialchars($cat_nome); ?></td>
+                                                </tr>
+                                                <?php foreach ($lista_secoes as $s): 
+                                                    $slug_secao = 'form_' . $s['id'];
+                                                    $p = $permissoes[$slug_secao] ?? ['p_ver'=>0,'p_lancar'=>0,'p_editar'=>0,'p_excluir'=>0];
+                                                ?>
+                                                <tr>
+                                                    <td class="ps-4"><i class="bi bi-file-earmark-text text-muted me-2"></i><?php echo htmlspecialchars($s['portal_nome']); ?></td>
+                                                    <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][ver]" value="1" <?php if($p['p_ver']){ echo 'checked'; } ?>></div></td>
+                                                    <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][lancar]" value="1" <?php if($p['p_lancar']){ echo 'checked'; } ?>></div></td>
+                                                    <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][editar]" value="1" <?php if($p['p_editar']){ echo 'checked'; } ?>></div></td>
+                                                    <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][excluir]" value="1" <?php if($p['p_excluir']){ echo 'checked'; } ?>></div></td>
+                                                </tr>
+                                                <?php endforeach; ?>
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
