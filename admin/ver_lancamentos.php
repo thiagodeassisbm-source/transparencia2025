@@ -81,6 +81,38 @@ if (!empty($registros_ids)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
+    <style>
+        /* Ajustes de densidade para telas de notebook (média resolução) */
+        @media (max-width: 1400px) {
+            .table { font-size: 0.8rem !important; }
+            .btn-sm { padding: 0.25rem 0.4rem !important; font-size: 0.75rem !important; }
+            .table th, .table td { padding: 0.4rem !important; }
+        }
+        
+        /* Evita que colunas de texto fiquem muito estreitas ou muito largas */
+        .table td { max-width: 300px; word-wrap: break-word; vertical-align: middle; }
+        .col-exercicio { width: 80px; }
+        .col-mes { width: 100px; }
+        .col-acoes { width: 100px; }
+        
+        /* Estilização para o link de anexo */
+        .btn-anexo {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-radius: 4px;
+            background: #eef2f7;
+            color: #475569;
+            text-decoration: none;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s;
+        }
+        .btn-anexo:hover { background: #36c0d3; color: #fff; border-color: #36c0d3; }
+    </style>
 </head>
 <body class="bg-light-subtle">
 
@@ -113,14 +145,14 @@ include 'admin_header.php';
                     <table class="table table-striped table-hover mb-0 align-middle">
                         <thead class="table-dark">
                             <tr>
-                                <th>Exercício</th>
-                                <th>Mês</th>
+                                <th class="col-exercicio">Exercício</th>
+                                <th class="col-mes">Mês</th>
                                 <th>Unidade Gestora</th>
                                 <th>Tipo Documento</th>
                                 <?php foreach ($campos_dinamicos as $campo): ?>
                                     <th><?php echo htmlspecialchars($campo['nome_campo']); ?></th>
                                 <?php endforeach; ?>
-                                <th class="text-end">Ações</th>
+                                <th class="text-end col-acoes">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -139,15 +171,18 @@ include 'admin_header.php';
                                         $valores_deste_registro = $valores_dinamicos[$registro['id']] ?? [];
                                         foreach ($campos_dinamicos as $campo) {
                                             $valor = $valores_deste_registro[$campo['id']] ?? '';
-                                            $valor_formatado = htmlspecialchars(mb_strimwidth((string)$valor, 0, 50, "..."));
-
-                                            if ($campo['tipo_campo'] === 'data' && !empty($valor)) {
+                                            
+                                            // Lógica especial por tipo de campo
+                                            if ($campo['tipo_campo'] === 'anexo' && !empty($valor)) {
+                                                echo '<td><a href="../' . htmlspecialchars($valor) . '" target="_blank" class="btn-anexo"><i class="bi bi-file-earmark-pdf"></i> Ver</a></td>';
+                                            } elseif ($campo['tipo_campo'] === 'data' && !empty($valor)) {
                                                 $data_objeto = date_create($valor);
-                                                if ($data_objeto) {
-                                                    $valor_formatado = date_format($data_objeto, 'd/m/Y');
-                                                }
+                                                $valor_formatado = $data_objeto ? date_format($data_objeto, 'd/m/Y') : $valor;
+                                                echo '<td>' . htmlspecialchars($valor_formatado) . '</td>';
+                                            } else {
+                                                $valor_formatado = htmlspecialchars(mb_strimwidth((string)$valor, 0, 80, "..."));
+                                                echo '<td>' . $valor_formatado . '</td>';
                                             }
-                                            echo '<td>' . $valor_formatado . '</td>';
                                         }
                                         ?>
 
