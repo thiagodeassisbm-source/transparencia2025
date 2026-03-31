@@ -188,21 +188,33 @@ include 'admin_header.php';
                                         <div class="inner-section-item shadow-sm">
                                             <div class="d-flex flex-column">
                                                 <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
                                                     <div>
-                                                        <div class="d-flex align-items-center mb-1">
-                                                            <h6 class="fw-bold mb-0 me-2" style="font-size: 1.1rem;"><?php echo htmlspecialchars($s['nome']); ?></h6>
-                                                            <span class="badge bg-light text-success border border-success border-opacity-10 py-1">Ativo</span>
+                                                        <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                                                            <h6 class="fw-bold mb-0 me-1" style="font-size: 1.15rem; color: #2d3748;"><?php echo htmlspecialchars($s['nome']); ?></h6>
+                                                            <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2" style="font-size: 0.7rem;">ATIVO</span>
+                                                            
+                                                            <?php if ($s['total_pdfs'] > 0): ?>
+                                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle py-1 px-2" style="font-size: 0.7rem;">
+                                                                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> <?php echo $s['total_pdfs']; ?> ARQUIVOS PDF
+                                                                </span>
+                                                            <?php endif; ?>
+                                                            
+                                                            <span class="badge bg-info-subtle text-dark border border-info-subtle py-1 px-2" style="font-size: 0.7rem;">
+                                                                <i class="bi bi-calendar3 me-1"></i> <?php echo $s['ano_min'] ? ($s['ano_min'] == $s['ano_max'] ? $s['ano_min'] : $s['ano_min'].' - '.$s['ano_max']) : 'SEM DADOS'; ?>
+                                                            </span>
                                                         </div>
-                                                        <div class="d-flex flex-wrap gap-4 align-items-center mt-2 mb-3">
-                                                            <small class="text-dark bg-secondary bg-opacity-10 px-2 py-1 rounded small" style="font-size: 0.75rem;"><i class="bi bi-hash me-1"></i> ID: #<?php echo str_pad($s['id'], 6, '0', STR_PAD_LEFT); ?></small>
-                                                            <small class="text-muted"><i class="bi bi-file-earmark-pdf me-1"></i> <strong><?php echo $s['total_pdfs'] ?: 0; ?></strong> Arquivos PDF</small>
-                                                            <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> Período: <strong><?php echo $s['ano_min'] ? ($s['ano_min'] == $s['ano_max'] ? $s['ano_min'] : $s['ano_min'].' - '.$s['ano_max']) : 'N/A'; ?></strong></small>
-                                                            <small class="text-muted"><i class="bi bi-layers me-1"></i> <strong><?php echo $s['total_registros'] ?: 0; ?></strong> Lançamentos</small>
+                                                        <small class="text-muted d-block" style="font-size: 0.85rem; opacity: 0.7;">
+                                                            Portal ID: #<?php echo str_pad($s['id'], 6, '0', STR_PAD_LEFT); ?> • 
+                                                            <a href="../portal.php?slug=<?php echo $s['slug']; ?>" target="_blank" class="text-info text-decoration-none fw-bold">Visualizar Link Público</a>
+                                                        </small>
+                                                    </div>
+                                                    
+                                                    <div class="text-end d-none d-sm-block">
+                                                        <div class="text-muted small fw-bold text-uppercase mb-0" style="font-size: 0.65rem; letter-spacing: 0.8px; opacity: 0.8;">Total Lançamentos</div>
+                                                        <div class="fw-bold text-success" style="font-size: 1.6rem; line-height: 1;">
+                                                            <?php echo number_format($s['total_registros'] ?: 0, 0, ',', '.'); ?>
                                                         </div>
-                                                        
-                                                        <a href="../portal.php?slug=<?php echo $s['slug']; ?>" target="_blank" class="text-info text-decoration-none small fw-bold">
-                                                            <i class="bi bi-box-arrow-up-right me-1"></i> Ver Link Público
-                                                        </a>
                                                     </div>
                                                 </div>
 
