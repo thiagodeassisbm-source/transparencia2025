@@ -135,11 +135,16 @@ include 'admin_header.php';
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Total de <?php echo $total_itens; ?> registro(s) cadastrado(s)</span>
-                    <?php if (tem_permissao('form_' . $portal_id, 'lancar')): ?>
-                        <a href="lancar_dados.php?portal_id=<?php echo $portal_id; ?>" class="btn btn-success btn-sm">
-                            <i class="bi bi-plus-circle"></i> Novo Lançamento
+                    <div class="d-flex gap-2">
+                        <?php if (tem_permissao('form_' . $portal_id, 'lancar')): ?>
+                            <a href="lancar_dados.php?portal_id=<?php echo $portal_id; ?>" class="btn btn-success btn-sm">
+                                <i class="bi bi-plus-circle"></i> Novo Lançamento
+                            </a>
+                        <?php endif; ?>
+                        <a href="criar_secoes.php" class="btn btn-secondary btn-sm">
+                            <i class="bi bi-arrow-left"></i> Voltar
                         </a>
-                    <?php endif; ?>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-striped table-hover mb-0 align-middle">

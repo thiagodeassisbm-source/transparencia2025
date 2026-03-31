@@ -186,7 +186,7 @@ include 'admin_header.php';
                     
                     <div class="mt-4">
                         <button type="submit" class="btn btn-success">Salvar Lançamento</button>
-                        <a href="ver_lancamentos.php?portal_id=<?php echo $portal_id; ?>" class="btn btn-secondary">Cancelar</a>
+                        <a href="criar_secoes.php" class="btn btn-secondary">Voltar</a>
                     </div>
                 </form>
             </div>

@@ -133,7 +133,7 @@ include 'admin_header.php';
                             </div>
                         </div>
                         <button type="submit" class="btn btn-success">Adicionar Campo</button>
-                        <a href="index.php" class="btn btn-secondary">Voltar</a>
+                        <a href="criar_secoes.php" class="btn btn-secondary">Voltar</a>
                     </form>
                 </div>
             </div>
