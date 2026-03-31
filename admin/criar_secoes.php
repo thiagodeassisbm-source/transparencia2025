@@ -163,7 +163,7 @@ include 'admin_header.php';
                         <?php foreach ($secoes_agrupadas as $categoria => $secoes): ?>
                             <?php $id_cat = md5($categoria); ?>
                             <div class="card category-card border-0">
-                                <div class="category-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#collapse-<?php echo $id_cat; ?>">
+                                <div class="category-header d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-<?php echo $id_cat; ?>">
                                     <div class="d-flex align-items-center">
                                         <div class="secao-avatar me-3">
                                             <?php echo strtoupper(substr($categoria, 0, 1)); ?>
@@ -174,44 +174,48 @@ include 'admin_header.php';
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <i class="bi bi-chevron-down opacity-50 ms-3"></i>
+                                        <i class="bi bi-chevron-down opacity-50 ms-3 fs-5"></i>
                                     </div>
                                 </div>
-                                <div id="collapse-<?php echo $id_cat; ?>" class="collapse show" data-bs-parent="#accordionCategorias">
+                                <div id="collapse-<?php echo $id_cat; ?>" class="collapse" data-bs-parent="#accordionCategorias">
                                     <?php foreach ($secoes as $s): ?>
                                         <div class="inner-section-item shadow-sm">
-                                            <div class="d-flex flex-wrap justify-content-between align-items-center">
-                                                <div class="mb-3 mb-md-0">
-                                                    <div class="d-flex align-items-center mb-1">
-                                                        <h6 class="fw-bold mb-0 me-2"><?php echo htmlspecialchars($s['nome']); ?></h6>
-                                                        <span class="badge bg-light text-success border border-success border-opacity-10 py-1">Ativo</span>
+                                            <div class="d-flex flex-column">
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                    <div>
+                                                        <div class="d-flex align-items-center mb-1">
+                                                            <h6 class="fw-bold mb-0 me-2" style="font-size: 1.1rem;"><?php echo htmlspecialchars($s['nome']); ?></h6>
+                                                            <span class="badge bg-light text-success border border-success border-opacity-10 py-1">Ativo</span>
+                                                        </div>
+                                                        <small class="text-muted d-block mb-1">ID do Portal: #<?php echo str_pad($s['id'], 6, '0', STR_PAD_LEFT); ?></small>
+                                                        
+                                                        <a href="../portal.php?slug=<?php echo $s['slug']; ?>" target="_blank" class="text-info text-decoration-none small fw-bold">
+                                                            <i class="bi bi-box-arrow-up-right me-1"></i> Ver Link Público
+                                                        </a>
                                                     </div>
-                                                    <small class="text-muted d-block mb-2">ID do Portal: #<?php echo str_pad($s['id'], 6, '0', STR_PAD_LEFT); ?></small>
-                                                    
-                                                    <a href="../portal.php?slug=<?php echo $s['slug']; ?>" target="_blank" class="text-info text-decoration-none small fw-bold">
-                                                        <i class="bi bi-box-arrow-up-right me-1"></i> Visualizar no Portal Público
-                                                    </a>
                                                 </div>
-                                                
-                                                <div class="d-flex flex-wrap gap-2">
-                                                    <a href="ver_lancamentos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-ver">
-                                                        <i class="bi bi-file-earmark-bar-graph"></i> Planilha
-                                                    </a>
-                                                    <a href="lancar_dados.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-lancar">
-                                                        <i class="bi bi-plus-square"></i> Lançar
-                                                    </a>
-                                                    <a href="gerenciar_campos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-detalhes">
-                                                        <i class="bi bi-pencil-square"></i> Campos
-                                                    </a>
-                                                    <a href="editar_secao.php?id=<?php echo $s['id']; ?>" class="btn-action-custom btn-editar">
-                                                        <i class="bi bi-pencil"></i> Nome
-                                                    </a>
-                                                    <form method="POST" action="excluir_secao.php" class="d-inline" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir esta seção?');">
-                                                        <input type="hidden" name="portal_id" value="<?php echo $s['id']; ?>">
-                                                        <button type="submit" class="btn-action-custom btn-excluir">
-                                                            <i class="bi bi-trash"></i> Excluir
-                                                        </button>
-                                                    </form>
+
+                                                <div class="border-top pt-3 mt-1">
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <a href="ver_lancamentos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-ver">
+                                                            <i class="bi bi-file-earmark-bar-graph"></i> Planilha de Dados
+                                                        </a>
+                                                        <a href="lancar_dados.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-lancar">
+                                                            <i class="bi bi-plus-square"></i> Novo Lançamento
+                                                        </a>
+                                                        <a href="gerenciar_campos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-detalhes">
+                                                            <i class="bi bi-pencil-square"></i> Gerenciar Campos
+                                                        </a>
+                                                        <a href="editar_secao.php?id=<?php echo $s['id']; ?>" class="btn-action-custom btn-editar">
+                                                            <i class="bi bi-pencil"></i> Editar Nome
+                                                        </a>
+                                                        <form method="POST" action="excluir_secao.php" class="d-inline" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir esta seção?');">
+                                                            <input type="hidden" name="portal_id" value="<?php echo $s['id']; ?>">
+                                                            <button type="submit" class="btn-action-custom btn-excluir">
+                                                                <i class="bi bi-trash"></i> Excluir
+                                                            </button>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
