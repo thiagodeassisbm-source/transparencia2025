@@ -75,48 +75,41 @@ include 'admin_header.php';
                         <button type="submit" name="salvar_permissoes" class="btn btn-success"><i class="bi bi-save me-1"></i> Salvar Alterações</button>
                     </div>
                     <div class="card-body p-4">
-                        
                         <div class="row">
-                            <!-- MENUS E RECURSOS GLOBAIS -->
-                            <div class="col-lg-6">
-
                             <!-- FORMULÁRIOS DINÂMICOS (SEÇÕES) -->
-                            <div class="col-lg-6 border-start ps-lg-4">
+                            <div class="col-12">
                                 <h5 class="fw-bold mb-4 pb-2 border-bottom">Formulários de Lançamento (Seções)</h5>
-                                <div class="accordion" id="accordionSecoes">
-                                    <div class="table-responsive">
-                                        <table class="table align-middle">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Seção (Formulário)</th>
-                                                    <th class="text-center">Ver</th>
-                                                    <th class="text-center">Lançar</th>
-                                                    <th class="text-center">Editar</th>
-                                                    <th class="text-center">Excluir</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($secoes as $s): 
-                                                    $slug_secao = 'form_' . $s['id'];
-                                                    $p = $permissoes[$slug_secao] ?? ['p_ver'=>0,'p_lancar'=>0,'p_editar'=>0,'p_excluir'=>0];
-                                                ?>
-                                                <tr>
-                                                    <td><i class="bi bi-file-earmark-text text-muted me-2"></i><?php echo htmlspecialchars($s['nome']); ?></td>
-                                                    <td class="text-center"><div class="form-check"><input class="form-check-input mx-auto" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][ver]" value="1" <?php if($p['p_ver']){ echo 'checked'; } ?>></div></td>
-                                                    <td class="text-center"><div class="form-check"><input class="form-check-input mx-auto" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][lancar]" value="1" <?php if($p['p_lancar']){ echo 'checked'; } ?>></div></td>
-                                                    <td class="text-center"><div class="form-check"><input class="form-check-input mx-auto" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][editar]" value="1" <?php if($p['p_editar']){ echo 'checked'; } ?>></div></td>
-                                                    <td class="text-center"><div class="form-check"><input class="form-check-input mx-auto" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][excluir]" value="1" <?php if($p['p_excluir']){ echo 'checked'; } ?>></div></td>
-                                                </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width: 40%;">Seção (Formulário)</th>
+                                                <th class="text-center">Ver</th>
+                                                <th class="text-center">Lançar</th>
+                                                <th class="text-center">Editar</th>
+                                                <th class="text-center">Excluir</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($secoes as $s): 
+                                                $slug_secao = 'form_' . $s['id'];
+                                                $p = $permissoes[$slug_secao] ?? ['p_ver'=>0,'p_lancar'=>0,'p_editar'=>0,'p_excluir'=>0];
+                                            ?>
+                                            <tr>
+                                                <td><i class="bi bi-file-earmark-text text-muted me-2"></i><?php echo htmlspecialchars($s['nome']); ?></td>
+                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][ver]" value="1" <?php if($p['p_ver']){ echo 'checked'; } ?>></div></td>
+                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][lancar]" value="1" <?php if($p['p_lancar']){ echo 'checked'; } ?>></div></td>
+                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][editar]" value="1" <?php if($p['p_editar']){ echo 'checked'; } ?>></div></td>
+                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug_secao; ?>][excluir]" value="1" <?php if($p['p_excluir']){ echo 'checked'; } ?>></div></td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                        </div>
-
-                    </div>
-                </div>
+                        </div> <!-- .row -->
+                    </div> <!-- .card-body -->
+                </div> <!-- .card -->
                 <input type="hidden" name="salvar_permissoes" value="1">
             </form>
         </div>
