@@ -102,10 +102,9 @@ include 'admin_header.php';
                                         <td class="text-end">
                                             <a href="editar_permissoes_perfil.php?id=<?php echo $perfil['id']; ?>" class="btn btn-outline-primary btn-sm me-1"><i class="bi bi-shield-lock me-1"></i> Configurar Permissões</a>
                                             <?php if ($perfil['nome'] !== 'Administrador'): ?>
-                                                <form action="excluir_perfil.php" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir o perfil \'<?php echo addslashes($perfil['nome']); ?>\'?');">
-                                                    <input type="hidden" name="perfil_id" value="<?php echo $perfil['id']; ?>">
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i> Excluir</button>
-                                                </form>
+                                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="prepararExclusao(<?php echo $perfil['id']; ?>, '<?php echo addslashes($perfil['nome']); ?>', <?php echo $perfil['total_usuarios']; ?>)">
+                                                    <i class="bi bi-trash me-1"></i> Excluir
+                                                </button>
                                             <?php endif; ?>
                                         </td>
                                     </tr>
@@ -119,5 +118,73 @@ include 'admin_header.php';
         </div>
     </div>
 </div>
+
+<!-- Modal de Exclusão -->
+<div class="modal fade" id="modalExcluirPerfil" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="excluir_perfil.php" method="POST">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle me-2"></i>Excluir Perfil</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="perfil_id" id="inputPerfilId">
+          
+          <p id="pConfirmacaoPadrao" class="fs-5">Deseja realmente excluir o perfil <strong id="strongNomePerfil"></strong>?</p>
+
+          <div id="divAvisoUsuarios" class="alert alert-warning border-warning shadow-sm d-none">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Este perfil possui <strong id="strongTotalUsuarios"></strong> usuários vinculados. 
+            <hr>
+            <label class="form-label fw-bold">Transferir usuários para:</label>
+            <select name="transferir_para_id" class="form-select border-warning" id="selectTransferir">
+                <option value="">-- Selecionar Perfil --</option>
+                <?php foreach ($perfis as $p): ?>
+                    <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['nome']); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <small class="text-muted d-block mt-2">Escolha para qual perfil os usuários atuais serão migrados antes da exclusão.</small>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger px-4">Confirmar e Excluir</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function prepararExclusao(id, nome, totalUsuarios) {
+    document.getElementById('inputPerfilId').value = id;
+    document.getElementById('strongNomePerfil').innerText = nome;
+    
+    const divAviso = document.getElementById('divAvisoUsuarios');
+    const select = document.getElementById('selectTransferir');
+    
+    if (totalUsuarios > 0) {
+        divAviso.classList.remove('d-none');
+        document.getElementById('strongTotalUsuarios').innerText = totalUsuarios;
+        select.setAttribute('required', 'required');
+        
+        // Esconde o próprio perfil na lista de transferência
+        Array.from(select.options).forEach(option => {
+            if (option.value == id) {
+                option.style.display = 'none';
+            } else {
+                option.style.display = 'block';
+            }
+        });
+    } else {
+        divAviso.classList.add('d-none');
+        select.removeAttribute('required');
+    }
+    
+    const myModal = new bootstrap.Modal(document.getElementById('modalExcluirPerfil'));
+    myModal.show();
+}
+</script>
 
 <?php include 'admin_footer.php'; ?>

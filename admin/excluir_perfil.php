@@ -32,11 +32,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['perfil_id'])) {
                 $stmt_users->execute([$perfil_id]);
                 $total_usuarios = $stmt_users->fetchColumn();
 
-                if ($total_usuarios > 0) {
-                     $_SESSION['mensagem_erro'] = "Não é possível excluir o perfil '{$nome_perfil}' pois existem {$total_usuarios} usuários vinculados a ele. Altere o perfil desses usuários primeiro.";
+                $transferir_id = filter_input(INPUT_POST, 'transferir_para_id', FILTER_VALIDATE_INT);
+
+                if ($total_usuarios > 0 && (!$transferir_id || $transferir_id == $perfil_id)) {
+                     $_SESSION['mensagem_erro'] = "Não é possível excluir o perfil '{$nome_perfil}' pois existem {$total_usuarios} usuários vinculados. Selecione um perfil de destino válido.";
                 } else {
                     try {
                         $pdo->beginTransaction();
+
+                        // Se houver transferência, move os usuários primeiro
+                        if ($total_usuarios > 0 && $transferir_id) {
+                            $stmt_transfer = $pdo->prepare("UPDATE usuarios_admin SET id_perfil = ? WHERE id_perfil = ?");
+                            $stmt_transfer->execute([$transferir_id, $perfil_id]);
+                            
+                            $stmt_target_name = $pdo->prepare("SELECT nome FROM perfis WHERE id = ?");
+                            $stmt_target_name->execute([$transferir_id]);
+                            $nome_target = $stmt_target_name->fetchColumn();
+                            
+                            registrar_log($pdo, 'EDIÇÃO', 'usuarios_admin', "Transferiu $total_usuarios usuários do perfil $nome_perfil para $nome_target devido à exclusão do perfil original.");
+                        }
 
                         // Deleta as permissões primeiro
                         $stmt_del_perms = $pdo->prepare("DELETE FROM permissoes_perfil WHERE id_perfil = ?");
@@ -49,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['perfil_id'])) {
                         registrar_log($pdo, 'EXCLUSÃO', 'perfis', "Excluiu o perfil de acesso: $nome_perfil (ID: $perfil_id)");
                         
                         $pdo->commit();
-                        $_SESSION['mensagem_sucesso'] = "Perfil '$nome_perfil' excluído com sucesso!";
+                        $_SESSION['mensagem_sucesso'] = "Perfil '$nome_perfil' excluído com sucesso!" . ($total_usuarios > 0 ? " (Os usuários foram migrados para outro perfil)" : "");
                     } catch (Exception $e) {
                         $pdo->rollBack();
                         $_SESSION['mensagem_erro'] = "Erro ao excluir perfil: " . $e->getMessage();
