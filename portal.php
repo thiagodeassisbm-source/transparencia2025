@@ -169,7 +169,7 @@ include 'header_publico.php';
                                 <tr><td colspan="<?php echo count($campos_tabela); ?>" class="text-center p-5 text-muted">Ainda não há dados cadastrados nesta seção.</td></tr>
                             <?php else: ?>
                                 <?php foreach ($dados_tabela as $linha): ?>
-                                    <tr onclick="window.location='detalhes.php?id=<?php echo $linha['id_registro_para_link']; ?>';">
+                                    <tr onclick="window.location='detalhes.php?id=<?php echo $linha['id_registro_para_link']; ?>&pref_slug=<?php echo $slug_prefeitura_ativa; ?>';">
                                         <?php 
                                         $id_registro_atual = $linha['id_registro_para_link'];
                                         unset($linha['id_registro_para_link']);
