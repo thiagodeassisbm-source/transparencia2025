@@ -54,9 +54,16 @@ include 'admin_header.php';
                      '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
                 unset($_SESSION['mensagem_sucesso']);
             }
+            if (isset($_SESSION['mensagem_erro'])) {
+                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">' . 
+                     htmlspecialchars($_SESSION['mensagem_erro']) . 
+                     '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+                unset($_SESSION['mensagem_erro']);
+            }
             if ($erro) {
                 echo '<div class="alert alert-danger">' . $erro . '</div>';
             }
+
             ?>
 
             <div class="row">
@@ -95,7 +102,10 @@ include 'admin_header.php';
                                         <td class="text-end">
                                             <a href="editar_permissoes_perfil.php?id=<?php echo $perfil['id']; ?>" class="btn btn-outline-primary btn-sm me-1"><i class="bi bi-shield-lock me-1"></i> Configurar Permissões</a>
                                             <?php if ($perfil['nome'] !== 'Administrador'): ?>
-                                                <!-- Lógica de exclusão se necessário -->
+                                                <form action="excluir_perfil.php" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir o perfil \'<?php echo addslashes($perfil['nome']); ?>\'?');">
+                                                    <input type="hidden" name="perfil_id" value="<?php echo $perfil['id']; ?>">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i> Excluir</button>
+                                                </form>
                                             <?php endif; ?>
                                         </td>
                                     </tr>
