@@ -204,8 +204,7 @@ include 'admin_header.php';
                                                             </span>
                                                         </div>
                                                         <small class="text-muted d-block" style="font-size: 0.85rem; opacity: 0.7;">
-                                                            Portal ID: #<?php echo str_pad($s['id'], 6, '0', STR_PAD_LEFT); ?> • 
-                                                            <a href="../portal.php?slug=<?php echo $s['slug']; ?>" target="_blank" class="text-info text-decoration-none fw-bold">Visualizar Link Público</a>
+                                                            Portal ID: #<?php echo str_pad($s['id'], 6, '0', STR_PAD_LEFT); ?>
                                                         </small>
                                                     </div>
                                                     
@@ -237,6 +236,9 @@ include 'admin_header.php';
                                                                 <i class="bi bi-trash"></i> Excluir
                                                             </button>
                                                         </form>
+                                                        <a href="../portal.php?slug=<?php echo $s['slug']; ?>" target="_blank" class="btn-action-custom btn-detalhes ms-md-auto">
+                                                            <i class="bi bi-box-arrow-up-right"></i> Ver Portal Público
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
