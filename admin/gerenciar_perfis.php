@@ -42,14 +42,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_perfil'])) {
 // Busca os perfis existentes filtrados pela prefeitura
 $sql = "
     SELECT id, nome, 
-    (SELECT COUNT(*) FROM usuarios_admin WHERE id_perfil = perfis.id AND id_prefeitura = :pref_id) as total_usuarios 
+    (SELECT COUNT(*) FROM usuarios_admin WHERE id_perfil = perfis.id AND id_prefeitura = :pref_id1) as total_usuarios 
     FROM perfis 
-    WHERE id_prefeitura = :pref_id OR id_prefeitura IS NULL
+    WHERE id_prefeitura = :pref_id2 OR id_prefeitura IS NULL
     ORDER BY nome ASC
 ";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([':pref_id' => $id_prefeitura]);
+$stmt->execute([':pref_id1' => $id_prefeitura, ':pref_id2' => $id_prefeitura]);
 $perfis = $stmt->fetchAll();
+
 
 $page_title_for_header = 'Gerenciar Perfis';
 include 'admin_header.php';
