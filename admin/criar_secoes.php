@@ -89,7 +89,13 @@ $secoes_agrupadas = [];
 if ($action === 'list') {
     $pref_id = $_SESSION['id_prefeitura'] ?? 0;
     $stmt = $pdo->prepare("
-        SELECT p.id, p.nome, p.slug, c.nome as nome_categoria 
+        SELECT p.id, p.nome, p.slug, c.nome as nome_categoria,
+        (SELECT COUNT(*) FROM registros r WHERE r.id_portal = p.id) as total_registros,
+        (SELECT MIN(exercicio) FROM registros r WHERE r.id_portal = p.id) as ano_min,
+        (SELECT MAX(exercicio) FROM registros r WHERE r.id_portal = p.id) as ano_max,
+        (SELECT COUNT(*) FROM valores_registros vr 
+         JOIN campos_portal cp ON vr.id_campo = cp.id 
+         WHERE cp.id_portal = p.id AND cp.tipo_campo = 'anexo' AND vr.valor != '') as total_pdfs
         FROM portais p
         LEFT JOIN categorias c ON p.id_categoria = c.id
         WHERE p.id_prefeitura = ?
@@ -187,7 +193,12 @@ include 'admin_header.php';
                                                             <h6 class="fw-bold mb-0 me-2" style="font-size: 1.1rem;"><?php echo htmlspecialchars($s['nome']); ?></h6>
                                                             <span class="badge bg-light text-success border border-success border-opacity-10 py-1">Ativo</span>
                                                         </div>
-                                                        <small class="text-muted d-block mb-1">ID do Portal: #<?php echo str_pad($s['id'], 6, '0', STR_PAD_LEFT); ?></small>
+                                                        <div class="d-flex flex-wrap gap-4 align-items-center mt-2 mb-3">
+                                                            <small class="text-dark bg-secondary bg-opacity-10 px-2 py-1 rounded small" style="font-size: 0.75rem;"><i class="bi bi-hash me-1"></i> ID: #<?php echo str_pad($s['id'], 6, '0', STR_PAD_LEFT); ?></small>
+                                                            <small class="text-muted"><i class="bi bi-file-earmark-pdf me-1"></i> <strong><?php echo $s['total_pdfs'] ?: 0; ?></strong> Arquivos PDF</small>
+                                                            <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> Período: <strong><?php echo $s['ano_min'] ? ($s['ano_min'] == $s['ano_max'] ? $s['ano_min'] : $s['ano_min'].' - '.$s['ano_max']) : 'N/A'; ?></strong></small>
+                                                            <small class="text-muted"><i class="bi bi-layers me-1"></i> <strong><?php echo $s['total_registros'] ?: 0; ?></strong> Lançamentos</small>
+                                                        </div>
                                                         
                                                         <a href="../portal.php?slug=<?php echo $s['slug']; ?>" target="_blank" class="text-info text-decoration-none small fw-bold">
                                                             <i class="bi bi-box-arrow-up-right me-1"></i> Ver Link Público
