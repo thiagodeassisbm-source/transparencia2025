@@ -229,17 +229,17 @@ include 'admin_header.php';
 
                                                 <div class="border-top pt-3 mt-1">
                                                     <div class="d-flex flex-wrap gap-2">
-                                                        <a href="ver_lancamentos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-ver">
-                                                            <i class="bi bi-file-earmark-bar-graph"></i> Planilha de Dados
+                                                        <a href="gerenciar_campos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-detalhes">
+                                                            <i class="bi bi-pencil-square"></i> Gerenciar Campos
                                                         </a>
                                                         <a href="lancar_dados.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-lancar">
                                                             <i class="bi bi-plus-square"></i> Novo Lançamento
                                                         </a>
-                                                        <a href="gerenciar_campos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-detalhes">
-                                                            <i class="bi bi-pencil-square"></i> Gerenciar Campos
-                                                        </a>
                                                         <a href="editar_secao.php?id=<?php echo $s['id']; ?>" class="btn-action-custom btn-editar">
-                                                            <i class="bi bi-pencil"></i> Editar Nome
+                                                            <i class="bi bi-pencil"></i> Editar
+                                                        </a>
+                                                        <a href="ver_lancamentos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-ver">
+                                                            <i class="bi bi-file-earmark-bar-graph"></i> Planilha de Dados
                                                         </a>
                                                         <form method="POST" action="excluir_secao.php" class="d-inline" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir esta seção?');">
                                                             <input type="hidden" name="portal_id" value="<?php echo $s['id']; ?>">
