@@ -150,12 +150,12 @@ function isActive($pageName) {
                     $pref_id = $_SESSION['id_prefeitura'];
                     $has_global_secoes = tem_permissao('secoes', 'ver');
                     
-                    // Busca todas as seções desta prefeitura e agrupa se forem permitidas
+                    // Busca todas as seções desta prefeitura (e as globais) e agrupa se forem permitidas
                     $stmt_menu_secoes = $pdo->prepare("
                         SELECT p.id, p.nome as portal_nome, c.nome as categoria_nome 
                         FROM portais p 
                         LEFT JOIN categorias c ON p.id_categoria = c.id 
-                        WHERE p.id_prefeitura = :pref_id
+                        WHERE (p.id_prefeitura = :pref_id OR p.id_prefeitura IS NULL)
                         ORDER BY c.ordem ASC, p.nome ASC
                     ");
                     $stmt_menu_secoes->execute([':pref_id' => $pref_id]);
