@@ -69,6 +69,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
             $stmt_secao = $pdo->prepare("INSERT INTO portais (nome, descricao, slug, id_categoria, id_prefeitura) VALUES (?, ?, ?, ?, ?)");
             $stmt_secao->execute([$secao_nome, $secao_descricao, $slug, $id_categoria, ($_SESSION['id_prefeitura'] ?? 0)]);
             $id_secao = $pdo->lastInsertId();
+
+            // Atribui automaticamente permissões totais para o perfil de quem está criando a seção.
+            // Para não precisar ir gerenciar perfis logo de cara.
+            $perfil_id_atual = $_SESSION['admin_user_id_perfil'] ?? 0;
+            if ($perfil_id_atual > 0) {
+                $stmt_perm = $pdo->prepare("INSERT INTO permissoes_perfil (id_perfil, recurso, p_ver, p_lancar, p_editar, p_excluir) VALUES (?, ?, 1, 1, 1, 1)");
+                $stmt_perm->execute([$perfil_id_atual, 'form_' . $id_secao]);
+                
+                // Limpa o cache de sessão para refletir a mudança imediatamente
+                unset($_SESSION['permissoes_sessao']);
+            }
         }
         
         $stmt_card = $pdo->prepare("INSERT INTO cards_informativos (id_categoria, id_secao, link_url, titulo, subtitulo, caminho_icone, tipo_icone, ordem, id_prefeitura) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
