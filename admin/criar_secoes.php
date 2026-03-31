@@ -108,53 +108,114 @@ include 'admin_header.php';
 
 <div class="container-fluid">
     <?php if ($action === 'list'): ?>
-        <!-- MODO LISTAGEM (ANEXO 2) -->
+        <!-- MODO LISTAGEM MODERNA (INSPIRADO NOS ANEXOS) -->
+        <style>
+            .secao-avatar { width: 50px; height: 50px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem; color: #dc3545; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+            .category-card { transition: all 0.2s; border: 1px solid #f8d7da !important; background-color: #fff5f5 !important; border-radius: 12px !important; margin-bottom: 12px; }
+            .category-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(220, 53, 69, 0.1) !important; }
+            .category-header { cursor: pointer; padding: 1.5rem !important; }
+            .category-title { font-size: 1.1rem; font-weight: 700; color: #2d3748; margin-bottom: 0; }
+            .category-subtitle { font-size: 0.85rem; color: #718096; }
+            .btn-action-custom { border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; transition: all 0.2s; border: none; display: inline-flex; align-items: center; gap: 6px; }
+            .btn-ver { background-color: #7c3aed; color: #fff; }
+            .btn-detalhes { background-color: #f1f5f9; color: #475569; }
+            .btn-editar { background-color: #f8fafc; border: 1px solid #e2e8f0; color: #6366f1; }
+            .btn-lancar { background-color: #ecfdf5; color: #059669; }
+            .btn-excluir { background-color: #fff1f2; color: #e11d48; }
+            .btn-action-custom:hover { opacity: 0.9; transform: scale(1.02); }
+            .inner-section-item { background: #fff; border-radius: 10px; margin: 0 1.5rem 1.5rem 1.5rem; border: 1px solid #f1f5f9; padding: 1.25rem; }
+        </style>
+
         <div class="row">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="mb-0">Gerenciar Estrutura</h4>
-                    <a href="criar_secoes.php?action=new" class="btn btn-success">
+                    <h3 class="fw-bold text-dark">Lista de Seções</h3>
+                    <a href="criar_secoes.php?action=new" class="btn btn-success px-4 py-2 shadow-sm rounded-pill">
                         <i class="bi bi-plus-circle me-1"></i> Criar Seção / Card
                     </a>
                 </div>
 
+                <!-- Card Informativo -->
+                <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #36c0d3 0%, #2d9fb0 100%); color: #fff; border-radius: 12px;">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div class="me-4 d-none d-md-block">
+                            <i class="bi bi-info-circle-fill" style="font-size: 3rem; opacity: 0.8;"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">O que é uma Seção?</h5>
+                            <p class="mb-0 opacity-90">As seções são as páginas de destino onde os lançamentos de dados acontecem. No portal público, elas aparecem como <strong>Cards Informativos</strong>. É aqui que você define qual tipo de dado será publicado e como ele será exibido para o cidadão.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <?php if (isset($_SESSION['mensagem_sucesso'])): ?>
-                    <div class="alert alert-success alert-dismissible fade show"><?php echo $_SESSION['mensagem_sucesso']; unset($_SESSION['mensagem_sucesso']); ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+                    <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show"><?php echo $_SESSION['mensagem_sucesso']; unset($_SESSION['mensagem_sucesso']); ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
                 <?php endif; ?>
 
                 <div class="accordion border-0" id="accordionCategorias">
                     <?php if (empty($secoes_agrupadas)): ?>
-                        <div class="alert alert-info border-0 shadow-sm">Nenhuma seção cadastrada até o momento. Clique no botão acima para começar.</div>
+                        <div class="card p-5 text-center border-0 shadow-sm" style="border-radius: 15px;">
+                            <div class="mb-3"><i class="bi bi-folder-x text-muted" style="font-size: 4rem;"></i></div>
+                            <h5 class="text-muted">Nenhuma seção encontrada nesta prefeitura.</h5>
+                            <p class="text-muted small">Clique no botão superior para criar sua primeira seção agora mesmo.</p>
+                        </div>
                     <?php else: ?>
                         <?php foreach ($secoes_agrupadas as $categoria => $secoes): ?>
-                            <div class="card mb-3 border-0 shadow-sm overflow-hidden">
-                                <div class="card-header bg-white border-0 py-3" id="heading-<?php echo md5($categoria); ?>">
-                                    <button class="btn btn-link text-decoration-none p-0 w-100 text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?php echo md5($categoria); ?>">
-                                        <span class="text-primary fw-bold text-uppercase small"><?php echo htmlspecialchars($categoria); ?></span>
-                                        <i class="bi bi-chevron-down opacity-50"></i>
-                                    </button>
-                                </div>
-                                <div id="collapse-<?php echo md5($categoria); ?>" class="collapse show">
-                                    <div class="card-body p-0">
-                                        <div class="list-group list-group-flush">
-                                            <?php foreach ($secoes as $s): ?>
-                                                <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-light">
-                                                    <div>
-                                                        <i class="bi bi-grip-vertical text-muted me-2 opacity-50"></i>
-                                                        <span class="fw-600"><?php echo htmlspecialchars($s['nome']); ?></span>
-                                                        <br><small class="text-muted ms-4"><a href="../portal.php?slug=<?php echo $s['slug']; ?>" target="_blank" class="text-decoration-none"><i class="bi bi-link-45deg"></i> Link Público</a></small>
-                                                    </div>
-                                                    <div class="btn-group shadow-sm">
-                                                        <a href="ver_lancamentos.php?portal_id=<?php echo $s['id']; ?>" class="btn btn-sm btn-info text-white" title="Ver Dados"><i class="bi bi-eye"></i></a>
-                                                        <a href="gerenciar_campos.php?portal_id=<?php echo $s['id']; ?>" class="btn btn-sm btn-secondary" title="Gerenciar Campos"><i class="bi bi-pencil-square"></i></a>
-                                                        <a href="editar_secao.php?id=<?php echo $s['id']; ?>" class="btn btn-sm btn-warning text-white" title="Editar"><i class="bi bi-pencil"></i></a>
-                                                        <a href="lancar_dados.php?portal_id=<?php echo $s['id']; ?>" class="btn btn-sm btn-primary" title="Lançar"><i class="bi bi-plus-square"></i></a>
-                                                        <button class="btn btn-sm btn-danger" title="Excluir"><i class="bi bi-trash"></i></button>
-                                                    </div>
-                                                </div>
-                                            <?php endforeach; ?>
+                            <?php $id_cat = md5($categoria); ?>
+                            <div class="card category-card border-0">
+                                <div class="category-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#collapse-<?php echo $id_cat; ?>">
+                                    <div class="d-flex align-items-center">
+                                        <div class="secao-avatar me-3">
+                                            <?php echo strtoupper(substr($categoria, 0, 1)); ?>
+                                        </div>
+                                        <div>
+                                            <h4 class="category-title"><?php echo htmlspecialchars($categoria); ?></h4>
+                                            <span class="category-subtitle"><?php echo count($secoes); ?> Seção(ões) vinculada(s)</span>
                                         </div>
                                     </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-chevron-down opacity-50 ms-3"></i>
+                                    </div>
+                                </div>
+                                <div id="collapse-<?php echo $id_cat; ?>" class="collapse show" data-bs-parent="#accordionCategorias">
+                                    <?php foreach ($secoes as $s): ?>
+                                        <div class="inner-section-item shadow-sm">
+                                            <div class="d-flex flex-wrap justify-content-between align-items-center">
+                                                <div class="mb-3 mb-md-0">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <h6 class="fw-bold mb-0 me-2"><?php echo htmlspecialchars($s['nome']); ?></h6>
+                                                        <span class="badge bg-light text-success border border-success border-opacity-10 py-1">Ativo</span>
+                                                    </div>
+                                                    <small class="text-muted d-block mb-2">ID do Portal: #<?php echo str_pad($s['id'], 6, '0', STR_PAD_LEFT); ?></small>
+                                                    
+                                                    <a href="../portal.php?slug=<?php echo $s['slug']; ?>" target="_blank" class="text-info text-decoration-none small fw-bold">
+                                                        <i class="bi bi-box-arrow-up-right me-1"></i> Visualizar no Portal Público
+                                                    </a>
+                                                </div>
+                                                
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    <a href="ver_lancamentos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-ver">
+                                                        <i class="bi bi-file-earmark-bar-graph"></i> Planilha
+                                                    </a>
+                                                    <a href="lancar_dados.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-lancar">
+                                                        <i class="bi bi-plus-square"></i> Lançar
+                                                    </a>
+                                                    <a href="gerenciar_campos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-detalhes">
+                                                        <i class="bi bi-pencil-square"></i> Campos
+                                                    </a>
+                                                    <a href="editar_secao.php?id=<?php echo $s['id']; ?>" class="btn-action-custom btn-editar">
+                                                        <i class="bi bi-pencil"></i> Nome
+                                                    </a>
+                                                    <form method="POST" action="excluir_secao.php" class="d-inline" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir esta seção?');">
+                                                        <input type="hidden" name="portal_id" value="<?php echo $s['id']; ?>">
+                                                        <button type="submit" class="btn-action-custom btn-excluir">
+                                                            <i class="bi bi-trash"></i> Excluir
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
