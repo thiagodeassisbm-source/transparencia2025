@@ -87,9 +87,50 @@ include 'admin_header.php';
                     </div>
                     <div class="card-body p-4">
                         <div class="row">
+                            <!-- MÓDULOS GLOBAIS -->
+                            <div class="col-12 mb-5">
+                                <h5 class="fw-bold mb-4 pb-2 border-bottom text-primary"><i class="bi bi-grid-fill me-2"></i>Módulos do Sistema (Menu Superior/Lateral)</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width: 40%;">Módulo</th>
+                                                <th class="text-center">Acesso (Ver)</th>
+                                                <th class="text-center">Gerenciar (Lançar/Editar)</th>
+                                                <th class="text-center">Excluir</th>
+                                                <th class="text-center">Configurações/Tudo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php 
+                                            $modulos = [
+                                                'dashboard' => 'Painel de Controle (Dashboard)',
+                                                'secoes' => 'Menu: Lançamentos (Lista Geral)',
+                                                'estrutura' => 'Menu: Estrutura (Criação de Seções)',
+                                                'prefeitura' => 'Menu: Prefeitura (Info Gerais)',
+                                                'sic' => 'Módulo: E-Sic (Inbox e Resp.)',
+                                                'ouvidoria' => 'Módulo: Ouvidoria',
+                                                'usuarios' => 'Módulo: Usuários e Perfis'
+                                            ];
+                                            foreach($modulos as $slug => $label): 
+                                                $p = $permissoes[$slug] ?? ['p_ver'=>0,'p_lancar'=>0,'p_editar'=>0,'p_excluir'=>0];
+                                            ?>
+                                            <tr>
+                                                <td><strong><?php echo $label; ?></strong></td>
+                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug; ?>][ver]" value="1" <?php if($p['p_ver']){ echo 'checked'; } ?>></div></td>
+                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug; ?>][lancar]" value="1" <?php if($p['p_lancar']){ echo 'checked'; } ?>></div></td>
+                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug; ?>][editar]" value="1" <?php if($p['p_editar']){ echo 'checked'; } ?>></div></td>
+                                                <td class="text-center"><div class="form-check d-flex justify-content-center"><input class="form-check-input" type="checkbox" name="permissoes[<?php echo $slug; ?>][excluir]" value="1" <?php if($p['p_excluir']){ echo 'checked'; } ?>></div></td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
                             <!-- FORMULÁRIOS DINÂMICOS (SEÇÕES) -->
                             <div class="col-12">
-                                <h5 class="fw-bold mb-4 pb-2 border-bottom">Formulários de Lançamento (Seções)</h5>
+                                <h5 class="fw-bold mb-4 pb-2 border-bottom text-success"><i class="bi bi-stack me-2"></i>Formulários de Lançamento (Seções de Dados)</h5>
                                 <div class="table-responsive">
                                     <table class="table table-hover align-middle">
                                         <thead class="table-light">

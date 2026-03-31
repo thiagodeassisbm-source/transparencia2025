@@ -145,7 +145,31 @@ function isActive($pageName) {
 
                 <ul class="mt-3">
                     <li class="px-3 mb-2 small text-muted text-uppercase fw-bold">Conteúdo</li>
-                    <?php if (tem_permissao('secoes', 'ver')): ?>
+                    <?php 
+                    // Lógica para carregar as seções permitidas para este usuário
+                    $pref_id = $_SESSION['id_prefeitura'];
+                    $has_global_secoes = tem_permissao('secoes', 'ver');
+                    
+                    // Busca todas as seções desta prefeitura e agrupa se forem permitidas
+                    $stmt_menu_secoes = $pdo->prepare("
+                        SELECT p.id, p.nome as portal_nome, c.nome as categoria_nome 
+                        FROM portais p 
+                        LEFT JOIN categorias c ON p.id_categoria = c.id 
+                        WHERE p.id_prefeitura = :pref_id
+                        ORDER BY c.ordem ASC, p.nome ASC
+                    ");
+                    $stmt_menu_secoes->execute([':pref_id' => $pref_id]);
+                    $secoes_menu = $stmt_menu_secoes->fetchAll();
+                    
+                    $permitted_in_menu = [];
+                    foreach ($secoes_menu as $sm) {
+                        if (tem_permissao('form_' . $sm['id'], 'ver')) {
+                            $permitted_in_menu[$sm['categoria_nome'] ?? 'Outros'][] = $sm;
+                        }
+                    }
+                    
+                    if ($has_global_secoes || !empty($permitted_in_menu)): 
+                    ?>
                     <li>
                         <?php $lancamentos_active = isActive(['index.php', 'ver_lancamentos.php', 'lancar_dados.php']); ?>
                         <a href="#collapseLancamentos" class="nav-link has-submenu <?php echo $lancamentos_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
@@ -154,7 +178,17 @@ function isActive($pageName) {
                         </a>
                         <div class="collapse <?php echo $lancamentos_active ? 'show' : ''; ?>" id="collapseLancamentos">
                             <ul class="submenu">
-                                <li><a href="index.php" class="nav-link <?php echo isActive(['index.php', 'ver_lancamentos.php', 'lancar_dados.php']); ?>">Gerenciar Seções</a></li>
+                                <?php if ($has_global_secoes): ?>
+                                    <li><a href="index.php" class="nav-link <?php echo isActive('index.php'); ?>"><strong><i class="bi bi-list-stars"></i> Gerenciar Tudo</strong></a></li>
+                                    <li class="border-top my-1 opacity-25"></li>
+                                <?php endif; ?>
+                                
+                                <?php foreach ($permitted_in_menu as $cat_label => $items): ?>
+                                    <li class="submenu-header text-uppercase opacity-50 small ps-3 mt-2" style="font-size: 0.65rem;"><?php echo htmlspecialchars($cat_label); ?></li>
+                                    <?php foreach ($items as $it): ?>
+                                        <li><a href="ver_lancamentos.php?portal_id=<?php echo $it['id']; ?>" class="nav-link <?php echo (isset($_GET['portal_id']) && $_GET['portal_id'] == $it['id']) ? 'active' : ''; ?>"><?php echo htmlspecialchars($it['portal_nome']); ?></a></li>
+                                    <?php endforeach; ?>
+                                <?php endforeach; ?>
                             </ul>
                         </div>
                     </li>
