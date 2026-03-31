@@ -208,9 +208,9 @@ include 'admin_header.php';
                                                         </small>
                                                     </div>
                                                     
-                                                    <div class="text-end d-none d-sm-block">
+                                                    <div class="text-center d-none d-sm-block ms-3" style="min-width: 140px;">
                                                         <div class="text-muted small fw-bold text-uppercase mb-0" style="font-size: 0.65rem; letter-spacing: 0.8px; opacity: 0.8;">Total Lançamentos</div>
-                                                        <div class="fw-bold text-success" style="font-size: 1.6rem; line-height: 1;">
+                                                        <div class="fw-bold text-success" style="font-size: 1.8rem; line-height: 1.1;">
                                                             <?php echo number_format($s['total_registros'] ?: 0, 0, ',', '.'); ?>
                                                         </div>
                                                     </div>
