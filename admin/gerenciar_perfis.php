@@ -10,6 +10,7 @@ if ($_SESSION['admin_user_perfil'] !== 'admin') {
     exit;
 }
 
+$id_prefeitura = $_SESSION['id_prefeitura'];
 $mensagem = '';
 $erro = '';
 
@@ -19,16 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_perfil'])) {
     if (empty($nome)) {
         $erro = "O nome do perfil é obrigatório.";
     } else {
-        $stmt_check = $pdo->prepare("SELECT id FROM perfis WHERE nome = ?");
-        $stmt_check->execute([$nome]);
+        // Agora o check é por prefeitura
+        $stmt_check = $pdo->prepare("SELECT id FROM perfis WHERE nome = ? AND (id_prefeitura = ? OR id_prefeitura IS NULL)");
+        $stmt_check->execute([$nome, $id_prefeitura]);
         if ($stmt_check->fetch()) {
-            $erro = "Este perfil já existe.";
+            $erro = "Este perfil já existe para sua prefeitura.";
         } else {
-            $stmt_insert = $pdo->prepare("INSERT INTO perfis (nome) VALUES (?)");
-            $stmt_insert->execute([$nome]);
+            $stmt_insert = $pdo->prepare("INSERT INTO perfis (nome, id_prefeitura) VALUES (?, ?)");
+            $stmt_insert->execute([$nome, $id_prefeitura]);
             $perfil_id = $pdo->lastInsertId();
             
-            registrar_log($pdo, 'ADIÇÃO', 'perfis', "Criou novo perfil de acesso: $nome (ID: $perfil_id)");
+            registrar_log($pdo, 'ADIÇÃO', 'perfis', "Criou novo perfil de acesso: $nome (ID: $perfil_id) para prefeitura ID: $id_prefeitura");
             
             $_SESSION['mensagem_sucesso'] = "Perfil '$nome' criado! Agora configure as permissões.";
             header("Location: gerenciar_perfis.php");
@@ -37,8 +39,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_perfil'])) {
     }
 }
 
-// Busca os perfis existentes
-$perfis = $pdo->query("SELECT id, nome, (SELECT COUNT(*) FROM usuarios_admin WHERE id_perfil = perfis.id) as total_usuarios FROM perfis ORDER BY nome ASC")->fetchAll();
+// Busca os perfis existentes filtrados pela prefeitura
+$sql = "
+    SELECT id, nome, 
+    (SELECT COUNT(*) FROM usuarios_admin WHERE id_perfil = perfis.id AND id_prefeitura = :pref_id) as total_usuarios 
+    FROM perfis 
+    WHERE id_prefeitura = :pref_id OR id_prefeitura IS NULL
+    ORDER BY nome ASC
+";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([':pref_id' => $id_prefeitura]);
+$perfis = $stmt->fetchAll();
 
 $page_title_for_header = 'Gerenciar Perfis';
 include 'admin_header.php';

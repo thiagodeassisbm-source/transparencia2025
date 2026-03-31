@@ -48,8 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_usuario']) && tem
     }
 }
 
-// Busca os perfis para o select
-$perfis_select = $pdo->query("SELECT id, nome FROM perfis ORDER BY nome ASC")->fetchAll();
+// Busca os perfis para o select (Filtrados por Prefeitura)
+$id_prefeitura = $_SESSION['id_prefeitura'];
+$stmt_perfis_select = $pdo->prepare("SELECT id, nome FROM perfis WHERE id_prefeitura = ? OR id_prefeitura IS NULL ORDER BY nome ASC");
+$stmt_perfis_select->execute([$id_prefeitura]);
+$perfis_select = $stmt_perfis_select->fetchAll();
+
 
 // Busca os usuários existentes com os nomes dos perfis (Aplicando Filtro SaaS)
 $sql_usuarios = "
