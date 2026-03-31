@@ -13,7 +13,7 @@ $stmt_info = $pdo->prepare(
      WHERE r.id = ? AND p.id_prefeitura = ?");
 $stmt_info->execute([$registro_id, $id_prefeitura_ativa]);
 $secao_info = $stmt_info->fetch();
-if (!$secao_info) { die("Registro não encontrado ou não pertence a esta prefeitura."); }
+if (!$secao_info) { die("Conteudo de testes para ver um documento real cadastre no painel da sua prefeitura"); }
 
 // Busca todos os campos e valores para este registro específico
 $stmt_detalhes = $pdo->prepare(
