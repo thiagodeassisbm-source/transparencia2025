@@ -178,11 +178,6 @@ function isActive($pageName) {
                         </a>
                         <div class="collapse <?php echo $lancamentos_active ? 'show' : ''; ?>" id="collapseLancamentos">
                             <ul class="submenu">
-                                <?php if ($has_global_secoes): ?>
-                                    <li><a href="index.php" class="nav-link <?php echo isActive('index.php'); ?>"><strong><i class="bi bi-list-stars"></i> Gerenciar Tudo</strong></a></li>
-                                    <li class="border-top my-1 opacity-25"></li>
-                                <?php endif; ?>
-                                
                                 <?php foreach ($permitted_in_menu as $cat_label => $items): ?>
                                     <li class="submenu-header text-uppercase opacity-50 small ps-3 mt-2" style="font-size: 0.65rem;"><?php echo htmlspecialchars($cat_label); ?></li>
                                     <?php foreach ($items as $it): ?>
