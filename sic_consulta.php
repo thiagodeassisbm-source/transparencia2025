@@ -81,7 +81,7 @@ if (!empty($protocolo_busca)) {
                             </div>
                             <div class="col-md-6 text-md-end">
                                 <span class="label-custom">Órgão Destino</span>
-                                <p class="value-custom"><i class="bi bi-building text-primary me-2"></i> Prefeitura de <?php echo $info_prefeitura['nome']; ?></p>
+                                <p class="value-custom"><i class="bi bi-building text-primary me-2"></i> Prefeitura de <?php echo $prefeitura_ativa['nome']; ?></p>
                             </div>
                         </div>
 
