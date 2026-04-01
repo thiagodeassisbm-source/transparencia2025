@@ -143,15 +143,15 @@ include 'admin_header.php';
         <div class="col-xl-10 mx-auto">
             
             <div class="d-flex align-items-center mb-4">
-                <a href="criar_secoes.php" class="btn btn-light border-0 shadow-sm me-3"><i class="bi bi-arrow-left"></i> Voltar</a>
-                <h4 class="mb-0 fw-bold">Editar Configurações: <?php echo htmlspecialchars($secao_atual['nome']); ?></h4>
+                <a href="criar_secoes.php" class="btn btn-light border-0 shadow-sm me-3 text-muted"><i class="bi bi-arrow-left"></i> Voltar</a>
+                <h4 class="mb-0 fw-bold">Editar Configurações: <?php echo htmlspecialchars($secao_atual['nome'] ?? $card_atual['titulo']); ?></h4>
             </div>
 
             <?php if (isset($erro)): ?>
                 <div class="alert alert-danger shadow-sm"><?php echo $erro; ?></div>
             <?php endif; ?>
 
-            <form method="POST" action="editar_secao.php?id=<?php echo $secao_id; ?>" enctype="multipart/form-data">
+            <form method="POST" action="editar_secao.php?id=<?php echo $secao_id; ?>&card_id=<?php echo $card_id; ?>" enctype="multipart/form-data">
                 
                 <!-- 1. DADOS DO CARD -->
                 <div class="card mb-4 shadow-sm border-0">
