@@ -45,28 +45,12 @@ body {
 }
 
 .sidebar-header {
-    min-height: var(--topbar-height);
-    height: auto;
+    height: var(--topbar-height);
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 0.65rem 1.5rem;
+    align-items: center;
+    padding: 0 1.5rem;
     background-color: var(--sidebar-header-bg);
     color: var(--sidebar-header-color);
-}
-
-.sidebar-welcome {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    line-height: 1.35;
-    color: rgba(255, 255, 255, 0.95);
-    max-width: 100%;
-}
-
-.sidebar-welcome strong {
-    font-weight: 700;
-    color: #fff;
 }
 
 .sidebar-header h2 {
@@ -197,16 +181,31 @@ body {
 
 /* Topbar Styling */
 .admin-topbar {
-    height: 50px;
+    min-height: 50px;
     background-color: #fff;
     border-bottom: 1px solid #e2e8f0;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2rem;
+    padding: 0.5rem 2rem;
+    gap: 1rem;
     position: sticky;
     top: 0;
     z-index: 1050; /* Aumentado para ficar acima de tudo */
+}
+
+.topbar-welcome {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+    line-height: 1.35;
+    max-width: min(280px, 42vw);
+}
+
+.topbar-welcome strong {
+    font-weight: 700;
+    color: #0f172a;
 }
 
 .topbar-left h1 {
@@ -576,6 +575,11 @@ html.high-contrast .admin-sidebar {
 
 html.high-contrast .sidebar-header {
     background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+html.high-contrast .topbar-welcome,
+html.high-contrast .topbar-welcome strong {
     color: #ffffff !important;
 }
 
