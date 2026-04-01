@@ -42,7 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registro_id'])) {
             
             $pdo->commit();
             
-            registrar_log($pdo, 'EXCLUSÃO', 'registros', "Excluiu lançamento ID: $registro_id (Seção: $portal_id)");
+            registrar_log(
+                $pdo,
+                'EXCLUSÃO',
+                modulo_log_lancamento($pdo, $portal_id),
+                "Excluiu lançamento ID $registro_id (seção portal_id $portal_id)."
+            );
             
             $_SESSION['mensagem_sucesso'] = "Lançamento excluído com sucesso!";
 

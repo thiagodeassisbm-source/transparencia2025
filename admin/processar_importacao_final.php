@@ -127,8 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         registrar_log(
             $pdo,
             'ADIÇÃO',
-            'registros',
-            "Importação XML: $sucessos registro(s) na seção \"" . $nome_secao_import . "\" (portal_id $id_portal)."
+            modulo_log_lancamento($pdo, $id_portal),
+            "Importação XML: $sucessos lançamento(s) (seção \"" . $nome_secao_import . "\", portal_id $id_portal)."
         );
 
         // Redireciona para a página de lançamentos com mensagem de sucesso

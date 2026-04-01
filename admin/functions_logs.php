@@ -54,6 +54,23 @@ function obter_ip_cliente_para_log(): string {
     return '';
 }
 
+/**
+ * Nome amigável da seção (portais.nome) para identificar o tipo de lançamento nos logs.
+ */
+function nome_secao_para_log(PDO $pdo, int $portal_id): string {
+    $stmt = $pdo->prepare('SELECT nome FROM portais WHERE id = ?');
+    $stmt->execute([$portal_id]);
+    $n = $stmt->fetchColumn();
+    return $n ? (string) $n : ('Seção ID ' . $portal_id);
+}
+
+/**
+ * Coluna "Módulo/Tabela" em logs de lançamentos — inclui o nome da seção (ex.: Receitas Gerais).
+ */
+function modulo_log_lancamento(PDO $pdo, int $portal_id): string {
+    return 'Lançamentos · ' . nome_secao_para_log($pdo, $portal_id);
+}
+
 function registrar_log($pdo, $acao, $tabela, $detalhes) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();

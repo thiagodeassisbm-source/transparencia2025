@@ -79,8 +79,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $pdo->commit();
         
-        $nome_secao = $secao['nome'] ?? 'Seção ID: ' . $portal_id;
-        registrar_log($pdo, 'EDIÇÃO', 'registros', "Editou lançamento ID: $registro_id (Seção: $nome_secao)");
+        registrar_log(
+            $pdo,
+            'EDIÇÃO',
+            modulo_log_lancamento($pdo, $portal_id),
+            "Editou lançamento ID $registro_id (seção portal_id $portal_id)."
+        );
         
         $_SESSION['mensagem_sucesso'] = "Lançamento atualizado com sucesso!";
         header("Location: ver_lancamentos.php?portal_id=" . $portal_id);
