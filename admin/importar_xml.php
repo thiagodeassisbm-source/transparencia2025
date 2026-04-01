@@ -38,7 +38,6 @@ if ($pref_id > 0) {
 
 $erro = '';
 
-// Passo 1: upload + sessão para o mapeamento (sempre vinculado à prefeitura do contexto)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['xml_file'])) {
     if ($sem_contexto_super) {
         $erro = 'Entre em uma prefeitura pela Central do Super Admin (Gerenciar Prefeituras → Entrar) antes de importar.';
@@ -77,73 +76,135 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['xml_file'])) {
         $erro = 'Ocorreu um erro no upload do arquivo.';
     }
 }
-?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Importar XML (Passo 1)</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
-</head>
-<body class="bg-light-subtle">
 
-<?php
 $page_title_for_header = 'Importar XML';
 include 'admin_header.php';
 ?>
 
-<div class="container-fluid container-custom-padding">
+<style>
+    .import-xml-card {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    }
+</style>
+
+<div class="container-fluid container-custom-padding py-4">
     <div class="row">
         <div class="col-12">
+
+            <div class="row align-items-center mb-4">
+                <div class="col-md-8">
+                    <h3 class="fw-bold text-dark mb-1">Importar XML</h3>
+                    <p class="text-muted small mb-0"><span class="badge rounded-pill bg-success bg-opacity-10 text-success me-1">Passo 1/3</span> Informações da publicação, upload do XML e mapeamento dos campos.</p>
+                </div>
+            </div>
+
             <?php if (!empty($_SESSION['mensagem_erro'])): ?>
-                <div class="alert alert-danger border-0 shadow-sm"><?php echo htmlspecialchars($_SESSION['mensagem_erro']); unset($_SESSION['mensagem_erro']); ?></div>
+                <div class="alert alert-danger border-0 shadow-sm alert-dismissible fade show rounded-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i><?php echo htmlspecialchars($_SESSION['mensagem_erro']); unset($_SESSION['mensagem_erro']); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
             <?php endif; ?>
             <?php if (!empty($_SESSION['mensagem_sucesso'])): ?>
-                <div class="alert alert-success border-0 shadow-sm"><?php echo htmlspecialchars($_SESSION['mensagem_sucesso']); unset($_SESSION['mensagem_sucesso']); ?></div>
+                <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show rounded-4" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i><?php echo htmlspecialchars($_SESSION['mensagem_sucesso']); unset($_SESSION['mensagem_sucesso']); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
             <?php endif; ?>
-            <?php if ($erro): ?><div class="alert alert-danger"><?php echo htmlspecialchars($erro); ?></div><?php endif; ?>
+            <?php if ($erro): ?>
+                <div class="alert alert-danger border-0 shadow-sm rounded-4"><i class="bi bi-exclamation-triangle-fill me-2"></i><?php echo htmlspecialchars($erro); ?></div>
+            <?php endif; ?>
 
             <?php if ($sem_contexto_super): ?>
-            <div class="alert alert-warning border-0 shadow-sm">
+            <div class="alert alert-warning border-0 shadow-sm rounded-4 mb-4">
                 <strong>Prefeitura não selecionada.</strong> Na Central do Super Admin, abra <strong>Gerenciar Prefeituras</strong> e use <strong>Entrar</strong> no município desejado; em seguida volte a <strong>Importar XML</strong>.
             </div>
             <?php endif; ?>
 
-            <div class="card">
-                <div class="card-header"><h4>Passo 1: Informações da Publicação e Upload do XML</h4></div>
-                <div class="card-body">
-                    <?php if ($pref_id > 0): ?>
-                    <p class="text-muted small mb-3">Importação apenas para seções e tipos cadastrados <strong>desta prefeitura</strong>.</p>
-                    <?php endif; ?>
-                    <form method="POST" action="importar_xml.php" enctype="multipart/form-data" class="<?php echo ($sem_contexto_super || empty($secoes)) ? 'opacity-50' : ''; ?>">
-                        <h5 class="mb-3">Informações Gerais da Publicação</h5>
-                        <div class="row p-3 mb-3 bg-white rounded border">
-                            <div class="col-md-3 mb-3"><label for="exercicio" class="form-label">Exercício</label><select class="form-select" id="exercicio" name="exercicio" required><?php for ($ano = 2050; $ano >= 2020; $ano--): ?><option value="<?php echo $ano; ?>" <?php echo (date('Y') == $ano) ? 'selected' : ''; ?>><?php echo $ano; ?></option><?php endfor; ?></select></div>
-                            <div class="col-md-3 mb-3"><label for="unidade_gestora" class="form-label">Unidade Gestora</label><select class="form-select" id="unidade_gestora" name="unidade_gestora" required><option>Prefeitura Municipal</option><option>Fundo Municipal de Saúde</option></select></div>
-                            <div class="col-md-3 mb-3"><label for="periodicidade" class="form-label">Periodicidade</label><select class="form-select" id="periodicidade" name="periodicidade" required><option>Não se Aplica</option><option>Mensal</option><option>Bimestral</option><option>Trimestral</option><option>Quadrimestral</option><option>Semestral</option><option>Anual</option><option>Quadrienal</option></select></div>
-                            <div class="col-md-3 mb-3"><label for="mes" class="form-label">Mês de Referência</label><select class="form-select" id="mes" name="mes" required><option>Não se Aplica</option><option>Janeiro</option><option>Fevereiro</option><option>Março</option><option>Abril</option><option>Maio</option><option>Junho</option><option>Julho</option><option>Agosto</option><option>Setembro</option><option>Outubro</option><option>Novembro</option><option>Dezembro</option></select></div>
-                            <div class="col-md-6 mb-3"><label for="id_tipo_documento" class="form-label">Tipo de Documento</label><select class="form-select" id="id_tipo_documento" name="id_tipo_documento" required><option value="">-- Selecione --</option><?php foreach ($tipos_documento as $tipo): ?><option value="<?php echo (int) $tipo['id']; ?>"><?php echo htmlspecialchars($tipo['nome']); ?></option><?php endforeach; ?></select></div>
-                            <div class="col-md-6 mb-3"><label for="id_classificacao" class="form-label">Classificação (Categoria)</label><select class="form-select" id="id_classificacao" name="id_classificacao"><option value="">-- Nenhuma --</option><?php foreach ($categorias as $categoria): ?><option value="<?php echo (int) $categoria['id']; ?>"><?php echo htmlspecialchars($categoria['nome']); ?></option><?php endforeach; ?></select></div>
+            <?php if ($pref_id > 0): ?>
+            <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; border-radius: 15px;">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="me-4 d-none d-md-block">
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                            <i class="bi bi-filetype-xml fs-2"></i>
                         </div>
-                        <hr>
-                        <h5 class="mb-3 mt-4">Arquivos</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3"><label for="id_portal" class="form-label fw-bold">Seção de Destino dos Dados</label><select class="form-select" id="id_portal" name="id_portal" required <?php echo ($sem_contexto_super || empty($secoes)) ? 'disabled' : ''; ?>><option value="">-- Escolha uma seção --</option><?php foreach ($secoes as $secao): ?><option value="<?php echo (int) $secao['id']; ?>"><?php echo htmlspecialchars($secao['nome']); ?></option><?php endforeach; ?></select></div>
-                            <div class="col-md-6 mb-3"><label for="xml_file" class="form-label fw-bold">Arquivo de Dados (XML)</label><input class="form-control" type="file" id="xml_file" name="xml_file" accept=".xml,text/xml" required <?php echo ($sem_contexto_super || empty($secoes)) ? 'disabled' : ''; ?>></div>
-                        </div>
-                        <button type="submit" class="btn btn-primary" <?php echo ($sem_contexto_super || empty($secoes)) ? 'disabled' : ''; ?>><i class="bi bi-arrow-right-circle-fill"></i> Continuar para Mapeamento</button>
-                        <?php if ($pref_id > 0 && empty($secoes)): ?>
-                            <p class="text-danger small mt-2 mb-0">Não há seções (portais) cadastradas para esta prefeitura. Crie uma seção em <strong>Criar Seções</strong> antes de importar.</p>
-                        <?php endif; ?>
-                    </form>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1 text-white">Importação por prefeitura</h5>
+                        <p class="mb-0 opacity-90 small">Somente seções, tipos de documento e categorias <strong>desta prefeitura</strong> aparecem nas listas. O arquivo será associado à seção que você escolher.</p>
+                    </div>
                 </div>
             </div>
+            <?php endif; ?>
+
+            <form method="POST" action="importar_xml.php" enctype="multipart/form-data" class="<?php echo ($sem_contexto_super || empty($secoes)) ? 'opacity-50' : ''; ?>">
+
+                <div class="card import-xml-card mb-4 overflow-hidden">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-file-earmark-text me-2 text-success"></i>Informações gerais da publicação</h6>
+                    </div>
+                    <div class="card-body bg-light bg-opacity-10 px-4 py-4">
+                        <?php if ($pref_id > 0): ?>
+                        <p class="text-muted small mb-4 mb-md-3">Preencha os metadados que serão gravados em cada registro importado.</p>
+                        <?php endif; ?>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="exercicio" class="form-label fw-bold small text-muted">Exercício</label>
+                                <select class="form-select border-0 shadow-sm" id="exercicio" name="exercicio" required style="border-radius: 10px;"><?php for ($ano = 2050; $ano >= 2020; $ano--): ?><option value="<?php echo $ano; ?>" <?php echo (date('Y') == $ano) ? 'selected' : ''; ?>><?php echo $ano; ?></option><?php endfor; ?></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="unidade_gestora" class="form-label fw-bold small text-muted">Unidade gestora</label>
+                                <select class="form-select border-0 shadow-sm" id="unidade_gestora" name="unidade_gestora" required style="border-radius: 10px;"><option>Prefeitura Municipal</option><option>Fundo Municipal de Saúde</option></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="periodicidade" class="form-label fw-bold small text-muted">Periodicidade</label>
+                                <select class="form-select border-0 shadow-sm" id="periodicidade" name="periodicidade" required style="border-radius: 10px;"><option>Não se Aplica</option><option>Mensal</option><option>Bimestral</option><option>Trimestral</option><option>Quadrimestral</option><option>Semestral</option><option>Anual</option><option>Quadrienal</option></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="mes" class="form-label fw-bold small text-muted">Mês de referência</label>
+                                <select class="form-select border-0 shadow-sm" id="mes" name="mes" required style="border-radius: 10px;"><option>Não se Aplica</option><option>Janeiro</option><option>Fevereiro</option><option>Março</option><option>Abril</option><option>Maio</option><option>Junho</option><option>Julho</option><option>Agosto</option><option>Setembro</option><option>Outubro</option><option>Novembro</option><option>Dezembro</option></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_tipo_documento" class="form-label fw-bold small text-muted">Tipo de documento</label>
+                                <select class="form-select border-0 shadow-sm" id="id_tipo_documento" name="id_tipo_documento" required style="border-radius: 10px;"><option value="">-- Selecione --</option><?php foreach ($tipos_documento as $tipo): ?><option value="<?php echo (int) $tipo['id']; ?>"><?php echo htmlspecialchars($tipo['nome']); ?></option><?php endforeach; ?></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_classificacao" class="form-label fw-bold small text-muted">Classificação (categoria)</label>
+                                <select class="form-select border-0 shadow-sm" id="id_classificacao" name="id_classificacao" style="border-radius: 10px;"><option value="">-- Nenhuma --</option><?php foreach ($categorias as $categoria): ?><option value="<?php echo (int) $categoria['id']; ?>"><?php echo htmlspecialchars($categoria['nome']); ?></option><?php endforeach; ?></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card import-xml-card mb-4 overflow-hidden">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-cloud-arrow-up me-2 text-success"></i>Arquivos</h6>
+                    </div>
+                    <div class="card-body bg-light bg-opacity-10 px-4 py-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="id_portal" class="form-label fw-bold small text-muted">Seção de destino dos dados</label>
+                                <select class="form-select border-0 shadow-sm" id="id_portal" name="id_portal" required <?php echo ($sem_contexto_super || empty($secoes)) ? 'disabled' : ''; ?> style="border-radius: 10px;"><option value="">-- Escolha uma seção --</option><?php foreach ($secoes as $secao): ?><option value="<?php echo (int) $secao['id']; ?>"><?php echo htmlspecialchars($secao['nome']); ?></option><?php endforeach; ?></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="xml_file" class="form-label fw-bold small text-muted">Arquivo de dados (XML)</label>
+                                <input class="form-control border-0 shadow-sm" type="file" id="xml_file" name="xml_file" accept=".xml,text/xml" required <?php echo ($sem_contexto_super || empty($secoes)) ? 'disabled' : ''; ?> style="border-radius: 10px;">
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap align-items-center gap-3 mt-4 pt-2 border-top border-light-subtle">
+                            <button type="submit" class="btn btn-primary rounded-3 px-4 shadow-sm" <?php echo ($sem_contexto_super || empty($secoes)) ? 'disabled' : ''; ?>><i class="bi bi-arrow-right-circle-fill me-2"></i>Continuar para mapeamento</button>
+                            <?php if ($pref_id > 0 && empty($secoes)): ?>
+                                <p class="text-danger small mb-0">Não há seções cadastradas para esta prefeitura. Crie uma em <strong>Criar Seções</strong> antes de importar.</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
         </div>
     </div>
 </div>
 
 <?php include 'admin_footer.php'; ?>
-
-</body>
-</html>
