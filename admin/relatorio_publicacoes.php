@@ -79,7 +79,18 @@ $tipos_documento = $stmt_tipos->fetchAll();
     <style>
         .filter-card { border-radius: 15px; border: none; background: #fff; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
         .table-rounded { border-radius: 12px; overflow: hidden; border: 1px solid #f1f5f9; }
-        .badge-cat { background-color: #f1f5f9; color: #475569; font-weight: 600; font-size: 0.75rem; }
+        /* Contraste explícito: o .badge global do Bootstrap pode forçar texto branco */
+        .relat-cat-pill {
+            display: inline-block;
+            padding: 0.4rem 0.85rem;
+            border-radius: 50rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: #1e293b !important;
+            background-color: #e2e8f0 !important;
+            border: 1px solid #cbd5e1;
+        }
     </style>
 </head>
 <body class="bg-light-subtle">
@@ -183,7 +194,7 @@ include 'admin_header.php';
                                         <div class="text-muted small ms-4"><?php echo date('H:i', strtotime($pub['data_criacao'])); ?></div>
                                     </td>
                                     <td class="p-3">
-                                        <span class="badge badge-cat rounded-pill px-3 py-2"><?php echo htmlspecialchars($pub['nome_categoria'] ?? 'N/A'); ?></span>
+                                        <span class="relat-cat-pill"><?php echo htmlspecialchars($pub['nome_categoria'] ?? 'N/A'); ?></span>
                                     </td>
                                     <td class="p-3">
                                         <div class="fw-bold text-dark mb-1"><?php echo htmlspecialchars($pub['nome_secao'] ?? 'N/A'); ?></div>
