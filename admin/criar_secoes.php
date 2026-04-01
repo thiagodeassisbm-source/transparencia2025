@@ -99,6 +99,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
 $secoes_agrupadas = [];
 if ($action === 'list') {
     $pref_id = $_SESSION['id_prefeitura'] ?? 0;
+    
+    // Recupera o slug da prefeitura para gerar os links do portal
+    $stmt_slug_pref = $pdo->prepare("SELECT slug FROM prefeituras WHERE id = ?");
+    $stmt_slug_pref->execute([$pref_id]);
+    $pref_slug_contexto = $stmt_slug_pref->fetchColumn() ?: 'principal';
+    
     $stmt = $pdo->prepare("
         SELECT 
             ci.id as card_id, ci.titulo, ci.subtitulo, ci.caminho_icone, ci.tipo_icone, ci.link_url, ci.id_secao,
@@ -205,7 +211,7 @@ include 'admin_header.php';
                                              $display_name = $s['portal_nome'] ?: $s['titulo'];
                                              $display_id = $s['portal_id'] ? str_pad($s['portal_id'], 6, '0', STR_PAD_LEFT) : 'Card Link';
                                              $edit_url = "editar_secao.php?card_id=" . $s['card_id'] . ($is_portal ? "&id=" . $s['portal_id'] : "");
-                                             $public_link = $is_portal && !empty($s['portal_slug']) ? "../portal/" . $_SESSION['pref_slug'] . "/" . $s['portal_slug'] : $s['link_url'];
+                                             $public_link = $is_portal && !empty($s['portal_slug']) ? "../portal/" . $pref_slug_contexto . "/" . $s['portal_slug'] : $s['link_url'];
                                          ?>
                                          <div class="inner-section-item shadow-sm">
                                              <div class="d-flex flex-column">
