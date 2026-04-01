@@ -82,9 +82,15 @@ if ($id_pagina) {
     <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
     
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-pt-BR.js"></script>
+    <style>
+        .note-editor { background: #fff !important; border-radius: 12px !important; border: 1px solid #e2e8f0 !important; overflow: hidden; }
+        .note-toolbar { background: #f8fafc !important; border-bottom: 1px solid #e2e8f0 !important; padding: 10px !important; }
+        .note-btn { background: #fff !important; border: 1px solid #e2e8f0 !important; border-radius: 6px !important; padding: 5px 10px !important; color: #475569 !important; }
+        .note-btn:hover { background: #f1f5f9 !important; }
+    </style>
 </head>
 <body class="bg-light-subtle">
 
@@ -93,11 +99,42 @@ $page_title_for_header = $id_pagina ? 'Editar Página' : 'Criar Nova Página';
 include 'admin_header.php'; 
 ?>
 
-<div class="container-fluid container-custom-padding">
-    <div class="row"><div class="col-12">
-        <div class="card">
-            <div class="card-header"><h4>Editor de Página</h4></div>
-            <div class="card-body">
+<div class="container-fluid container-custom-padding py-4">
+    <div class="row">
+        <div class="col-xl-10 mx-auto">
+            
+            <div class="d-flex align-items-center mb-4">
+                <a href="gerenciar_paginas.php" class="btn btn-light border-0 shadow-sm me-3 text-muted">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+                <div>
+                    <h3 class="fw-bold text-dark mb-0"><?php echo $id_pagina ? 'Editar Página' : 'Nova Página de Conteúdo'; ?></h3>
+                    <p class="text-muted small mb-0">Crie conteúdos ricos com textos, imagens e anexos.</p>
+                </div>
+            </div>
+
+            <!-- Card Informativo -->
+            <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color: #fff; border-radius: 12px;">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="me-4 d-none d-md-block">
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="bi bi-magic fs-3"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Dica de Formatação</h5>
+                        <p class="mb-0 opacity-90 small">
+                            Você pode copiar textos do Word ou Excel e colar aqui. O sistema manterá a formatação básica. Use a barra de ferramentas para mudar cores e tamanhos de fonte conforme necessário.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white py-3 border-bottom border-light">
+                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-pencil-square me-2 text-primary"></i>Editor de Conteúdo Profissional</h6>
+                </div>
+                <div class="card-body p-4">
                 <form method="POST" action="editor_pagina.php<?php if($id_pagina) echo '?id='.$id_pagina; ?>" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="titulo" class="form-label">Título da Página</label>
@@ -138,10 +175,12 @@ include 'admin_header.php';
     $('#conteudo-editor').summernote({
       placeholder: 'Comece a escrever o conteúdo da sua página aqui...',
       lang: 'pt-BR',
-      height: 400,
+      height: 500,
+      fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '28', '32', '36', '48', '64', '72', '80', '96', '110', '120'],
       toolbar: [
         ['style', ['style']],
         ['font', ['bold', 'italic', 'underline', 'clear']],
+        ['fontsize', ['fontsize']],
         ['color', ['color']],
         ['para', ['ul', 'ol', 'paragraph']],
         ['table', ['table']],
