@@ -87,6 +87,37 @@ include 'admin_header.php';
         border: none;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
     }
+    .import-xml-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10050;
+        background: rgba(15, 23, 42, 0.48);
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        backdrop-filter: blur(2px);
+    }
+    .import-xml-overlay.is-visible {
+        display: flex;
+    }
+    .import-xml-overlay-card {
+        width: 100%;
+        max-width: 420px;
+        background: linear-gradient(180deg, #f8fafc 0%, #fff 45%);
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        padding: 1.75rem;
+        text-align: center;
+    }
+    .import-xml-overlay .progress {
+        border-radius: 999px;
+        overflow: hidden;
+        background: #e2e8f0;
+    }
+    .import-xml-overlay .progress-bar {
+        transition: width 0.2s ease-out;
+    }
 </style>
 
 <div class="container-fluid container-custom-padding py-4">
@@ -138,7 +169,7 @@ include 'admin_header.php';
             </div>
             <?php endif; ?>
 
-            <form method="POST" action="importar_xml.php" enctype="multipart/form-data" class="<?php echo ($sem_contexto_super || empty($secoes)) ? 'opacity-50' : ''; ?>">
+            <form id="form-importar-xml" method="POST" action="importar_xml.php" enctype="multipart/form-data" class="<?php echo ($sem_contexto_super || empty($secoes)) ? 'opacity-50' : ''; ?>">
 
                 <div class="card import-xml-card mb-4 overflow-hidden">
                     <div class="card-header bg-white py-3 border-bottom">
@@ -203,8 +234,136 @@ include 'admin_header.php';
 
             </form>
 
+            <div id="importXmlOverlay" class="import-xml-overlay" role="dialog" aria-modal="true" aria-labelledby="importXmlOverlayTitle" aria-busy="true">
+                <div class="import-xml-overlay-card">
+                    <div class="mb-3">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary" style="width: 56px; height: 56px;">
+                            <i class="bi bi-cloud-arrow-up fs-3"></i>
+                        </span>
+                    </div>
+                    <h5 class="fw-bold mb-1" id="importXmlOverlayTitle">Importando XML</h5>
+                    <p class="text-muted small mb-3 mb-md-4" id="importXmlStatusMsg">Preparando envio...</p>
+                    <div class="progress mb-2" style="height: 14px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" id="importXmlProgressBar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="mb-0 fw-semibold" style="font-size: 1.1rem; color: #0f172a;" id="importXmlProgressPct">0%</p>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
+<?php if (!$sem_contexto_super && !empty($secoes)): ?>
+<script>
+(function () {
+    var form = document.getElementById('form-importar-xml');
+    var overlay = document.getElementById('importXmlOverlay');
+    if (!form || !overlay) return;
+
+    function formatBytes(n) {
+        if (n < 1024) return n + ' B';
+        if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+        return (n / 1048576).toFixed(1) + ' MB';
+    }
+
+    function setProgress(pct) {
+        pct = Math.max(0, Math.min(100, Math.round(pct)));
+        var bar = document.getElementById('importXmlProgressBar');
+        var label = document.getElementById('importXmlProgressPct');
+        if (bar) {
+            bar.style.width = pct + '%';
+            bar.setAttribute('aria-valuenow', String(pct));
+        }
+        if (label) label.textContent = pct + '%';
+    }
+
+    function setStatus(msg) {
+        var el = document.getElementById('importXmlStatusMsg');
+        if (el) el.textContent = msg;
+    }
+
+    function showOverlay() {
+        overlay.classList.add('is-visible');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideOverlay() {
+        overlay.classList.remove('is-visible');
+        document.body.style.overflow = '';
+    }
+
+    form.addEventListener('submit', function (e) {
+        if (!form.checkValidity()) return;
+        e.preventDefault();
+
+        setProgress(0);
+        setStatus('Preparando envio...');
+        showOverlay();
+
+        var fd = new FormData(form);
+        var xhr = new XMLHttpRequest();
+        var serverSimTimer = null;
+
+        xhr.upload.addEventListener('progress', function (ev) {
+            if (ev.lengthComputable && ev.total > 0) {
+                var uploadPct = (ev.loaded / ev.total) * 78;
+                setProgress(uploadPct);
+                setStatus('Enviando arquivo... ' + formatBytes(ev.loaded) + ' de ' + formatBytes(ev.total));
+            } else {
+                setStatus('Enviando arquivo...');
+                setProgress(15);
+            }
+        });
+
+        xhr.upload.addEventListener('load', function () {
+            setProgress(80);
+            setStatus('Processando XML no servidor...');
+            var fake = 80;
+            if (serverSimTimer) clearInterval(serverSimTimer);
+            serverSimTimer = setInterval(function () {
+                if (fake < 96) {
+                    fake += Math.random() * 2.2 + 0.3;
+                    if (fake > 96) fake = 96;
+                    setProgress(fake);
+                }
+            }, 350);
+        });
+
+        xhr.onload = function () {
+            if (serverSimTimer) clearInterval(serverSimTimer);
+            var url = xhr.responseURL || '';
+
+            if (url.indexOf('mapear_xml.php') !== -1) {
+                setProgress(100);
+                setStatus('Concluindo...');
+                window.location.href = url;
+                return;
+            }
+
+            setProgress(100);
+            hideOverlay();
+            try {
+                document.open('text/html', 'replace');
+                document.write(xhr.responseText);
+                document.close();
+            } catch (err) {
+                window.location.reload();
+            }
+        };
+
+        xhr.onerror = function () {
+            if (serverSimTimer) clearInterval(serverSimTimer);
+            hideOverlay();
+            alert('Não foi possível concluir o envio. Verifique sua conexão e tente novamente.');
+        };
+
+        xhr.open('POST', form.getAttribute('action') || 'importar_xml.php');
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.send(fd);
+    });
+})();
+</script>
+<?php endif; ?>
 
 <?php include 'admin_footer.php'; ?>
