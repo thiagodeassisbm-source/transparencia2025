@@ -12,15 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $pref_id_sess = (int) ($_SESSION['id_prefeitura'] ?? 0);
 
-        // --- INÍCIO DA ÁREA DE CONFIGURAÇÃO ---
-        /**
-         * MODIFIQUE AQUI O NOME DO CAMPO DE ANEXO
-         * Coloque abaixo o nome EXATO que o campo de anexo possui na sua tabela 'campos_portal'.
-         */
-        $nome_campo_anexo_no_banco = 'Anexo'; 
-        // --- FIM DA ÁREA DE CONFIGURAÇÃO ---
-
-
         // Carrega os dados recebidos do formulário
         $id_portal = filter_input(INPUT_POST, 'id_portal', FILTER_VALIDATE_INT);
         $metadados = unserialize(base64_decode($_POST['metadados_serializados']));
@@ -57,13 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Busca o ID do campo de anexo a partir do nome configurado
-        $stmt_campo_anexo = $pdo->prepare("SELECT id FROM campos_portal WHERE id_portal = ? AND nome_campo = ? LIMIT 1");
-        $stmt_campo_anexo->execute([$id_portal, $nome_campo_anexo_no_banco]);
+        // Primeiro campo do tipo anexo desta seção (Download, Anexo, etc. — mesmo nome da listagem)
+        $stmt_campo_anexo = $pdo->prepare(
+            'SELECT id FROM campos_portal WHERE id_portal = ? AND tipo_campo = ? ORDER BY ordem ASC, id ASC LIMIT 1'
+        );
+        $stmt_campo_anexo->execute([$id_portal, 'anexo']);
         $id_campo_anexo = $stmt_campo_anexo->fetchColumn();
-
-        // Linha para debug do campo de anexo (manter comentada)
-        // var_dump($id_campo_anexo); die('Fim do teste. Verifique o valor acima.');
 
 
         // --- INÍCIO DO NOVO CÓDIGO DINÂMICO ---
@@ -104,17 +94,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // Verifica se há um anexo para esta linha e o processa
-            if ($id_campo_anexo && isset($anexos['name'][$index]) && $anexos['error'][$index] === UPLOAD_ERR_OK) {
+            // Anexo por linha (Passo 3): mesmo formato de caminho que lancar_dados / editar_lancamento
+            if (
+                $id_campo_anexo
+                && !empty($anexos['name'][$index])
+                && isset($anexos['error'][$index])
+                && (int) $anexos['error'][$index] === UPLOAD_ERR_OK
+                && !empty($anexos['tmp_name'][$index])
+            ) {
                 $upload_dir = '../uploads/importados/';
-                if (!is_dir($upload_dir)) { mkdir($upload_dir, 0755, true); }
-                
-                $nome_anexo = uniqid() . '-' . basename($anexos['name'][$index]);
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0755, true);
+                }
+
+                $nome_anexo = uniqid() . '-' . basename((string) $anexos['name'][$index]);
                 $caminho_final = $upload_dir . $nome_anexo;
 
                 if (move_uploaded_file($anexos['tmp_name'][$index], $caminho_final)) {
-                    // Salva o caminho do anexo no banco de dados
-                    $stmt_val->execute([$id_registro, $id_campo_anexo, $caminho_final]);
+                    $valor_db = str_replace('../', '', $caminho_final);
+                    $stmt_val->execute([$id_registro, $id_campo_anexo, $valor_db]);
                 }
             }
             
