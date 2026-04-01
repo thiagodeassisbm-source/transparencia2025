@@ -2,13 +2,61 @@
 require_once 'auth_check.php';
 require_once '../conexao.php';
 
-if (!isset($_SESSION['import_xml']) || !isset($_POST['mapeamento'])) { 
-    die("Dados de importação ou mapeamento ausentes."); 
+if ($_SESSION['admin_user_perfil'] !== 'admin') {
+    header('Location: index.php');
+    exit;
 }
+
+if (!isset($_SESSION['import_xml']) || !isset($_POST['mapeamento'])) {
+    $_SESSION['mensagem_erro'] = 'Dados de importação ou mapeamento ausentes. Refaça o Passo 2.';
+    header('Location: importar_xml.php');
+    exit;
+}
+
 $dados_importacao = $_SESSION['import_xml'];
+$pref_id = (int) ($_SESSION['id_prefeitura'] ?? 0);
+$id_portal = (int) ($dados_importacao['id_portal'] ?? 0);
+$stored_pref = isset($dados_importacao['id_prefeitura']) ? (int) $dados_importacao['id_prefeitura'] : 0;
+
+if ($pref_id <= 0 || $id_portal <= 0 || ($stored_pref > 0 && $stored_pref !== $pref_id)) {
+    unset($_SESSION['import_xml']);
+    $_SESSION['mensagem_erro'] = 'Contexto de importação inválido. Comece pelo Passo 1.';
+    header('Location: importar_xml.php');
+    exit;
+}
+
+$stmt_portal = $pdo->prepare('SELECT id FROM portais WHERE id = ? AND id_prefeitura = ?');
+$stmt_portal->execute([$id_portal, $pref_id]);
+if (!$stmt_portal->fetch()) {
+    unset($_SESSION['import_xml']);
+    $_SESSION['mensagem_erro'] = 'A seção não pertence à prefeitura atual.';
+    header('Location: importar_xml.php');
+    exit;
+}
+
 $mapeamento = $_POST['mapeamento'];
+$stmt_campos_ok = $pdo->prepare('SELECT id FROM campos_portal WHERE id_portal = ?');
+$stmt_campos_ok->execute([$id_portal]);
+$campos_permitidos = array_map('intval', $stmt_campos_ok->fetchAll(PDO::FETCH_COLUMN));
+foreach ($mapeamento as $tag => $id_campo) {
+    if ($id_campo === '' || $id_campo === null) {
+        continue;
+    }
+    $cid = (int) $id_campo;
+    if (!in_array($cid, $campos_permitidos, true)) {
+        $_SESSION['mensagem_erro'] = 'Mapeamento inválido: campo de destino não pertence à seção escolhida.';
+        header('Location: mapear_xml.php');
+        exit;
+    }
+}
+
 $xml = simplexml_load_string($dados_importacao['xml_content']);
-$id_portal = $dados_importacao['id_portal'];
+if ($xml === false) {
+    unset($_SESSION['import_xml']);
+    $_SESSION['mensagem_erro'] = 'XML inválido. Reinicie a importação.';
+    header('Location: importar_xml.php');
+    exit;
+}
 
 
 // --- INÍCIO DO NOVO CÓDIGO DINÂMICO ---

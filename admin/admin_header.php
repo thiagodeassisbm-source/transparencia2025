@@ -297,15 +297,15 @@ function isActive($pageName) {
                     <li class="px-3 mb-2 small text-muted text-uppercase fw-bold">Configurações</li>
                     <?php if ($_SESSION['admin_user_perfil'] === 'admin'): ?>
                     <li>
-                        <?php $entrada_dados_active = isActive(['importar_xml.php', 'mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>
+                        <?php $entrada_dados_active = isActive(['importar_xml.php', 'mapear_xml.php', 'preview_importacao.php', 'processar_importacao_final.php', 'gerenciar_tipos_xml.php']); ?>
                         <a href="#collapseEntradaDados" class="nav-link has-submenu <?php echo $entrada_dados_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
                             <span><i class="bi bi-database-add"></i> Entrada de Dados</span>
                             <i class="bi bi-chevron-down submenu-arrow"></i>
                         </a>
                         <div class="collapse <?php echo $entrada_dados_active ? 'show' : ''; ?>" id="collapseEntradaDados">
                             <ul class="submenu">
-                                <li><a href="mapear_xml.php" class="nav-link <?php echo isActive(['mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>">Gerenciar XML</a></li>
-                                <li><a href="importar_xml.php" class="nav-link <?php echo isActive('importar_xml.php'); ?>">Importar XML</a></li>
+                                <li><a href="gerenciar_tipos_xml.php" class="nav-link <?php echo isActive('gerenciar_tipos_xml.php'); ?>">Gerenciar XML</a></li>
+                                <li><a href="importar_xml.php" class="nav-link <?php echo isActive(['importar_xml.php', 'mapear_xml.php', 'preview_importacao.php', 'processar_importacao_final.php']); ?>">Importar XML</a></li>
                             </ul>
                         </div>
                     </li>

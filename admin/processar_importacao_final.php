@@ -5,9 +5,11 @@ set_time_limit(300); // Aumenta o limite de tempo de execução para 5 minutos
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        if ($_SESSION['admin_user_perfil'] !== 'admin') { 
-            throw new Exception("Acesso negado."); 
+        if ($_SESSION['admin_user_perfil'] !== 'admin') {
+            throw new Exception('Acesso negado.');
         }
+
+        $pref_id_sess = (int) ($_SESSION['id_prefeitura'] ?? 0);
 
         // --- INÍCIO DA ÁREA DE CONFIGURAÇÃO ---
         /**
@@ -26,7 +28,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $anexos = $_FILES['anexos'] ?? [];
 
         if (!$id_portal || !$metadados || !$mapeamento || !$xml) {
-            throw new Exception("Dados essenciais para a importação estão faltando.");
+            throw new Exception('Dados essenciais para a importação estão faltando.');
+        }
+
+        if ($pref_id_sess <= 0) {
+            throw new Exception('Contexto de prefeitura não identificado.');
+        }
+
+        $stmt_pref = $pdo->prepare('SELECT id FROM portais WHERE id = ? AND id_prefeitura = ?');
+        $stmt_pref->execute([$id_portal, $pref_id_sess]);
+        if (!$stmt_pref->fetch()) {
+            throw new Exception('A seção não pertence à prefeitura atual ou foi alterada durante a importação.');
+        }
+
+        $stmt_campos_ok = $pdo->prepare('SELECT id FROM campos_portal WHERE id_portal = ?');
+        $stmt_campos_ok->execute([$id_portal]);
+        $campos_permitidos = array_map('intval', $stmt_campos_ok->fetchAll(PDO::FETCH_COLUMN));
+        foreach ($mapeamento as $tag => $id_campo) {
+            if ($id_campo === '' || $id_campo === null) {
+                continue;
+            }
+            if (!in_array((int) $id_campo, $campos_permitidos, true)) {
+                throw new Exception('Mapeamento inválido para esta seção.');
+            }
         }
 
         // Busca o ID do campo de anexo a partir do nome configurado

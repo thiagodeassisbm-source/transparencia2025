@@ -2,47 +2,75 @@
 require_once 'auth_check.php';
 require_once '../conexao.php';
 
-if (!isset($_SESSION['import_xml'])) { 
-    die("Nenhum dado de importação encontrado. Por favor, comece pelo Passo 1."); 
+if ($_SESSION['admin_user_perfil'] !== 'admin') {
+    header('Location: index.php');
+    exit;
 }
+
+if (!isset($_SESSION['import_xml'])) {
+    $_SESSION['mensagem_erro'] = 'Nenhum arquivo em processamento. Envie o XML em Importar XML (Passo 1).';
+    header('Location: importar_xml.php');
+    exit;
+}
+
 $dados_importacao = $_SESSION['import_xml'];
+$pref_id = (int) ($_SESSION['id_prefeitura'] ?? 0);
+$id_portal = isset($dados_importacao['id_portal']) ? (int) $dados_importacao['id_portal'] : 0;
+$stored_pref = isset($dados_importacao['id_prefeitura']) ? (int) $dados_importacao['id_prefeitura'] : 0;
+
+if ($pref_id <= 0 || $id_portal <= 0) {
+    unset($_SESSION['import_xml']);
+    $_SESSION['mensagem_erro'] = 'Contexto de prefeitura inválido. Reinicie a importação pelo Passo 1.';
+    header('Location: importar_xml.php');
+    exit;
+}
+
+if ($stored_pref > 0 && $stored_pref !== $pref_id) {
+    unset($_SESSION['import_xml']);
+    $_SESSION['mensagem_erro'] = 'A importação foi iniciada em outro município. Reinicie pelo Passo 1.';
+    header('Location: importar_xml.php');
+    exit;
+}
+
+$stmt_portal = $pdo->prepare('SELECT id FROM portais WHERE id = ? AND id_prefeitura = ?');
+$stmt_portal->execute([$id_portal, $pref_id]);
+if (!$stmt_portal->fetch()) {
+    unset($_SESSION['import_xml']);
+    $_SESSION['mensagem_erro'] = 'A seção desta importação não pertence à prefeitura atual. Reinicie pelo Passo 1.';
+    header('Location: importar_xml.php');
+    exit;
+}
 
 $xml = simplexml_load_string($dados_importacao['xml_content']);
-if ($xml === false) { 
-    die("Erro ao ler o XML."); 
+if ($xml === false) {
+    unset($_SESSION['import_xml']);
+    $_SESSION['mensagem_erro'] = 'Erro ao ler o XML. Envie um arquivo válido no Passo 1.';
+    header('Location: importar_xml.php');
+    exit;
 }
 
-$id_portal = $dados_importacao['id_portal'];
-$stmt_campos = $pdo->prepare("SELECT id, nome_campo FROM campos_portal WHERE id_portal = ? ORDER BY nome_campo ASC");
+$stmt_campos = $pdo->prepare('SELECT id, nome_campo FROM campos_portal WHERE id_portal = ? ORDER BY nome_campo ASC');
 $stmt_campos->execute([$id_portal]);
 $campos_destino = $stmt_campos->fetchAll();
 
 $tags_xml = [];
 
-// --- INÍCIO DO NOVO CÓDIGO DINÂMICO ---
-// Busca todas as tags de registro (singular) ativas da tabela `tipos_xml`
-$stmt_tags = $pdo->query("SELECT tag_registro FROM tipos_xml WHERE ativo = 1");
-$tags_validas = $stmt_tags->fetchAll(PDO::FETCH_COLUMN);
+$stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1');
+$tags_validas = $stmt_tags ? $stmt_tags->fetchAll(PDO::FETCH_COLUMN) : [];
 
 $primeiro_registro = null;
-// Apenas executa a busca se houver tags cadastradas no banco
 if (!empty($tags_validas)) {
-    // Monta a string de busca do XPath dinamicamente para encontrar o primeiro registro de qualquer tipo válido
-    // Exemplo de resultado: //Contrato[1] | //Despesa[1] | //Servidor[1]
     $xpath_parts = [];
     foreach ($tags_validas as $tag) {
-        $xpath_parts[] = "//$tag" . "[1]";
+        $xpath_parts[] = '//' . $tag . '[1]';
     }
     $xpath_query = implode(' | ', $xpath_parts);
-
-    // Executa a busca no XML
-    $primeiro_registro = $xml->xpath($xpath_query)[0] ?? null;
+    $found = $xml->xpath($xpath_query);
+    $primeiro_registro = $found[0] ?? null;
 }
-// --- FIM DO NOVO CÓDIGO DINÂMICO ---
-
 
 if ($primeiro_registro) {
-    foreach($primeiro_registro->children() as $child) {
+    foreach ($primeiro_registro->children() as $child) {
         $tags_xml[] = $child->getName();
     }
 }
@@ -72,7 +100,7 @@ if ($primeiro_registro) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if(empty($tags_xml)): ?>
+                            <?php if (empty($tags_xml)): ?>
                                 <tr><td colspan="2" class="text-center">
                                     <strong class="text-danger">Nenhuma tag de dados encontrada no XML.</strong><br>
                                     Verifique a estrutura do arquivo ou se o tipo de XML está cadastrado corretamente em "Gerenciar Tipos de XML".
@@ -85,7 +113,7 @@ if ($primeiro_registro) {
                                         <select name="mapeamento[<?php echo htmlspecialchars($tag); ?>]" class="form-select">
                                             <option value="">-- Ignorar este campo --</option>
                                             <?php foreach ($campos_destino as $campo): ?>
-                                                <option value="<?php echo $campo['id']; ?>"><?php echo htmlspecialchars($campo['nome_campo']); ?></option>
+                                                <option value="<?php echo (int) $campo['id']; ?>"><?php echo htmlspecialchars($campo['nome_campo']); ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </td>
@@ -96,7 +124,9 @@ if ($primeiro_registro) {
                     </table>
                     <div class="text-end">
                         <a href="importar_xml.php" class="btn btn-secondary">Voltar</a>
-                        <button type="submit" class="btn btn-primary" <?php if(empty($tags_xml)) echo 'disabled'; ?>>Continuar para Anexos <i class="bi bi-arrow-right"></i></button>
+                        <button type="submit" class="btn btn-primary" <?php if (empty($tags_xml)) {
+                            echo 'disabled';
+                        } ?>>Continuar para Anexos <i class="bi bi-arrow-right"></i></button>
                     </div>
                 </form>
             </div>
