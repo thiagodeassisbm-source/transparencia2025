@@ -201,19 +201,6 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
                                 <i class="bi bi-chevron-right"></i>
                             </a>
 
-                            <span class="section-title-sac">Dados sigilosos</span>
-                            <p class="section-desc-sac">Acesse os dados que foram classificados como sigilosos e os perderam a classificação de sigilosos.</p>
-                            
-                            <div class="list-group list-group-flush border-0">
-                                <a href="#" class="legis-item shadow-sm">
-                                    <span>Informações classificadas</span>
-                                    <i class="bi bi-chevron-right"></i>
-                                </a>
-                                <a href="#" class="legis-item shadow-sm">
-                                    <span>Informações desclassificadas</span>
-                                    <i class="bi bi-chevron-right"></i>
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>
