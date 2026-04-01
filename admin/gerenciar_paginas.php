@@ -121,13 +121,13 @@ include 'admin_header.php';
                                     </td>
                                     <td class="p-3 text-end">
                                         <div class="d-flex justify-content-end gap-2">
-                                            <a href="editor_pagina.php?id=<?php echo $pagina['id']; ?>" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm">
-                                                <i class="bi bi-pencil-square me-1"></i> Editar
+                                            <a href="editor_pagina.php?id=<?php echo $pagina['id']; ?>" class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;" title="Editar Página">
+                                                <i class="bi bi-pencil"></i>
                                             </a>
                                             <form method="POST" action="gerenciar_paginas.php" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir esta página?');">
                                                 <input type="hidden" name="id_pagina" value="<?php echo $pagina['id']; ?>">
-                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm">
-                                                    <i class="bi bi-trash-fill"></i>
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;" title="Excluir Página">
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
                                         </div>
