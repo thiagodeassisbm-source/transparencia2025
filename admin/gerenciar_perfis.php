@@ -103,7 +103,7 @@ include 'admin_header.php';
                                     <tr>
                                         <th>Nome do Perfil</th>
                                         <th class="text-center">Usuários</th>
-                                        <th class="text-end">Ações</th>
+                                        <th class="text-center">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -111,8 +111,8 @@ include 'admin_header.php';
                                     <tr>
                                         <td><span class="fw-bold fs-5"><?php echo htmlspecialchars($perfil['nome']); ?></span></td>
                                         <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $perfil['total_usuarios']; ?></span></td>
-                                        <td class="text-end">
-                                            <div class="d-flex justify-content-end gap-2">
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-2">
                                                 <a href="editar_permissoes_perfil.php?id=<?php echo $perfil['id']; ?>" class="btn btn-outline-primary btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Configurar Permissões">
                                                     <i class="bi bi-shield-lock"></i>
                                                 </a>

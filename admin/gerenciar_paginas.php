@@ -96,7 +96,7 @@ include 'admin_header.php';
                             <tr>
                                 <th>Título</th>
                                 <th>Última Modificação</th>
-                                <th class="text-end">Ações</th>
+                                <th class="text-center">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -119,8 +119,8 @@ include 'admin_header.php';
                                     <td class="p-3 text-muted">
                                         <i class="bi bi-clock me-1"></i> <?php echo date('d/m/Y H:i', strtotime($pagina['data_modificacao'])); ?>
                                     </td>
-                                    <td class="p-3 text-end">
-                                        <div class="d-flex justify-content-end gap-2">
+                                    <td class="p-3 text-center">
+                                        <div class="d-flex justify-content-center gap-2">
                                             <a href="editor_pagina.php?id=<?php echo $pagina['id']; ?>" class="btn btn-outline-primary btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;" title="Editar Página">
                                                 <i class="bi bi-pencil"></i>
                                             </a>

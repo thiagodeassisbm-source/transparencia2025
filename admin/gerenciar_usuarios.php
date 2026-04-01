@@ -141,7 +141,7 @@ include 'admin_header.php';
                                     <tr>
                                         <th>Nome / Login</th>
                                         <th>Perfil</th>
-                                        <th class="text-end">Ações</th>
+                                        <th class="text-center">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody id="usuarios-lista">
@@ -152,8 +152,8 @@ include 'admin_header.php';
                                             <small class="text-muted">@<?php echo htmlspecialchars($u['usuario']); ?></small>
                                         </td>
                                         <td><span class="badge bg-light text-dark border"><?php echo htmlspecialchars($u['nome_perfil'] ?? 'Sem Perfil'); ?></span></td>
-                                        <td class="text-end">
-                                            <div class="d-flex justify-content-end gap-2">
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-2">
                                                 <?php if (tem_permissao('usuarios', 'editar')): ?>
                                                     <a href="editar_usuario.php?id=<?php echo $u['id']; ?>" class="btn btn-outline-primary btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;" title="Editar Usuário">
                                                         <i class="bi bi-pencil"></i>

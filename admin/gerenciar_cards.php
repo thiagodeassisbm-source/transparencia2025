@@ -76,7 +76,7 @@ include 'admin_header.php';
                                 <th>Título</th>
                                 <th>Categoria</th>
                                 <th>Link de Destino</th>
-                                <th class="text-end">Ações</th>
+                                <th class="text-center">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -115,8 +115,8 @@ include 'admin_header.php';
                                     }
                                     ?>
                                 </td>
-                                <td class="text-end">
-                                    <div class="d-flex justify-content-end gap-2">
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
                                         <a href="editar_card.php?id=<?php echo $card['id']; ?>" class="btn btn-outline-primary btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Editar Card">
                                             <i class="bi bi-pencil"></i>
                                         </a>
