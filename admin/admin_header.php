@@ -326,11 +326,11 @@ function isActive($pageName) {
     <!-- Main Content -->
     <div class="admin-main">
         <header class="admin-topbar">
-            <div class="topbar-left">
-                <h1 class="h5 mb-0 fw-600"><?php echo htmlspecialchars($page_title_for_header); ?></h1>
+            <div class="topbar-left d-flex flex-wrap align-items-center gap-2 gap-md-3">
+                <p class="topbar-welcome mb-0" role="status">Bem-vindo, <strong><?php echo htmlspecialchars($nome_completo_boas_vindas); ?></strong></p>
+                <h1 class="h5 mb-0 fw-600 topbar-page-title"><?php echo htmlspecialchars($page_title_for_header); ?></h1>
             </div>
             <div class="topbar-right d-flex align-items-center flex-wrap justify-content-end gap-2 gap-md-3">
-                <p class="topbar-welcome mb-0 text-end" role="status">Bem-vindo, <strong><?php echo htmlspecialchars($nome_completo_boas_vindas); ?></strong></p>
                 <div class="dropdown">
                     <a href="#" class="user-profile dropdown-toggle" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <span class="d-none d-md-inline me-2 text-dark small">

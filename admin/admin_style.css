@@ -200,7 +200,7 @@ body {
     font-weight: 500;
     color: #111827;
     line-height: 1.35;
-    max-width: min(280px, 42vw);
+    flex-shrink: 0;
 }
 
 .topbar-welcome strong {
@@ -208,11 +208,16 @@ body {
     color: #0f172a;
 }
 
-.topbar-left h1 {
+.topbar-left h1,
+.topbar-page-title {
     font-size: 1.15rem;
     font-weight: 600;
     margin: 0;
-    color: var(--sidebar-bg);
+    color: #1e293b;
+    padding-left: 0.75rem;
+    margin-left: 0.25rem;
+    border-left: 1px solid #e2e8f0;
+    min-width: 0;
 }
 
 /* Banner Header (Anexo 2) */
