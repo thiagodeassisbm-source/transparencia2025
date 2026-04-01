@@ -248,7 +248,7 @@ function isActive($pageName) {
                         </a>
                         <div class="collapse <?php echo $ouvidoria_active ? 'show' : ''; ?>" id="collapseOuvidoria">
                             <ul class="submenu">
-                                <li><a href="ouvidoria_inbox.php" class="nav-link <?php echo isActive(['ouvidoria_inbox.php', 'responder_manifestacao.php']); ?>">Inbox</a></li>
+                                <li><a href="ouvidoria_inbox.php" class="nav-link <?php echo isActive(['ouvidoria_inbox.php', 'responder_manifestacao.php']); ?>">Caixa de Entrada</a></li>
                                 <?php if (tem_permissao('ouvidoria', 'editar')): ?>
                                     <li><a href="config_ouvidoria.php" class="nav-link <?php echo isActive('config_ouvidoria.php'); ?>">Configurações</a></li>
                                 <?php endif; ?>
