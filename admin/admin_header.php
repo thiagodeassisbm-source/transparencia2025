@@ -11,6 +11,10 @@ require_once 'functions_logs.php';
 $nome_usuario_logado = $_SESSION['admin_user_nome'] ?? 'Usuário';
 $id_usuario_logado = $_SESSION['admin_user_id'] ?? 0;
 $perfil_nome = $_SESSION['admin_user_perfil_nome'] ?? 'Perfil';
+$nome_completo_boas_vindas = trim((string)($_SESSION['admin_user_nome_real'] ?? ''));
+if ($nome_completo_boas_vindas === '') {
+    $nome_completo_boas_vindas = $nome_usuario_logado;
+}
 
 // Define um título padrão para a página
 $page_title_for_header = $page_title_for_header ?? 'Painel Administrativo';
@@ -60,7 +64,8 @@ function isActive($pageName) {
     <!-- Sidebar -->
     <aside class="admin-sidebar shadow">
         <div class="sidebar-header">
-            <h2>Painel de controle</h2>
+            <p class="sidebar-welcome mb-0" role="status">Bem-vindo, <strong><?php echo htmlspecialchars($nome_completo_boas_vindas); ?></strong></p>
+            <h2 class="mt-1">Painel de controle</h2>
         </div>
         <nav class="sidebar-nav">
             <?php 

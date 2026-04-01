@@ -45,12 +45,28 @@ body {
 }
 
 .sidebar-header {
-    height: var(--topbar-height);
+    min-height: var(--topbar-height);
+    height: auto;
     display: flex;
-    align-items: center;
-    padding: 0 1.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0.65rem 1.5rem;
     background-color: var(--sidebar-header-bg);
     color: var(--sidebar-header-color);
+}
+
+.sidebar-welcome {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.95);
+    max-width: 100%;
+}
+
+.sidebar-welcome strong {
+    font-weight: 700;
+    color: #fff;
 }
 
 .sidebar-header h2 {
