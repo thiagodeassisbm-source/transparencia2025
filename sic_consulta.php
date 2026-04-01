@@ -75,13 +75,28 @@ if (!empty($protocolo_busca)) {
                     
                     <div class="card-body p-4 p-md-5">
                         <div class="row g-4 mb-5">
-                            <div class="col-md-6 text-start">
+                            <div class="col-md-4 text-start">
                                 <span class="label-custom">Recebido em</span>
                                 <p class="value-custom"><i class="bi bi-calendar3 text-primary me-2"></i> <?php echo date('d/m/Y \à\s H:i', strtotime($solicitacao['data_solicitacao'])); ?></p>
                             </div>
+                            <div class="col-md-4 text-start">
+                                <span class="label-custom">Solicitante</span>
+                                <p class="value-custom"><i class="bi bi-person-fill text-primary me-2"></i> <?php echo htmlspecialchars($solicitacao['nome_solicitante']); ?></p>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <span class="label-custom">Documento (<?php echo htmlspecialchars($solicitacao['tipo_documento']); ?>)</span>
+                                <p class="value-custom"><i class="bi bi-card-text text-primary me-2"></i> <?php echo htmlspecialchars($solicitacao['numero_documento']); ?></p>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6 text-start">
+                                <span class="label-custom">E-mail de Retorno</span>
+                                <p class="value-custom"><i class="bi bi-envelope-fill text-primary me-2"></i> <?php echo htmlspecialchars($solicitacao['email'] ?: 'Não informado'); ?></p>
+                            </div>
                             <div class="col-md-6 text-md-end">
-                                <span class="label-custom">Órgão Destino</span>
-                                <p class="value-custom"><i class="bi bi-building text-primary me-2"></i> Prefeitura de <?php echo $prefeitura_ativa['nome']; ?></p>
+                                <span class="label-custom">Telefone / WhatsApp</span>
+                                <p class="value-custom"><i class="bi bi-whatsapp text-primary me-2"></i> <?php echo htmlspecialchars($solicitacao['telefone'] ?: 'Não informado'); ?></p>
                             </div>
                         </div>
 
