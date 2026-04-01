@@ -95,15 +95,15 @@ try {
     </div>
 </header>
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-5">
     <div class="row">
         <!-- Menu Lateral -->
-        <div class="col-md-3 col-lg-2 d-none d-md-block p-0 mb-4">
+        <div class="col-md-3 col-lg-2 d-none d-md-block px-0 ps-3 mb-4">
             <?php include 'menu.php'; ?>
         </div>
         
         <!-- Conteúdo Principal -->
-        <main class="col-md-9 ms-auto col-lg-10 px-md-4">
+        <main class="col-md-9 ms-auto col-lg-10 px-md-5">
             <div class="card mb-4">
                 <div class="card-body">
                     <form method="GET" action="ouvidoria_relatorio.php" class="row g-3 align-items-end">

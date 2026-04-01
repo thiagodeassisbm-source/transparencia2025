@@ -42,7 +42,7 @@ if (!empty($protocolo_busca)) {
 <div class="container-fluid py-5">
     <div class="row">
         <!-- Menu Lateral -->
-        <div class="col-md-3 col-lg-2 d-none d-md-block px-0 ps-3">
+        <div class="col-md-3 col-lg-2 d-none d-md-block px-0 ps-3 mb-4">
             <?php include 'menu.php'; ?>
         </div>
 

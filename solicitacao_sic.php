@@ -25,15 +25,15 @@ $page_title = "Fazer Solicitação ao SIC";
 include 'header_publico.php'; 
 ?>
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-5">
     <div class="row">
         <!-- Menu Lateral -->
-        <div class="col-md-3 col-lg-2 d-none d-md-block p-0 mb-4">
+        <div class="col-md-3 col-lg-2 d-none d-md-block px-0 ps-3 mb-4">
             <?php include 'menu.php'; ?>
         </div>
 
         <!-- Conteúdo Principal -->
-        <main class="col-md-9 ms-auto col-lg-10 px-md-4">
+        <main class="col-md-9 ms-auto col-lg-10 px-md-5">
             <h2 class="mb-4 fw-bold text-dark border-bottom pb-2">Pedido de Acesso à Informação (e-SIC)</h2>
             
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
@@ -86,7 +86,7 @@ include 'header_publico.php';
                             </div>
 
                             <div class="col-12 mt-5 text-end border-top pt-4">
-                                <a href="portal/<?php echo $slug_pref_header; ?>/sic.php" class="btn btn-light rounded-pill px-4 me-2">Cancelar</a>
+                                <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/sic.php" class="btn btn-light rounded-pill px-4 me-2">Cancelar</a>
                                 <button type="submit" class="btn btn-dynamic-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
                                     <i class="bi bi-send-fill me-2 rotate-45"></i> Enviar Pedido ao SIC
                                 </button>

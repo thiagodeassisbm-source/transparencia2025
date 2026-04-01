@@ -60,15 +60,15 @@ $config_ouvidoria['ouvidoria_telefone'] = $config_ouvidoria['ouvidoria_telefone'
 include 'header_publico.php'; 
 ?>
 
-<div class="container-fluid">
+<div class="container-fluid py-5">
     <div class="row">
         <!-- Menu Lateral -->
-        <div class="col-md-3 col-lg-2 d-none d-md-block p-0 mb-4">
+        <div class="col-md-3 col-lg-2 d-none d-md-block px-0 ps-3 mb-4">
             <?php include 'menu.php'; ?>
         </div>
 
         <!-- Conteúdo Principal -->
-        <main class="col-md-9 ms-auto col-lg-10 px-md-4">
+        <main class="col-md-9 ms-auto col-lg-10 px-md-5">
             <h2 class="mb-4 fw-bold text-dark border-bottom pb-2">Ouvidoria Municipal</h2>
             
             <?php if (isset($_GET['protocolo'])): ?>

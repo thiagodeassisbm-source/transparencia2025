@@ -320,6 +320,14 @@ main h1, main .h2, main .display-5 {
     padding-right: 8rem;
 }
 
+/*
+ * Portal público (padrão ESIC / sic.php):
+ * container-fluid py-5
+ * coluna menu: col-md-3 col-lg-2 d-none d-md-block px-0 ps-3 mb-4
+ * conteúdo: col-md-9 ms-auto col-lg-10 px-md-5
+ * Evite p-0 na coluna do menu — remove o gutter e cola o menu ao conteúdo.
+ */
+
 /* --- 5. ESTILOS DE TABELA PERSONALIZADA --- */
 
 /* Estilo geral da tabela */
