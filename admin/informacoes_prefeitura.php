@@ -117,21 +117,44 @@ $page_title_for_header = 'Configurações da Prefeitura';
 include 'admin_header.php'; 
 ?>
 <div class="container-fluid container-custom-padding py-4">
-    <div class="row"><div class="col-12">
-        <?php
-        if (isset($_SESSION['mensagem_sucesso'])) {
-            echo '<div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">' 
-               . '<i class="bi bi-check-circle-fill me-2"></i>' . htmlspecialchars($_SESSION['mensagem_sucesso']) . 
-               '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-            unset($_SESSION['mensagem_sucesso']);
-        }
-        ?>
-        
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-bottom py-3">
-                <h4 class="mb-0"><i class="bi bi-gear-fill me-2 text-primary"></i>Configurações Gerais do Sistema</h4>
+    <div class="row">
+        <div class="col-12">
+            
+            <div class="row align-items-center mb-4">
+                <div class="col-md-7">
+                    <h3 class="fw-bold text-dark mb-1">Configurações da Prefeitura</h3>
+                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i> Gerencie a identidade visual, cores e informações institucionais do seu portal.</p>
+                </div>
             </div>
-            <div class="card-body p-0">
+
+            <?php
+            if (isset($_SESSION['mensagem_sucesso'])) {
+                echo '<div class="alert alert-success border-0 shadow-sm alert-dismissible fade show rounded-4" role="alert">' 
+                   . '<i class="bi bi-check-circle-fill me-2"></i>' . htmlspecialchars($_SESSION['mensagem_sucesso']) . 
+                   '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                unset($_SESSION['mensagem_sucesso']);
+            }
+            ?>
+
+            <!-- Card Informativo -->
+            <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; border-radius: 15px;">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="me-4 d-none d-md-block">
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                            <i class="bi bi-building-gear fs-2"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1 text-white">Identidade & Identidade Visual</h5>
+                        <p class="mb-0 opacity-90 small">
+                            As configurações abaixo definem como o público enxerga o seu portal. Ao alterar as <strong>cores principais e secundárias</strong>, todo o site será atualizado automaticamente com a nova paleta.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-0">
                 <form method="POST" action="informacoes_prefeitura.php" enctype="multipart/form-data">
                     
                     <!-- Navegação por Abas -->
