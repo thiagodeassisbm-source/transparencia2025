@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['config'])) {
         }
     }
 
-    registrar_log($pdo, 'EDIÇÃO', 'configuracoes', "Atualizou as configurações da Ouvidoria para a prefeitura ID: $pref_id");
+    registrar_log($pdo, 'EDIÇÃO', 'configuracoes', "Atualizou as configurações da Ouvidoria (todas as abas) para a prefeitura ID: $pref_id");
 
     $_SESSION['mensagem_sucesso'] = "Configurações da Ouvidoria salvas com sucesso!";
     header("Location: config_ouvidoria.php");
@@ -82,7 +82,7 @@ include 'admin_header.php';
             <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
                 <div>
                     <h3 class="fw-bold text-dark mb-1">Configurações da Ouvidoria</h3>
-                    <p class="text-muted small mb-0"><i class="bi bi-layout-text-sidebar-reverse me-1"></i> Todos os cards da página pública estão abaixo. Use <strong>Editar</strong> para abrir ou recolher cada bloco.</p>
+                    <p class="text-muted small mb-0"><i class="bi bi-gear-fill me-1"></i> Gerencie o conteúdo de todos os cards da página pública da Ouvidoria.</p>
                 </div>
             </div>
 
@@ -94,157 +94,159 @@ include 'admin_header.php';
                 <?php unset($_SESSION['mensagem_sucesso']); ?>
             <?php endif; ?>
 
+            <ul class="nav nav-pills mb-4 bg-white p-2 rounded-4 shadow-sm d-inline-flex flex-wrap" id="ouvidoriaTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-3 fw-bold px-3 px-md-4" id="atendimento-tab" data-bs-toggle="pill" data-bs-target="#pane-atendimento" type="button" role="tab">1. Atendimento</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-3 fw-bold px-3 px-md-4" id="manifestar-tab" data-bs-toggle="pill" data-bs-target="#pane-manifestar" type="button" role="tab">2. Manifestar</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-3 fw-bold px-3 px-md-4" id="consultar-tab" data-bs-toggle="pill" data-bs-target="#pane-consultar" type="button" role="tab">3. Consultar</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-3 fw-bold px-3 px-md-4" id="relatorio-tab" data-bs-toggle="pill" data-bs-target="#pane-relatorio" type="button" role="tab">4. Relatório</button>
+                </li>
+            </ul>
+
             <form method="POST" action="config_ouvidoria.php" id="form-ouvidoria-config">
+                <div class="tab-content" id="ouvidoriaTabsContent">
 
-                <!-- Card 1: Atendimento -->
-                <div class="card border-0 shadow-sm rounded-4 mb-3 overflow-hidden" id="card-atendimento">
-                    <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border-bottom">
-                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-headset text-primary me-2"></i>1. Atendimento e texto da página</h6>
-                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#edit-atendimento" aria-expanded="true" aria-controls="edit-atendimento">
-                            <i class="bi bi-pencil-square me-1"></i> Editar
-                        </button>
-                    </div>
-                    <div class="collapse show" id="edit-atendimento">
-                        <div class="card-body p-4 bg-light bg-opacity-10">
-                            <div class="row g-4">
-                                <div class="col-12">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Texto introdutório (abaixo do título “Ouvidoria Municipal”)</label>
-                                    <textarea class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_pagina_intro]" rows="3"><?php echo htmlspecialchars($config_atuais['ouvidoria_pagina_intro']); ?></textarea>
-                                </div>
-                                <div class="col-12 border-top pt-4">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Setor / Responsável</label>
-                                    <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_setor]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_setor']); ?>">
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Endereço</label>
-                                    <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_endereco]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_endereco']); ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">E-mail</label>
-                                    <input type="email" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_email]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_email']); ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Telefone</label>
-                                    <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_telefone]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_telefone']); ?>">
-                                </div>
+                    <div class="tab-pane fade show active" id="pane-atendimento" role="tabpanel">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <div class="card-header bg-white py-3 border-bottom-0">
+                                <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-headset text-primary me-2"></i>Atendimento e texto da página</h6>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 2: Manifestar -->
-                <div class="card border-0 shadow-sm rounded-4 mb-3 overflow-hidden" id="card-manifestar">
-                    <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border-bottom">
-                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-pencil-square text-success me-2"></i>2. Manifestar</h6>
-                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#edit-manifestar" aria-expanded="true" aria-controls="edit-manifestar">
-                            <i class="bi bi-pencil-square me-1"></i> Editar
-                        </button>
-                    </div>
-                    <div class="collapse show" id="edit-manifestar">
-                        <div class="card-body p-4 bg-light bg-opacity-10">
-                            <div class="row g-4">
-                                <div class="col-12">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Texto opcional (acima dos botões)</label>
-                                    <textarea class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_manifestar_descricao]" rows="3" placeholder="Deixe em branco para não exibir texto extra."><?php echo htmlspecialchars($config_atuais['ouvidoria_manifestar_descricao']); ?></textarea>
-                                </div>
-                                <div class="col-12 border-top pt-4">
-                                    <p class="fw-bold small text-dark mb-3">Botões por tipo de manifestação</p>
-                                    <p class="text-muted small mb-3">Defina o <strong>texto</strong> do botão e, se quiser, um <strong>link personalizado</strong>. Se o link ficar vazio, o sistema usa o formulário padrão deste portal.</p>
-                                    <div class="table-responsive">
-                                        <table class="table align-middle mb-0 bg-white rounded-3 overflow-hidden shadow-sm">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="small text-muted text-uppercase">Tipo</th>
-                                                    <th class="small text-muted text-uppercase">Texto do botão</th>
-                                                    <th class="small text-muted text-uppercase">Link (opcional)</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($tipos_manifestar as $tm):
-                                                    $s = $tm['slug'];
-                                                    $lk = "ouvidoria_btn_{$s}_label";
-                                                    $ln = "ouvidoria_btn_{$s}_link";
-                                                ?>
-                                                <tr>
-                                                    <td class="fw-semibold text-nowrap"><?php echo htmlspecialchars($tm['titulo']); ?></td>
-                                                    <td>
-                                                        <input type="text" class="form-control form-control-sm rounded-3" name="config[<?php echo $lk; ?>]" value="<?php echo htmlspecialchars($config_atuais[$lk]); ?>" placeholder="<?php echo htmlspecialchars($tm['titulo']); ?>">
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" class="form-control form-control-sm rounded-3" name="config[<?php echo $ln; ?>]" value="<?php echo htmlspecialchars($config_atuais[$ln]); ?>" placeholder="https://... ou portal/.../abrir_manifestacao.php">
-                                                    </td>
-                                                </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
+                            <div class="card-body p-4 bg-light bg-opacity-10">
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Texto introdutório (abaixo do título “Ouvidoria Municipal”)</label>
+                                        <textarea class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_pagina_intro]" rows="3"><?php echo htmlspecialchars($config_atuais['ouvidoria_pagina_intro']); ?></textarea>
+                                    </div>
+                                    <div class="col-12 border-top pt-4">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Setor / Responsável</label>
+                                        <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_setor]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_setor']); ?>">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Endereço</label>
+                                        <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_endereco]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_endereco']); ?>">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">E-mail</label>
+                                        <input type="email" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_email]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_email']); ?>">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Telefone</label>
+                                        <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_telefone]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_telefone']); ?>">
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Card 3: Consultar -->
-                <div class="card border-0 shadow-sm rounded-4 mb-3 overflow-hidden" id="card-consultar">
-                    <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border-bottom">
-                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-search text-info me-2"></i>3. Consultar protocolo</h6>
-                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#edit-consultar" aria-expanded="true" aria-controls="edit-consultar">
-                            <i class="bi bi-pencil-square me-1"></i> Editar
-                        </button>
-                    </div>
-                    <div class="collapse show" id="edit-consultar">
-                        <div class="card-body p-4 bg-light bg-opacity-10">
-                            <div class="row g-4">
-                                <div class="col-12">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Texto instrucional (acima do campo de protocolo)</label>
-                                    <textarea class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_consultar_descricao]" rows="3"><?php echo htmlspecialchars($config_atuais['ouvidoria_consultar_descricao']); ?></textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Texto do botão enviar</label>
-                                    <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_consultar_botao_label]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_consultar_botao_label']); ?>">
+                    <div class="tab-pane fade" id="pane-manifestar" role="tabpanel">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <div class="card-header bg-white py-3 border-bottom-0">
+                                <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-pencil-square text-success me-2"></i>Manifestar</h6>
+                            </div>
+                            <div class="card-body p-4 bg-light bg-opacity-10">
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Texto opcional (acima dos botões)</label>
+                                        <textarea class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_manifestar_descricao]" rows="3" placeholder="Deixe em branco para não exibir texto extra."><?php echo htmlspecialchars($config_atuais['ouvidoria_manifestar_descricao']); ?></textarea>
+                                    </div>
+                                    <div class="col-12 border-top pt-4">
+                                        <p class="fw-bold small text-dark mb-3">Botões por tipo de manifestação</p>
+                                        <p class="text-muted small mb-3">Defina o <strong>texto</strong> do botão e, se quiser, um <strong>link personalizado</strong>. Se o link ficar vazio, o sistema usa o formulário padrão deste portal.</p>
+                                        <div class="table-responsive">
+                                            <table class="table align-middle mb-0 bg-white rounded-3 overflow-hidden shadow-sm">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th class="small text-muted text-uppercase">Tipo</th>
+                                                        <th class="small text-muted text-uppercase">Texto do botão</th>
+                                                        <th class="small text-muted text-uppercase">Link (opcional)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($tipos_manifestar as $tm):
+                                                        $s = $tm['slug'];
+                                                        $lk = "ouvidoria_btn_{$s}_label";
+                                                        $ln = "ouvidoria_btn_{$s}_link";
+                                                    ?>
+                                                    <tr>
+                                                        <td class="fw-semibold text-nowrap"><?php echo htmlspecialchars($tm['titulo']); ?></td>
+                                                        <td>
+                                                            <input type="text" class="form-control form-control-sm rounded-3" name="config[<?php echo $lk; ?>]" value="<?php echo htmlspecialchars($config_atuais[$lk]); ?>" placeholder="<?php echo htmlspecialchars($tm['titulo']); ?>">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control form-control-sm rounded-3" name="config[<?php echo $ln; ?>]" value="<?php echo htmlspecialchars($config_atuais[$ln]); ?>" placeholder="https://... ou portal/.../abrir_manifestacao.php">
+                                                        </td>
+                                                    </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Card 4: Relatório -->
-                <div class="card border-0 shadow-sm rounded-4 mb-3 overflow-hidden" id="card-relatorio">
-                    <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border-bottom">
-                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-bar-chart-fill text-dark me-2"></i>4. Relatório em tempo real</h6>
-                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#edit-relatorio" aria-expanded="true" aria-controls="edit-relatorio">
-                            <i class="bi bi-pencil-square me-1"></i> Editar
-                        </button>
-                    </div>
-                    <div class="collapse show" id="edit-relatorio">
-                        <div class="card-body p-4 bg-light bg-opacity-10">
-                            <div class="row g-4">
-                                <div class="col-12">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Texto opcional (acima das barras)</label>
-                                    <textarea class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_relatorio_descricao]" rows="3" placeholder="Deixe em branco para não exibir."><?php echo htmlspecialchars($config_atuais['ouvidoria_relatorio_descricao']); ?></textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Texto do link “Ver mais”</label>
-                                    <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_relatorio_ver_mais_texto]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_relatorio_ver_mais_texto']); ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Link “Ver mais” (opcional)</label>
-                                    <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_relatorio_ver_mais_link]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_relatorio_ver_mais_link']); ?>" placeholder="Vazio = relatório estatístico do portal">
-                                    <p class="text-muted small mt-2 mb-0">URL completa ou caminho a partir da raiz do site. Vazio mantém o relatório interno.</p>
-                                </div>
-                                <div class="col-12">
-                                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i> Os totais nas barras são calculados automaticamente.</p>
+                    <div class="tab-pane fade" id="pane-consultar" role="tabpanel">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <div class="card-header bg-white py-3 border-bottom-0">
+                                <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-search text-info me-2"></i>Consultar protocolo</h6>
+                            </div>
+                            <div class="card-body p-4 bg-light bg-opacity-10">
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Texto instrucional (acima do campo de protocolo)</label>
+                                        <textarea class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_consultar_descricao]" rows="3"><?php echo htmlspecialchars($config_atuais['ouvidoria_consultar_descricao']); ?></textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Texto do botão enviar</label>
+                                        <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_consultar_botao_label]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_consultar_botao_label']); ?>">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="tab-pane fade" id="pane-relatorio" role="tabpanel">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <div class="card-header bg-white py-3 border-bottom-0">
+                                <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-bar-chart-fill text-dark me-2"></i>Relatório em tempo real</h6>
+                            </div>
+                            <div class="card-body p-4 bg-light bg-opacity-10">
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Texto opcional (acima das barras)</label>
+                                        <textarea class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_relatorio_descricao]" rows="3" placeholder="Deixe em branco para não exibir."><?php echo htmlspecialchars($config_atuais['ouvidoria_relatorio_descricao']); ?></textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Texto do link “Ver mais”</label>
+                                        <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_relatorio_ver_mais_texto]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_relatorio_ver_mais_texto']); ?>">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Link “Ver mais” (opcional)</label>
+                                        <input type="text" class="form-control border-0 shadow-sm p-3 rounded-4" name="config[ouvidoria_relatorio_ver_mais_link]" value="<?php echo htmlspecialchars($config_atuais['ouvidoria_relatorio_ver_mais_link']); ?>" placeholder="Vazio = relatório estatístico do portal">
+                                        <p class="text-muted small mt-2 mb-0">URL completa ou caminho a partir da raiz do site. Vazio mantém o relatório interno.</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i> Os totais nas barras são calculados automaticamente.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="mt-4 text-end">
                     <button type="submit" class="btn btn-primary btn-lg shadow px-5 py-3 rounded-4 fw-bold">
                         <i class="bi bi-save me-2"></i>Salvar Todas as Configurações
                     </button>
-                    <p class="text-muted small mt-2 mb-0">Salva todos os cards de uma vez.</p>
+                    <p class="text-muted small mt-2 mb-0">Clique para salvar as alterações de todas as abas simultaneamente.</p>
                 </div>
             </form>
 
@@ -252,4 +254,9 @@ include 'admin_header.php';
     </div>
 </div>
 
+<style>
+    .nav-pills .nav-link { color: #666; transition: all 0.3s; }
+    .nav-pills .nav-link.active { background-color: var(--primary-color, #36c0d3) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(54, 192, 211, 0.35); }
+    .nav-pills .nav-link:hover:not(.active) { background-color: #f8f9fa; color: #333; }
+</style>
 <?php include 'admin_footer.php'; ?>
