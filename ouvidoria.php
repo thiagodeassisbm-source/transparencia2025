@@ -73,6 +73,9 @@ function ouvidoria_href_opcional(string $base_url, $link_custom, string $path_pa
     return rtrim($base_url, '/') . '/' . ltrim($link_custom, '/');
 }
 
+// Slug do portal (bootstrap); header_publico.php ainda não rodou — não usar $slug_pref_header aqui
+$slug_portal = $slug_prefeitura_ativa ?? 'home';
+
 $manifestar_tipos = [
     ['slug' => 'sugestao', 'tipo' => 'Sugestão', 'icon' => 'bi-lightbulb-fill me-2 text-warning', 'default_label' => 'Sugestão'],
     ['slug' => 'elogio', 'tipo' => 'Elogio', 'icon' => 'bi-hand-thumbs-up-fill me-2 text-success', 'default_label' => 'Elogio'],
@@ -84,7 +87,7 @@ $manifestar_tipos = [
 $href_relatorio_ver_mais = ouvidoria_href_opcional(
     $base_url,
     $config_ouvidoria['ouvidoria_relatorio_ver_mais_link'],
-    'portal/' . $slug_pref_header . '/ouvidoria_relatorio.php'
+    'portal/' . $slug_portal . '/ouvidoria_relatorio.php'
 );
 ?>
 <!DOCTYPE html>
@@ -141,18 +144,6 @@ include 'header_publico.php';
                 <h2 class="fw-bold text-dark mb-0">Ouvidoria Municipal</h2>
             </div>
             
-            <?php if (isset($_GET['protocolo'])): ?>
-                <div class="alert alert-success shadow-sm border-0 rounded-4 p-4 mb-4">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-check-circle-fill fs-2 me-3 text-success"></i>
-                        <div>
-                            <span class="section-title-sac">Manifestação Registrada!</span>
-                            <p class="mb-0 sic-info-value">Sua manifestação foi enviada. Anote o protocolo: <strong><?php echo htmlspecialchars($_GET['protocolo']); ?></strong></p>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
             <p class="section-desc-sac mb-4"><?php echo nl2br(htmlspecialchars($config_ouvidoria['ouvidoria_pagina_intro'])); ?></p>
 
             <div class="row g-4 mb-4">
@@ -263,6 +254,41 @@ include 'header_publico.php';
         </main>
     </div>
 </div>
+
+<?php if (!empty($_GET['protocolo'])):
+    $protocolo_ok = htmlspecialchars($_GET['protocolo'], ENT_QUOTES, 'UTF-8');
+?>
+<!-- Modal sucesso — mesmo padrão visual do e-SIC (sic.php) -->
+<div class="modal fade" id="modalSucessoOuvidoria" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg p-3">
+            <div class="modal-body text-center p-4">
+                <div class="mb-3 text-success display-1">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-2">Manifestação registrada!</h3>
+                <p class="text-muted mb-4">Sua manifestação foi enviada com sucesso. Utilize o protocolo abaixo para acompanhar o andamento.</p>
+                <div class="bg-light p-3 rounded-4 border border-dashed mb-4">
+                    <span class="d-block small text-muted text-uppercase fw-bold mb-1">Número do protocolo</span>
+                    <h2 class="fw-bold mb-0" style="color: var(--cor-principal);"><?php echo $protocolo_ok; ?></h2>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-secondary rounded-pill py-2" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var el = document.getElementById('modalSucessoOuvidoria');
+    if (el && typeof bootstrap !== 'undefined') {
+        var modal = new bootstrap.Modal(el);
+        modal.show();
+    }
+});
+</script>
+<?php endif; ?>
 
 <?php include 'footer_publico.php'; ?>
 </body>
