@@ -43,7 +43,49 @@ $config_ouvidoria['ouvidoria_telefone'] = $config_ouvidoria['ouvidoria_telefone'
 $config_ouvidoria['ouvidoria_pagina_intro'] = $config_ouvidoria['ouvidoria_pagina_intro'] ?? 'A ouvidoria é o seu canal direto com a gestão municipal. Aqui você pode registrar elogios, sugestões, reclamações, solicitações ou denúncias de forma segura e transparente.';
 $config_ouvidoria['ouvidoria_manifestar_descricao'] = $config_ouvidoria['ouvidoria_manifestar_descricao'] ?? '';
 $config_ouvidoria['ouvidoria_consultar_descricao'] = $config_ouvidoria['ouvidoria_consultar_descricao'] ?? 'Acompanhe sua manifestação digitando o número do protocolo abaixo.';
+$config_ouvidoria['ouvidoria_consultar_botao_label'] = $config_ouvidoria['ouvidoria_consultar_botao_label'] ?? 'Acompanhar Manifestação';
 $config_ouvidoria['ouvidoria_relatorio_descricao'] = $config_ouvidoria['ouvidoria_relatorio_descricao'] ?? '';
+$config_ouvidoria['ouvidoria_relatorio_ver_mais_texto'] = $config_ouvidoria['ouvidoria_relatorio_ver_mais_texto'] ?? 'Ver Relatório Completo Detalhado';
+$config_ouvidoria['ouvidoria_relatorio_ver_mais_link'] = $config_ouvidoria['ouvidoria_relatorio_ver_mais_link'] ?? '';
+
+/**
+ * Link do botão Manifestar: vazio = formulário padrão do portal; senão URL absoluta ou caminho.
+ */
+function ouvidoria_href_manifesto(string $base_url, string $slug, $link_custom, string $tipo_query): string {
+    $link_custom = trim((string)$link_custom);
+    if ($link_custom === '') {
+        return rtrim($base_url, '/') . '/portal/' . rawurlencode($slug) . '/abrir_manifestacao.php?' . http_build_query(['tipo' => $tipo_query]);
+    }
+    if (preg_match('#^https?://#i', $link_custom)) {
+        return $link_custom;
+    }
+    return rtrim($base_url, '/') . '/' . ltrim($link_custom, '/');
+}
+
+function ouvidoria_href_opcional(string $base_url, $link_custom, string $path_padrao): string {
+    $link_custom = trim((string)$link_custom);
+    if ($link_custom === '') {
+        return rtrim($base_url, '/') . '/' . ltrim($path_padrao, '/');
+    }
+    if (preg_match('#^https?://#i', $link_custom)) {
+        return $link_custom;
+    }
+    return rtrim($base_url, '/') . '/' . ltrim($link_custom, '/');
+}
+
+$manifestar_tipos = [
+    ['slug' => 'sugestao', 'tipo' => 'Sugestão', 'icon' => 'bi-lightbulb-fill me-2 text-warning', 'default_label' => 'Sugestão'],
+    ['slug' => 'elogio', 'tipo' => 'Elogio', 'icon' => 'bi-hand-thumbs-up-fill me-2 text-success', 'default_label' => 'Elogio'],
+    ['slug' => 'solicitacao', 'tipo' => 'Solicitação', 'icon' => 'bi-chat-left-dots-fill me-2 text-info', 'default_label' => 'Solicitação'],
+    ['slug' => 'reclamacao', 'tipo' => 'Reclamação', 'icon' => 'bi-exclamation-triangle-fill me-2 text-warning', 'default_label' => 'Reclamação'],
+    ['slug' => 'denuncia', 'tipo' => 'Denúncia', 'icon' => 'bi-shield-fill-exclamation me-2 text-danger', 'default_label' => 'Denúncia'],
+];
+
+$href_relatorio_ver_mais = ouvidoria_href_opcional(
+    $base_url,
+    $config_ouvidoria['ouvidoria_relatorio_ver_mais_link'],
+    'portal/' . $slug_pref_header . '/ouvidoria_relatorio.php'
+);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -147,11 +189,17 @@ include 'header_publico.php';
                             <?php if (trim($config_ouvidoria['ouvidoria_manifestar_descricao']) !== ''): ?>
                                 <p class="section-desc-sac mb-3"><?php echo nl2br(htmlspecialchars($config_ouvidoria['ouvidoria_manifestar_descricao'])); ?></p>
                             <?php endif; ?>
-                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Sugestão" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-lightbulb-fill me-2 text-warning"></i> Sugestão</a>
-                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Elogio" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-hand-thumbs-up-fill me-2 text-success"></i> Elogio</a>
-                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Solicitação" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-chat-left-dots-fill me-2 text-info"></i> Solicitação</a>
-                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Reclamação" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i> Reclamação</a>
-                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Denúncia" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-shield-fill-exclamation me-2 text-danger"></i> Denúncia</a>
+                            <?php foreach ($manifestar_tipos as $mt):
+                                $lk = 'ouvidoria_btn_' . $mt['slug'] . '_label';
+                                $ln = 'ouvidoria_btn_' . $mt['slug'] . '_link';
+                                $btn_label = trim($config_ouvidoria[$lk] ?? '');
+                                if ($btn_label === '') {
+                                    $btn_label = $mt['default_label'];
+                                }
+                                $btn_href = ouvidoria_href_manifesto($base_url, $slug_pref_header, $config_ouvidoria[$ln] ?? '', $mt['tipo']);
+                            ?>
+                            <a href="<?php echo htmlspecialchars($btn_href); ?>" class="btn btn-outline-dynamic text-start py-2 px-3"<?php if (preg_match('#^https?://#i', $btn_href)) { echo ' target="_blank" rel="noopener noreferrer"'; } ?>><i class="bi <?php echo htmlspecialchars($mt['icon']); ?>"></i> <?php echo htmlspecialchars($btn_label); ?></a>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
@@ -167,7 +215,7 @@ include 'header_publico.php';
                                     <input type="text" name="protocolo" class="form-control rounded-start-pill rounded-end-pill px-4" placeholder="Ex: 2024.030.001" required>
                                 </div>
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-dynamic-primary rounded-pill py-2 fw-bold shadow-sm">Acompanhar Manifestação</button>
+                                    <button type="submit" class="btn btn-dynamic-primary rounded-pill py-2 fw-bold shadow-sm"><?php echo htmlspecialchars($config_ouvidoria['ouvidoria_consultar_botao_label']); ?></button>
                                 </div>
                             </form>
                         </div>
@@ -207,7 +255,7 @@ include 'header_publico.php';
                         <?php endforeach; ?>
                     </div>
                     <div class="text-center mt-3 pt-3 border-top">
-                        <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/ouvidoria_relatorio.php" class="text-decoration-none fw-bold sic-info-value" style="color: var(--cor-principal);">Ver Relatório Completo Detalhado <i class="bi bi-arrow-right"></i></a>
+                        <a href="<?php echo htmlspecialchars($href_relatorio_ver_mais); ?>" class="text-decoration-none fw-bold sic-info-value" style="color: var(--cor-principal);"<?php if (preg_match('#^https?://#i', $href_relatorio_ver_mais)) { echo ' target="_blank" rel="noopener noreferrer"'; } ?>><?php echo htmlspecialchars($config_ouvidoria['ouvidoria_relatorio_ver_mais_texto']); ?> <i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
