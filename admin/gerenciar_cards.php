@@ -116,12 +116,18 @@ include 'admin_header.php';
                                     ?>
                                 </td>
                                 <td class="text-end">
-                                    <a href="editar_card.php?id=<?php echo $card['id']; ?>" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil"></i></a>
-                                    <form method="POST" action="excluir_card.php" class="d-inline ms-1" onsubmit="return confirm('Tem certeza que deseja excluir este card?');">
-                                        <input type="hidden" name="card_id" value="<?php echo $card['id']; ?>">
-                                        <input type="hidden" name="caminho_icone" value="<?php echo htmlspecialchars($card['caminho_icone']); ?>">
-                                        <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" title="Excluir"><i class="bi bi-trash"></i></button>
-                                    </form>
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="editar_card.php?id=<?php echo $card['id']; ?>" class="btn btn-outline-primary btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Editar Card">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="POST" action="excluir_card.php" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir este card?');">
+                                            <input type="hidden" name="card_id" value="<?php echo $card['id']; ?>">
+                                            <input type="hidden" name="caminho_icone" value="<?php echo htmlspecialchars($card['caminho_icone']); ?>">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Excluir Card">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

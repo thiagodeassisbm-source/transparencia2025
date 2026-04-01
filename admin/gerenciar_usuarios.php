@@ -153,15 +153,21 @@ include 'admin_header.php';
                                         </td>
                                         <td><span class="badge bg-light text-dark border"><?php echo htmlspecialchars($u['nome_perfil'] ?? 'Sem Perfil'); ?></span></td>
                                         <td class="text-end">
-                                            <?php if (tem_permissao('usuarios', 'editar')): ?>
-                                                <a href="editar_usuario.php?id=<?php echo $u['id']; ?>" class="btn btn-primary btn-sm me-1"><i class="bi bi-pencil"></i></a>
-                                            <?php endif; ?>
-                                            <?php if (tem_permissao('usuarios', 'excluir') && $u['id'] != $_SESSION['admin_user_id']): ?>
-                                                <form method="POST" action="excluir_usuario.php" class="d-inline" onsubmit="return confirm('Excluir este usuário?');">
-                                                    <input type="hidden" name="usuario_id" value="<?php echo $u['id']; ?>">
-                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
-                                                </form>
-                                            <?php endif; ?>
+                                            <div class="d-flex justify-content-end gap-2">
+                                                <?php if (tem_permissao('usuarios', 'editar')): ?>
+                                                    <a href="editar_usuario.php?id=<?php echo $u['id']; ?>" class="btn btn-outline-primary btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;" title="Editar Usuário">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                <?php endif; ?>
+                                                <?php if (tem_permissao('usuarios', 'excluir') && $u['id'] != $_SESSION['admin_user_id']): ?>
+                                                    <form method="POST" action="excluir_usuario.php" class="d-inline" onsubmit="return confirm('Excluir este usuário?');">
+                                                        <input type="hidden" name="usuario_id" value="<?php echo $u['id']; ?>">
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;" title="Excluir Usuário">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                <?php endif; ?>
+                                            </div>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>

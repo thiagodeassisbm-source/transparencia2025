@@ -106,7 +106,7 @@ include 'admin_header.php';
                                         <form method="POST" action="gerenciar_tipos_documento.php" onsubmit="return confirm('Tem certeza que deseja excluir este item?');">
                                             <input type="hidden" name="id_documento" value="<?php echo $tipo['id']; ?>">
                                             <input type="hidden" name="delete_documento" value="1">
-                                            <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" title="Excluir">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Excluir Tipo">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>

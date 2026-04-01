@@ -112,12 +112,16 @@ include 'admin_header.php';
                                         <td><span class="fw-bold fs-5"><?php echo htmlspecialchars($perfil['nome']); ?></span></td>
                                         <td class="text-center"><span class="badge bg-light text-dark border"><?php echo $perfil['total_usuarios']; ?></span></td>
                                         <td class="text-end">
-                                            <a href="editar_permissoes_perfil.php?id=<?php echo $perfil['id']; ?>" class="btn btn-outline-primary btn-sm me-1"><i class="bi bi-shield-lock me-1"></i> Configurar Permissões</a>
-                                            <?php if ($perfil['nome'] !== 'Administrador'): ?>
-                                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="prepararExclusao(<?php echo $perfil['id']; ?>, '<?php echo addslashes($perfil['nome']); ?>', <?php echo $perfil['total_usuarios']; ?>)">
-                                                    <i class="bi bi-trash me-1"></i> Excluir
-                                                </button>
-                                            <?php endif; ?>
+                                            <div class="d-flex justify-content-end gap-2">
+                                                <a href="editar_permissoes_perfil.php?id=<?php echo $perfil['id']; ?>" class="btn btn-outline-primary btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Configurar Permissões">
+                                                    <i class="bi bi-shield-lock"></i>
+                                                </a>
+                                                <?php if ($perfil['nome'] !== 'Administrador'): ?>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" onclick="prepararExclusao(<?php echo $perfil['id']; ?>, '<?php echo addslashes($perfil['nome']); ?>', <?php echo $perfil['total_usuarios']; ?>)" title="Excluir Perfil">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>

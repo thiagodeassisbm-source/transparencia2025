@@ -151,13 +151,13 @@ include 'admin_header.php';
                                     </div>
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <a href="editar_categoria.php?id=<?php echo $categoria['id']; ?>" class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Editar Categoria">
+                                    <a href="editar_categoria.php?id=<?php echo $categoria['id']; ?>" class="btn btn-outline-primary btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Editar Categoria">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <form method="POST" action="gerenciar_categorias.php" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir esta categoria?');">
                                         <input type="hidden" name="id_categoria" value="<?php echo $categoria['id']; ?>">
                                         <input type="hidden" name="delete_categoria" value="1">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Excluir Categoria">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Excluir Categoria">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
