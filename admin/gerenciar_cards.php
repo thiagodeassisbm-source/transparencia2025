@@ -5,18 +5,8 @@ require_once '../conexao.php';
 // Pega as informações do usuário para o cabeçalho e permissões
 $perfil_usuario = $_SESSION['admin_user_perfil'];
 
-// Lógica para processar o formulário de novo card (simplificada)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_card'])) {
-    // A criação completa de cards agora é feita em criar_secoes.php
-    // Esta é apenas uma funcionalidade de atalho, se mantida.
-    // ... (lógica de adicionar card)
-    header("Location: gerenciar_cards.php");
-    exit;
-}
-
 // Busca os cards existentes para listar na página
 $pref_id = $_SESSION['id_prefeitura'] ?? 0;
-// Debug: Versão 2026.03.30.3 (Inclusiva para órfãos)
 $stmt = $pdo->prepare("SELECT c.*, cat.nome as nome_categoria, p.nome as nome_secao 
                       FROM cards_informativos c 
                       LEFT JOIN categorias cat ON c.id_categoria = cat.id 
@@ -34,103 +24,137 @@ $paginas_sistema_nomes = [
     'faq.php' => 'FAQ',
     'relatorio_publicacoes.php' => 'Relat. Publicações'
 ];
-?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Gerenciar Cards - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
-</head>
-<body class="bg-light-subtle">
 
-<?php
 $page_title_for_header = 'Gerenciar Cards';
 include 'admin_header.php';
 ?>
 
-<div class="container-fluid container-custom-padding">
+<div class="container-fluid container-custom-padding py-4">
     <div class="row">
         <div class="col-12">
+            
+            <div class="row align-items-center mb-4">
+                <div class="col-md-7">
+                    <h3 class="fw-bold text-dark mb-1">Gerenciar Cards</h3>
+                    <p class="text-muted small mb-0"><i class="bi bi-grid-3x3-gap me-1"></i> Visualize e organize os atalhos rápidos exibidos na página inicial do portal.</p>
+                </div>
+                <div class="col-md-5 text-md-end mt-3 mt-md-0">
+                    <a href="criar_secoes.php" class="btn btn-primary shadow-sm rounded-pill px-4">
+                        <i class="bi bi-plus-circle me-2"></i>Novo Card / Seção
+                    </a>
+                </div>
+            </div>
+
             <?php
             if (isset($_SESSION['mensagem_sucesso'])) {
-                echo '<div class="alert alert-info alert-dismissible fade show" role="alert">' 
-                   . htmlspecialchars($_SESSION['mensagem_sucesso']) . 
+                echo '<div class="alert alert-success border-0 shadow-sm alert-dismissible fade show rounded-4" role="alert">' 
+                   . '<i class="bi bi-check-circle-fill me-2"></i>' . htmlspecialchars($_SESSION['mensagem_sucesso']) . 
                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                 unset($_SESSION['mensagem_sucesso']);
             }
             ?>
-            <div class="alert alert-primary">
-                Para criar novos cards com opções avançadas (link para páginas internas ou sites externos), por favor, use o menu <a href="criar_secoes.php" class="alert-link">Nova Seção/Card</a>.
+
+            <!-- Card Informativo -->
+            <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); color: #fff; border-radius: 15px;">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="me-4 d-none d-md-block">
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                            <i class="bi bi-info-circle-fill fs-2"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1 text-white">Organização do Portal</h5>
+                        <p class="mb-0 opacity-90 small">
+                            Os cards são os principais pontos de acesso do cidadão. Para criar novos cards com opções avançadas (links externos ou páginas dinâmicas), utilize o botão <strong>Novo Card / Seção</strong> acima.
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="card">
-                <div class="card-header">Cards Cadastrados</div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-list-ul me-2 text-primary"></i>Portfólio de Cards</h6>
+                    <span class="badge bg-light text-primary rounded-pill px-3"><?php echo count($cards); ?> Total</span>
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover mb-0 align-middle">
-                        <thead>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <th>Ordem</th>
-                                <th>Ícone</th>
-                                <th>Título</th>
-                                <th>Categoria</th>
-                                <th>Link de Destino</th>
-                                <th class="text-center">Ações</th>
+                                <th class="p-3 text-center" style="width: 80px;">Ordem</th>
+                                <th class="p-3" style="width: 100px;">Ícone</th>
+                                <th class="p-3">Título / Subtítulo</th>
+                                <th class="p-3">Categoria</th>
+                                <th class="p-3">Destino</th>
+                                <th class="p-3 text-center" style="width: 120px;">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($cards as $card): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($card['ordem']); ?></td>
-                                <td>
-                                    <?php if (($card['tipo_icone'] ?? 'imagem') === 'bootstrap'): ?>
-                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <i class="bi <?php echo htmlspecialchars($card['caminho_icone']); ?> text-primary fs-5"></i>
-                                        </div>
-                                    <?php else: ?>
-                                        <img src="<?php echo htmlspecialchars($card['caminho_icone']); ?>" alt="Ícone" style="width: 40px; height: 40px; object-fit: contain;">
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php echo htmlspecialchars($card['titulo']); ?><br>
-                                    <small class="text-muted"><?php echo htmlspecialchars($card['subtitulo']); ?></small>
-                                </td>
-                                <td><span class="badge bg-dark"><?php echo htmlspecialchars($card['nome_categoria'] ?? 'N/A'); ?></span></td>
-                                <td>
-                                    <?php
-                                    $link_atual = trim($card['link_url'] ?? '');
-                                    if (!empty($card['id_secao'])) {
-                                        echo '<span class="badge bg-info text-dark">' . htmlspecialchars($card['nome_secao'] ?? 'Seção Interna') . '</span>';
-                                    } elseif (!empty($link_atual)) {
-                                        if (strpos($link_atual, 'pagina.php?slug=') !== false) {
-                                            echo '<span class="badge bg-success">Página Interna</span>';
-                                        } elseif (isset($paginas_sistema_nomes[$link_atual])) {
-                                            echo '<span class="badge bg-warning text-dark"><i class="bi bi-cpu-fill me-1"></i>Página do Sistema: ' . $paginas_sistema_nomes[$link_atual] . '</span>';
-                                        } else {
-                                            echo '<span class="badge bg-secondary">Link Externo</span>';
-                                        }
-                                    } else {
-                                        echo '<span class="badge bg-light text-dark border">Nenhum Link</span>';
-                                    }
-                                    ?>
-                                </td>
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <a href="editar_card.php?id=<?php echo $card['id']; ?>" class="btn btn-outline-primary btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Editar Card">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <form method="POST" action="excluir_card.php" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir este card?');">
-                                            <input type="hidden" name="card_id" value="<?php echo $card['id']; ?>">
-                                            <input type="hidden" name="caminho_icone" value="<?php echo htmlspecialchars($card['caminho_icone']); ?>">
-                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 d-flex align-items-center justify-content-center shadow-none" style="width: 32px; height: 32px;" title="Excluir Card">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
+                            <?php if (empty($cards)): ?>
+                                <tr>
+                                    <td colspan="6" class="p-5 text-center text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-3 opacity-20"></i>
+                                        Nenhum card cadastrado para esta prefeitura.
+                                    </td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($cards as $card): ?>
+                                    <tr>
+                                        <td class="p-3 text-center fw-bold text-muted"><?php echo htmlspecialchars($card['ordem']); ?></td>
+                                        <td class="p-3">
+                                            <?php if (($card['tipo_icone'] ?? 'imagem') === 'bootstrap'): ?>
+                                                <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                                    <i class="bi <?php echo htmlspecialchars($card['caminho_icone']); ?> fs-4"></i>
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="bg-light rounded-3 p-1" style="width: 45px; height: 45px;">
+                                                    <img src="<?php echo htmlspecialchars($card['caminho_icone']); ?>" alt="Ícone" class="w-100 h-100 object-fit-contain">
+                                                </div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="p-3">
+                                            <div class="fw-bold text-dark"><?php echo htmlspecialchars($card['titulo']); ?></div>
+                                            <div class="text-muted small truncate-1"><?php echo htmlspecialchars($card['subtitulo']); ?></div>
+                                        </td>
+                                        <td class="p-3">
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-20 rounded-pill px-3">
+                                                <?php echo htmlspecialchars($card['nome_categoria'] ?? 'Geral'); ?>
+                                            </span>
+                                        </td>
+                                        <td class="p-3">
+                                            <?php
+                                            $link_atual = trim($card['link_url'] ?? '');
+                                            if (!empty($card['id_secao'])) {
+                                                echo '<span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-3"><i class="bi bi-hdd-stack me-1"></i>' . htmlspecialchars($card['nome_secao']) . '</span>';
+                                            } elseif (!empty($link_atual)) {
+                                                if (strpos($link_atual, 'pagina.php?slug=') !== false) {
+                                                    echo '<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-3"><i class="bi bi-file-earmark-text me-1"></i>Página Interna</span>';
+                                                } elseif (isset($paginas_sistema_nomes[$link_atual])) {
+                                                    echo '<span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-3"><i class="bi bi-cpu me-1"></i>' . $paginas_sistema_nomes[$link_atual] . '</span>';
+                                                } else {
+                                                    echo '<span class="badge bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25 rounded-3"><i class="bi bi-link-45deg me-1"></i>Externo</span>';
+                                                }
+                                            } else {
+                                                echo '<span class="text-muted small italic">Sem vínculo</span>';
+                                            }
+                                            ?>
+                                        </td>
+                                        <td class="p-3">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <a href="editar_card.php?id=<?php echo $card['id']; ?>" class="btn btn-outline-primary btn-sm rounded-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Editar Card">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <form method="POST" action="excluir_card.php" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir este card?');">
+                                                    <input type="hidden" name="card_id" value="<?php echo $card['id']; ?>">
+                                                    <input type="hidden" name="caminho_icone" value="<?php echo htmlspecialchars($card['caminho_icone']); ?>">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Excluir Card">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
