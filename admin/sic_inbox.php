@@ -134,10 +134,10 @@ include 'admin_header.php';
                                         <td><?php echo date('d/m/Y H:i', strtotime($item['data_solicitacao'])); ?></td>
                                         <td class="text-center">
                                             <div class="btn-group shadow-sm rounded-3">
-                                                <a href="responder_esic.php?id=<?php echo $item['id']; ?>" class="btn btn-white btn-sm fw-bold border" title="Responder / Ver Detalhes">
+                                                <a href="responder_esic.php?id=<?php echo $item['id']; ?>" class="btn btn-light btn-sm fw-bold border" title="Responder / Ver Detalhes">
                                                     <i class="bi bi-pencil-fill text-primary"></i> <span class="d-none d-lg-inline ms-1">Responder</span>
                                                 </a>
-                                                <a href="sic_excluir.php?id=<?php echo $item['id']; ?>" class="btn btn-white btn-sm fw-bold border" title="Excluir Solicitação" onclick="return confirm('Tem certeza que deseja excluir esta solicitação permanentemente?')">
+                                                <a href="sic_excluir.php?id=<?php echo $item['id']; ?>" class="btn btn-light btn-sm fw-bold border" title="Excluir Solicitação" onclick="return confirm('Tem certeza que deseja excluir esta solicitação permanentemente?')">
                                                     <i class="bi bi-trash-fill text-danger"></i>
                                                 </a>
                                             </div>
