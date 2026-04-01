@@ -74,34 +74,34 @@ include 'header_publico.php';
             <div class="row g-4">
                 <!-- SIC Físico -->
                 <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden sic-card">
                         <div class="card-header bg-white py-3 border-0">
                             <h5 class="mb-0 fw-bold"><i class="bi bi-geo-alt-fill text-primary me-2"></i> SIC Físico</h5>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="small text-muted fw-bold text-uppercase">Setor:</label>
-                                <p class="mb-0 fw-medium" style="font-size: 18px;"><?php echo htmlspecialchars($info_sic['sic_setor']); ?></p>
+                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($info_sic['sic_setor']); ?></p>
                             </div>
                             <div class="mb-3">
                                 <label class="small text-muted fw-bold text-uppercase">Endereço:</label>
-                                <p class="mb-0 fw-medium" style="font-size: 18px;"><?php echo htmlspecialchars($info_sic['sic_endereco']); ?></p>
+                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($info_sic['sic_endereco']); ?></p>
                             </div>
                             <div class="mb-3">
                                 <label class="small text-muted fw-bold text-uppercase">Responsável:</label>
-                                <p class="mb-0 fw-medium" style="font-size: 18px;"><?php echo htmlspecialchars($info_sic['sic_responsavel']); ?></p>
+                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($info_sic['sic_responsavel']); ?></p>
                             </div>
                             <div class="mb-3">
                                 <label class="small text-muted fw-bold text-uppercase">E-mail:</label>
-                                <p class="mb-0 fw-medium text-primary" style="font-size: 18px;"><?php echo htmlspecialchars($info_sic['sic_email']); ?></p>
+                                <p class="mb-0 fw-medium text-primary"><?php echo htmlspecialchars($info_sic['sic_email']); ?></p>
                             </div>
                             <div class="mb-3">
                                 <label class="small text-muted fw-bold text-uppercase">Telefone:</label>
-                                <p class="mb-0 fw-medium" style="font-size: 18px;"><?php echo htmlspecialchars($info_sic['sic_telefone']); ?></p>
+                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($info_sic['sic_telefone']); ?></p>
                             </div>
                             <div>
                                 <label class="small text-muted fw-bold text-uppercase">Horário:</label>
-                                <p class="mb-0 fw-medium" style="font-size: 18px;"><?php echo htmlspecialchars($info_sic['sic_horario']); ?></p>
+                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($info_sic['sic_horario']); ?></p>
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@ include 'header_publico.php';
 
                 <!-- Solicitações Online -->
                 <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden sic-card">
                         <div class="card-header bg-white py-3 border-0">
                             <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square text-success me-2"></i> Solicitações</h5>
                         </div>
@@ -140,7 +140,7 @@ include 'header_publico.php';
 
                 <!-- Legislação -->
                 <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden sic-card">
                         <div class="card-header bg-white py-3 border-0">
                             <h5 class="mb-0 fw-bold"><i class="bi bi-journal-text text-warning me-2"></i> Legislação e Dados</h5>
                         </div>
@@ -175,6 +175,23 @@ include 'header_publico.php';
 </div>
 
 <?php include 'footer_publico.php'; ?>
+
+<style>
+    .sic-card h5 { font-size: 17px !important; font-weight: 700 !important; }
+    .sic-card h6 { font-size: 17px !important; font-weight: 700 !important; }
+    .sic-card p, 
+    .sic-card a, 
+    .sic-card label, 
+    .sic-card .list-group-item,
+    .sic-card .btn,
+    .sic-card input { 
+        font-size: 17px !important; 
+    }
+    .sic-card label {
+        opacity: 0.8;
+        letter-spacing: 0.5px;
+    }
+</style>
 
 </body>
 </html>
