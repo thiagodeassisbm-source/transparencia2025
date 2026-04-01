@@ -38,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_manifestacao'])
         ]);
 
         // Redireciona de volta para a página principal da ouvidoria com o protocolo
-        // Usamos base_url para garantir compatibilidade SaaS
-        header("Location: " . $base_url . "portal/" . $slug_pref_header . "/ouvidoria.php?protocolo=" . urlencode($protocolo));
+        $slug_redir = $_POST['pref_slug'] ?? 'principal';
+        header("Location: " . $base_url . "portal/" . $slug_redir . "/ouvidoria.php?protocolo=" . urlencode($protocolo));
         exit;
 
     } catch (Exception $e) {

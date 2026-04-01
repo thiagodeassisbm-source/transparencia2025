@@ -38,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome_solicitante']))
         ]);
 
         // Redireciona de volta para a página principal do SIC com a mensagem de sucesso
-        // Usamos base_url para garantir que o redirecionamento funcione no SaaS
-        header("Location: " . $base_url . "portal/" . $slug_pref_header . "/sic.php?protocolo=" . urlencode($protocolo));
+        $slug_redir = $_POST['pref_slug'] ?? 'principal';
+        header("Location: " . $base_url . "portal/" . $slug_redir . "/sic.php?protocolo=" . urlencode($protocolo));
         exit;
 
     } catch (Exception $e) {
