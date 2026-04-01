@@ -156,8 +156,7 @@ include 'admin_header.php';
             
             <div class="row align-items-center mb-4">
                 <div class="col-md-8">
-                    <h3 class="fw-bold text-dark mb-1">Relatório de Publicações</h3>
-                    <p class="text-muted small mb-0"><i class="bi bi-clock-history me-1"></i> Acompanhe cronologicamente tudo o que foi publicado no portal<?php echo $nome_prefeitura_contexto !== '' ? ' da prefeitura selecionada' : ''; ?>.</p>
+                    <h3 class="fw-bold text-dark mb-0">Relatório de Publicações</h3>
                     <?php if ($pref_id > 0 && $nome_prefeitura_contexto !== ''): ?>
                         <p class="mb-0 mt-2"><span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill"><i class="bi bi-building me-1"></i><?php echo htmlspecialchars($nome_prefeitura_contexto); ?></span></p>
                     <?php endif; ?>
