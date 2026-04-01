@@ -2,6 +2,7 @@
 require_once 'auth_check.php';
 require_once '../conexao.php';
 require_once 'functions_logs.php';
+require_once __DIR__ . '/includes/seed_informacoes_institucionais.php';
 
 // Apenas admins podem acessar
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
@@ -10,9 +11,12 @@ if ($_SESSION['admin_user_perfil'] !== 'admin') {
     exit;
 }
 
-// Busca dados para os dropdowns da criação
-$categorias = $pdo->query("SELECT id, nome FROM categorias ORDER BY ordem ASC")->fetchAll();
-$paginas = $pdo->query("SELECT slug, titulo FROM paginas ORDER BY titulo ASC")->fetchAll();
+// Busca dados para os dropdowns da criação (escopo da prefeitura)
+$pref_id_sess = (int) ($_SESSION['id_prefeitura'] ?? 0);
+$stmt_cat_dd = $pdo->prepare('SELECT id, nome FROM categorias WHERE id_prefeitura = ? ORDER BY ordem ASC');
+$stmt_cat_dd->execute([$pref_id_sess]);
+$categorias = $stmt_cat_dd->fetchAll();
+$paginas = $pdo->query('SELECT slug, titulo FROM paginas ORDER BY titulo ASC')->fetchAll();
 
 $action = $_GET['action'] ?? 'list';
 $mensagem = '';
@@ -95,33 +99,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
     }
 }
 
-// --- LÓGICA DE LISTAGEM ---
+// --- LÓGICA DE LISTAGEM (mesma base que index.php: todas as seções/portais da prefeitura) ---
 $secoes_agrupadas = [];
 if ($action === 'list') {
-    $pref_id = $_SESSION['id_prefeitura'] ?? 0;
-    
+    $pref_id = (int) ($_SESSION['id_prefeitura'] ?? 0);
+    $perfil_id_sess = (int) ($_SESSION['admin_user_id_perfil'] ?? 0);
+
+    if (ensure_informacoes_institucionais($pdo, $pref_id, $perfil_id_sess)) {
+        unset($_SESSION['permissoes_sessao']);
+    }
+
     // Recupera o slug da prefeitura para gerar os links do portal
-    $stmt_slug_pref = $pdo->prepare("SELECT slug FROM prefeituras WHERE id = ?");
+    $stmt_slug_pref = $pdo->prepare('SELECT slug FROM prefeituras WHERE id = ?');
     $stmt_slug_pref->execute([$pref_id]);
     $pref_slug_contexto = $stmt_slug_pref->fetchColumn() ?: 'principal';
-    
-    $stmt = $pdo->prepare("
-        SELECT 
+
+    $stmt = $pdo->prepare(
+        'SELECT 
             ci.id as card_id, ci.titulo, ci.subtitulo, ci.caminho_icone, ci.tipo_icone, ci.link_url, ci.id_secao,
             p.id as portal_id, p.nome as portal_nome, p.slug as portal_slug,
-            c.nome as nome_categoria,
+            cat.nome as nome_categoria,
             (SELECT COUNT(*) FROM registros r WHERE r.id_portal = p.id) as total_registros,
             (SELECT MIN(exercicio) FROM registros r WHERE r.id_portal = p.id) as ano_min,
             (SELECT MAX(exercicio) FROM registros r WHERE r.id_portal = p.id) as ano_max,
             (SELECT COUNT(*) FROM valores_registros vr 
              JOIN campos_portal cp ON vr.id_campo = cp.id 
-             WHERE cp.id_portal = p.id AND cp.tipo_campo = 'anexo' AND vr.valor != '') as total_pdfs
-        FROM cards_informativos ci
-        LEFT JOIN portais p ON ci.id_secao = p.id
-        LEFT JOIN categorias c ON ci.id_categoria = c.id
-        WHERE ci.id_prefeitura = ?
-        ORDER BY c.ordem ASC, c.nome ASC, ci.ordem ASC, ci.titulo ASC
-    ");
+             WHERE cp.id_portal = p.id AND cp.tipo_campo = \'anexo\' AND vr.valor != \'\') as total_pdfs
+        FROM portais p
+        LEFT JOIN categorias cat ON p.id_categoria = cat.id
+        LEFT JOIN (
+            SELECT c1.* FROM cards_informativos c1
+            INNER JOIN (
+                SELECT id_secao, MIN(id) AS mid FROM cards_informativos GROUP BY id_secao
+            ) pick ON c1.id = pick.mid
+        ) ci ON ci.id_secao = p.id
+        WHERE p.id_prefeitura = ?
+        ORDER BY cat.ordem ASC, cat.nome ASC, p.ordem ASC, p.nome ASC'
+    );
     $stmt->execute([$pref_id]);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($rows as $r) {
@@ -208,10 +222,18 @@ include 'admin_header.php';
                                     <?php foreach ($secoes as $s): ?>
                                          <?php 
                                              $is_portal = !empty($s['portal_id']);
-                                             $display_name = $s['portal_nome'] ?: $s['titulo'];
-                                             $display_id = $s['portal_id'] ? str_pad($s['portal_id'], 6, '0', STR_PAD_LEFT) : 'Card Link';
-                                             $edit_url = "editar_secao.php?card_id=" . $s['card_id'] . ($is_portal ? "&id=" . $s['portal_id'] : "");
-                                             $public_link = $is_portal && !empty($s['portal_slug']) ? "../portal/" . $pref_slug_contexto . "/" . $s['portal_slug'] : $s['link_url'];
+                                             $display_name = $s['portal_nome'] ?: ($s['titulo'] ?? '');
+                                             $display_id = $s['portal_id'] ? str_pad((string) $s['portal_id'], 6, '0', STR_PAD_LEFT) : 'Card Link';
+                                             if ($is_portal && !empty($s['portal_id'])) {
+                                                 if (!empty($s['card_id'])) {
+                                                     $edit_url = 'editar_secao.php?card_id=' . (int) $s['card_id'] . '&id=' . (int) $s['portal_id'];
+                                                 } else {
+                                                     $edit_url = 'editar_secao.php?id=' . (int) $s['portal_id'];
+                                                 }
+                                             } else {
+                                                 $edit_url = 'editar_secao.php?card_id=' . (int) $s['card_id'];
+                                             }
+                                             $public_link = $is_portal && !empty($s['portal_slug']) ? '../portal/' . $pref_slug_contexto . '/' . $s['portal_slug'] : ($s['link_url'] ?? '#');
                                          ?>
                                          <div class="inner-section-item shadow-sm">
                                              <div class="d-flex flex-column">
@@ -274,9 +296,11 @@ include 'admin_header.php';
                                                          <?php endif; ?>
  
                                                          <form method="POST" action="excluir_secao.php" class="d-inline" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir esta seção?');">
-                                                             <input type="hidden" name="card_id" value="<?php echo $s['card_id']; ?>">
+                                                             <?php if (!empty($s['card_id'])): ?>
+                                                             <input type="hidden" name="card_id" value="<?php echo (int) $s['card_id']; ?>">
+                                                             <?php endif; ?>
                                                              <?php if ($is_portal): ?>
-                                                                 <input type="hidden" name="portal_id" value="<?php echo $s['portal_id']; ?>">
+                                                                 <input type="hidden" name="portal_id" value="<?php echo (int) $s['portal_id']; ?>">
                                                              <?php endif; ?>
                                                              <button type="submit" class="btn-action-custom btn-excluir">
                                                                  <i class="bi bi-trash"></i> Excluir

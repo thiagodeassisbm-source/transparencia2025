@@ -15,9 +15,31 @@ if (!$card_id && !$secao_id) { header("Location: criar_secoes.php"); exit; }
 
 // Se veio apenas o Portal ID, tenta achar o Card ID
 if (!$card_id && $secao_id) {
-    $stmt_c = $pdo->prepare("SELECT id FROM cards_informativos WHERE id_secao = ?");
+    $stmt_c = $pdo->prepare('SELECT id FROM cards_informativos WHERE id_secao = ?');
     $stmt_c->execute([$secao_id]);
     $card_id = $stmt_c->fetchColumn();
+}
+
+// Portal existente sem card na home: cria card mínimo para o editor funcionar
+if (!$card_id && $secao_id) {
+    $stmt_p = $pdo->prepare('SELECT nome, id_categoria, id_prefeitura FROM portais WHERE id = ?');
+    $stmt_p->execute([$secao_id]);
+    $p = $stmt_p->fetch(PDO::FETCH_ASSOC);
+    if ($p) {
+        $pdo->prepare(
+            'INSERT INTO cards_informativos (id_categoria, id_secao, link_url, titulo, subtitulo, caminho_icone, tipo_icone, ordem, id_prefeitura)
+             VALUES (?, ?, NULL, ?, ?, ?, ?, 0, ?)'
+        )->execute([
+            $p['id_categoria'],
+            $secao_id,
+            $p['nome'],
+            $p['nome'],
+            'bi-layout-text-window',
+            'bootstrap',
+            $p['id_prefeitura'],
+        ]);
+        $card_id = $pdo->lastInsertId();
+    }
 }
 
 // Processa o formulário de atualização
