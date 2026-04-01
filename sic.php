@@ -38,13 +38,13 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
     <link rel="stylesheet" href="<?php echo $base_url; ?>css/style.css?v=<?php echo time(); ?>">
     <style>
         .sic-card { border-radius: 15px !important; border: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important; }
-        .sic-card-title { font-size: 26px !important; font-weight: 700 !important; color: #1a1a1a; margin-bottom: 25px; display: block; }
+        .sic-card-title { font-size: 24px !important; font-weight: 700 !important; color: #1a1a1a; margin-bottom: 25px; display: block; }
         
         /* Layout do SIC Físico */
         .sic-info-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; }
         .sic-info-item:last-child { border-bottom: none; }
-        .sic-info-label { display: block; font-weight: 700; color: #333; font-size: 16px; margin-bottom: 5px; }
-        .sic-info-value { font-size: 17px; color: #555; margin-bottom: 0; font-weight: 400; }
+        .sic-info-label { display: block; font-weight: 700; color: #333; font-size: 14px; margin-bottom: 5px; }
+        .sic-info-value { font-size: 15px; color: #555; margin-bottom: 0; font-weight: 400; }
 
         /* Botões Solicitações */
         .btn-sac { 
@@ -65,12 +65,12 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
             background: #d4a35d; 
             color: #fff; 
             padding: 22px 25px; 
-            font-size: 32px; 
+            font-size: 30px; 
             display: flex; 
             align-items: center; 
             justify-content: center;
         }
-        .btn-sac-text { padding: 0 25px; font-weight: 700; font-size: 19px; }
+        .btn-sac-text { padding: 0 25px; font-weight: 700; font-size: 17px; }
 
         /* Box Informativo */
         .info-box-sac { 
@@ -83,8 +83,8 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
             gap: 15px;
             margin-top: 15px;
         }
-        .info-box-sac i { font-size: 28px; color: #ced4da; }
-        .info-box-sac p { margin: 0; font-size: 15px; color: #6c757d; line-height: 1.6; }
+        .info-box-sac i { font-size: 26px; color: #ced4da; }
+        .info-box-sac p { margin: 0; font-size: 13px; color: #6c757d; line-height: 1.6; }
         .info-box-sac strong { color: #d4a35d; }
 
         /* Listas Legislação */
@@ -102,11 +102,11 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
             transition: all 0.2s;
         }
         .legis-item:hover { border-color: #d4a35d; background: #fffcf8; color: #1a1a1a; }
-        .legis-item span { font-size: 17px; font-weight: 400; }
+        .legis-item span { font-size: 15px; font-weight: 400; }
         .legis-item i.bi-chevron-right { font-size: 14px; color: #bbb; }
         
-        .section-title-sac { font-weight: 700; font-size: 20px; color: #222; margin-top: 30px; margin-bottom: 12px; display: block; }
-        .section-desc-sac { font-size: 15px; color: #777; margin-bottom: 20px; display: block; line-height: 1.5; }
+        .section-title-sac { font-weight: 700; font-size: 18px; color: #222; margin-top: 30px; margin-bottom: 12px; display: block; }
+        .section-desc-sac { font-size: 13px; color: #777; margin-bottom: 20px; display: block; line-height: 1.5; }
     </style>
 </head>
 <body class="bg-light">
