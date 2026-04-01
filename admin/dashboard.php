@@ -1,9 +1,15 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once __DIR__ . '/includes/seed_informacoes_institucionais.php';
+
+$pref_id = (int) ($_SESSION['id_prefeitura'] ?? 0);
+$perfil_id_sess = (int) ($_SESSION['admin_user_id_perfil'] ?? 0);
+if ($pref_id > 0 && ensure_informacoes_institucionais($pdo, $pref_id, $perfil_id_sess)) {
+    unset($_SESSION['permissoes_sessao']);
+}
 
 // --- BUSCA DE DADOS PARA OS CARDS NUMÉRICOS ---
-$pref_id = $_SESSION['id_prefeitura'] ?? 0;
 
 $total_secoes = $pdo->prepare("SELECT COUNT(id) FROM portais WHERE id_prefeitura = ?");
 $total_secoes->execute([$pref_id]);
