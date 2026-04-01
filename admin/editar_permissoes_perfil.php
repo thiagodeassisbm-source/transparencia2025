@@ -110,6 +110,7 @@ include 'admin_header.php';
                                                 'prefeitura' => 'Menu: Prefeitura (Info Gerais)',
                                                 'sic' => 'Módulo: E-Sic (Inbox e Resp.)',
                                                 'ouvidoria' => 'Módulo: Ouvidoria',
+                                                'relatorios' => 'Módulo: Relatórios',
                                                 'usuarios' => 'Módulo: Usuários e Perfis'
                                             ];
                                             foreach($modulos as $slug => $label): 

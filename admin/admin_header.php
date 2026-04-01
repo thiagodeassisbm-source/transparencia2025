@@ -208,6 +208,24 @@ function isActive($pageName) {
                     </li>
                     <?php endif; ?>
 
+                    <?php if (tem_permissao('sic', 'ver')): ?>
+                    <li>
+                        <?php $esic_active = isActive(['sic_inbox.php', 'configuracoes_sic.php', 'responder_esic.php']); ?>
+                        <a href="#collapseESic" class="nav-link has-submenu <?php echo $esic_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
+                            <span><i class="bi bi-mailbox"></i> E-Sic</span>
+                            <i class="bi bi-chevron-down submenu-arrow"></i>
+                        </a>
+                        <div class="collapse <?php echo $esic_active ? 'show' : ''; ?>" id="collapseESic">
+                            <ul class="submenu">
+                                <li><a href="sic_inbox.php" class="nav-link <?php echo isActive(['sic_inbox.php', 'responder_esic.php']); ?>">Caixa de Entrada</a></li>
+                                <?php if (tem_permissao('sic', 'editar')): ?>
+                                    <li><a href="configuracoes_sic.php" class="nav-link <?php echo isActive('configuracoes_sic.php'); ?>">Configurações</a></li>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
+                    </li>
+                    <?php endif; ?>
+
                     <?php if (tem_permissao('ouvidoria', 'ver')): ?>
                     <li>
                         <?php $ouvidoria_active = isActive(['ouvidoria_inbox.php', 'responder_manifestacao.php', 'config_ouvidoria.php']); ?>
@@ -242,19 +260,16 @@ function isActive($pageName) {
                     </li>
                     <?php endif; ?>
 
-                    <?php if (tem_permissao('sic', 'ver')): ?>
+                    <?php if (tem_permissao('relatorios', 'ver') || $_SESSION['admin_user_perfil'] === 'admin' || $_SESSION['admin_user_nome'] === 'admin'): ?>
                     <li>
-                        <?php $esic_active = isActive(['sic_inbox.php', 'configuracoes_sic.php', 'responder_esic.php']); ?>
-                        <a href="#collapseESic" class="nav-link has-submenu <?php echo $esic_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
-                            <span><i class="bi bi-mailbox"></i> E-Sic</span>
+                        <?php $relatorios_active = isActive(['relatorio_publicacoes.php']); ?>
+                        <a href="#collapseRelatorios" class="nav-link has-submenu <?php echo $relatorios_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
+                            <span><i class="bi bi-bar-chart-line"></i> Relatórios</span>
                             <i class="bi bi-chevron-down submenu-arrow"></i>
                         </a>
-                        <div class="collapse <?php echo $esic_active ? 'show' : ''; ?>" id="collapseESic">
+                        <div class="collapse <?php echo $relatorios_active ? 'show' : ''; ?>" id="collapseRelatorios">
                             <ul class="submenu">
-                                <li><a href="sic_inbox.php" class="nav-link <?php echo isActive(['sic_inbox.php', 'responder_esic.php']); ?>">Caixa de Entrada</a></li>
-                                <?php if (tem_permissao('sic', 'editar')): ?>
-                                    <li><a href="configuracoes_sic.php" class="nav-link <?php echo isActive('configuracoes_sic.php'); ?>">Configurações</a></li>
-                                <?php endif; ?>
+                                <li><a href="relatorio_publicacoes.php" class="nav-link <?php echo isActive('relatorio_publicacoes.php'); ?>">Relatório de Publicações</a></li>
                             </ul>
                         </div>
                     </li>
