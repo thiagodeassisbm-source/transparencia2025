@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once __DIR__ . '/includes/xml_import_helpers.php';
 set_time_limit(300); // Aumenta o limite de tempo de execução para 5 minutos
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,6 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mapeamento = unserialize(base64_decode($_POST['mapeamento_serializado']));
         $xml = simplexml_load_string(base64_decode($_POST['xml_content']));
         $anexos = $_FILES['anexos'] ?? [];
+        $tag_registro_importacao = isset($_POST['tag_registro_importacao'])
+            ? xml_import_sanitize_tag((string) $_POST['tag_registro_importacao'])
+            : '';
 
         if (!$id_portal || !$metadados || !$mapeamento || !$xml) {
             throw new Exception('Dados essenciais para a importação estão faltando.');
@@ -63,16 +67,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
         // --- INÍCIO DO NOVO CÓDIGO DINÂMICO ---
-        // Monta a string de busca do XPath dinamicamente com todas as tags de registro (singular) ativas
-        $stmt_tags = $pdo->query("SELECT tag_registro FROM tipos_xml WHERE ativo = 1");
+        $stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1');
         $tags_validas = $stmt_tags->fetchAll(PDO::FETCH_COLUMN);
 
-        $dados_xml = [];
-        if (!empty($tags_validas)) {
-            // Exemplo de resultado: //Contrato | //Despesa | //Servidor
-            $xpath_query = '//' . implode(' | //', $tags_validas);
-            $dados_xml = $xml->xpath($xpath_query);
-        }
+        $dados_xml = xml_import_listar_registros(
+            $xml,
+            $tags_validas,
+            $tag_registro_importacao !== '' ? $tag_registro_importacao : null
+        );
         // --- FIM DO NOVO CÓDIGO DINÂMICO ---
 
         

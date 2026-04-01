@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once __DIR__ . '/includes/xml_import_helpers.php';
 
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
     header('Location: index.php');
@@ -76,16 +77,18 @@ if (!empty($tipos_xml)) {
     }
 }
 
-// 3. Monta a string de busca do XPath dinamicamente com todas as tags de registro (singular)
-$stmt_tags = $pdo->query("SELECT tag_registro FROM tipos_xml WHERE ativo = 1");
+// 3. Lista registros: tag do passo 2 (detecção automática ou tipos_xml) ou união de tags do cadastro
+$stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1');
 $tags_validas = $stmt_tags->fetchAll(PDO::FETCH_COLUMN);
 
-$dados_xml = [];
-if (!empty($tags_validas)) {
-    // Exemplo de resultado: //Contrato | //Despesa | //Servidor
-    $xpath_query = '//' . implode(' | //', $tags_validas);
-    $dados_xml = $xml->xpath($xpath_query);
+$tag_registro_sessao = $dados_importacao['tag_registro_importacao'] ?? null;
+if ($tag_registro_sessao !== null && $tag_registro_sessao !== '') {
+    $tag_registro_sessao = xml_import_sanitize_tag((string) $tag_registro_sessao);
+} else {
+    $tag_registro_sessao = null;
 }
+
+$dados_xml = xml_import_listar_registros($xml, $tags_validas, $tag_registro_sessao);
 
 // --- FIM DO NOVO CÓDIGO DINÂMICO ---
 
@@ -119,6 +122,7 @@ include 'admin_header.php';
             <input type="hidden" name="metadados_serializados" value="<?php echo base64_encode(serialize($dados_importacao['metadados'])); ?>">
             <input type="hidden" name="mapeamento_serializado" value="<?php echo base64_encode(serialize($mapeamento)); ?>">
             <input type="hidden" name="tipo_dados" value="<?php echo htmlspecialchars($tipo_dados); ?>">
+            <input type="hidden" name="tag_registro_importacao" value="<?php echo htmlspecialchars($dados_importacao['tag_registro_importacao'] ?? ''); ?>">
             <textarea name="xml_content" style="display:none;"><?php echo base64_encode($dados_importacao['xml_content']); ?></textarea>
 
             <div class="card">

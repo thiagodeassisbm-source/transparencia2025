@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once __DIR__ . '/includes/xml_import_helpers.php';
 
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
     header('Location: index.php');
@@ -58,21 +59,15 @@ $tags_xml = [];
 $stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1');
 $tags_validas = $stmt_tags ? $stmt_tags->fetchAll(PDO::FETCH_COLUMN) : [];
 
-$primeiro_registro = null;
-if (!empty($tags_validas)) {
-    $xpath_parts = [];
-    foreach ($tags_validas as $tag) {
-        $xpath_parts[] = '//' . $tag . '[1]';
-    }
-    $xpath_query = implode(' | ', $xpath_parts);
-    $found = $xml->xpath($xpath_query);
-    $primeiro_registro = $found[0] ?? null;
-}
+$primeiro_registro = xml_import_obter_primeiro_registro($xml, $tags_validas);
 
 if ($primeiro_registro) {
+    $_SESSION['import_xml']['tag_registro_importacao'] = $primeiro_registro->getName();
     foreach ($primeiro_registro->children() as $child) {
         $tags_xml[] = $child->getName();
     }
+} else {
+    unset($_SESSION['import_xml']['tag_registro_importacao']);
 }
 ?>
 <!DOCTYPE html>
