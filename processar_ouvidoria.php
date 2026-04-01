@@ -11,7 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_manifestacao'])
 
         // Detecta prefeitura (SaaS Context)
         $id_prefeitura_form = $_POST['pref_id'] ?? ($_GET['pref_id'] ?? 0);
-        if (!$id_prefeitura_form && isset($_SESSION['id_prefeitura'])) $id_prefeitura_form = $_SESSION['id_prefeitura'];
+        // --- REPARAÇÃO DE EMERGÊNCIA ON-THE-FLY ---
+        $stmt_debug = $pdo->query("SHOW COLUMNS FROM ouvidoria_manifestacoes");
+        $cols_debug = $stmt_debug->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('id_prefeitura', $cols_debug)) {
+            $pdo->exec("ALTER TABLE ouvidoria_manifestacoes ADD COLUMN id_prefeitura INT DEFAULT 0 AFTER id");
+        }
+        // ------------------------------------------
 
         $stmt = $pdo->prepare(
             "INSERT INTO ouvidoria_manifestacoes 
@@ -32,12 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_manifestacao'])
         ]);
 
         // Redireciona de volta para a página principal da ouvidoria com o protocolo
-        header("Location: ouvidoria.php?protocolo=" . urlencode($protocolo));
+        // Usamos base_url para garantir compatibilidade SaaS
+        header("Location: " . $base_url . "portal/" . $slug_pref_header . "/ouvidoria.php?protocolo=" . urlencode($protocolo));
         exit;
 
     } catch (Exception $e) {
-        // Em caso de erro, exibe uma mensagem
-        die("Ocorreu um erro ao registrar sua manifestação. Por favor, tente novamente. Detalhe: " . $e->getMessage());
+        // Log para debug
+        error_log("Erro Ouvidoria: " . $e->getMessage());
+        die("Erro ao registrar manifestação. Detalhe: " . $e->getMessage());
     }
 } else {
     // Se o arquivo for acessado diretamente ou sem dados, redireciona para a ouvidoria
