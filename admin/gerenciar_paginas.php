@@ -44,23 +44,51 @@ $page_title_for_header = 'Gerenciar Páginas';
 include 'admin_header.php'; 
 ?>
 
-<div class="container-fluid container-custom-padding">
+<div class="container-fluid container-custom-padding py-4">
     <div class="row">
         <div class="col-12">
+            
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6">
+                    <h3 class="fw-bold text-dark mb-1">Páginas de Conteúdo</h3>
+                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i> Gerencie textos institucionais, legislações e informativos do portal.</p>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <a href="editor_pagina.php" class="btn btn-primary shadow-sm rounded-pill px-4 py-2">
+                        <i class="bi bi-plus-circle me-2"></i> Criar Nova Página
+                    </a>
+                </div>
+            </div>
+
             <?php
             if (isset($_SESSION['mensagem_sucesso'])) {
-                echo '<div class="alert alert-success alert-dismissible fade show" role="alert">' 
-                   . htmlspecialchars($_SESSION['mensagem_sucesso']) . 
+                echo '<div class="alert alert-success border-0 shadow-sm alert-dismissible fade show rounded-3" role="alert">' 
+                   . '<i class="bi bi-check-circle-fill me-2"></i>' . htmlspecialchars($_SESSION['mensagem_sucesso']) . 
                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
                 unset($_SESSION['mensagem_sucesso']);
             }
             ?>
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Páginas Cadastradas</span>
-                    <a href="editor_pagina.php" class="btn btn-success btn-sm">
-                        <i class="bi bi-plus-circle"></i> Criar Nova Página
-                    </a>
+
+            <!-- Card Informativo -->
+            <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); color: #fff; border-radius: 12px;">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="me-4 d-none d-md-block">
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                            <i class="bi bi-file-richtext-fill fs-2"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Estrutura de Páginas Institucionais</h5>
+                        <p class="mb-0 opacity-90 small">
+                            Use esta seção para criar páginas que não seguem um padrão de planilha de dados, como: <strong>Lista de Espera, Regras do IPTU, Organogramas</strong> ou <strong>Relatórios Anuais</strong>. Você pode formatar o texto e anexar documentos PDF/DOCX.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white py-3 border-bottom border-light">
+                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-list-ul me-2 text-primary"></i>Suas Páginas Cadastradas</h6>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-striped table-hover mb-0">
@@ -76,16 +104,33 @@ include 'admin_header.php';
                                 <tr><td colspan="3" class="text-center">Nenhuma página foi criada ainda.</td></tr>
                             <?php else: ?>
                                 <?php foreach ($paginas as $pagina): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($pagina['titulo']); ?></td>
-                                    <td><?php echo date('d/m/Y H:i', strtotime($pagina['data_modificacao'])); ?></td>
-                                    <td class="text-end">
-                                        <a href="editor_pagina.php?id=<?php echo $pagina['id']; ?>" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> Editar</a>
-                                        <form method="POST" action="gerenciar_paginas.php" class="d-inline ms-1" onsubmit="return confirm('Tem certeza que deseja excluir esta página?');">
-                                            <input type="hidden" name="id_pagina" value="<?php echo $pagina['id']; ?>">
-                                            <input type="hidden" name="delete_pagina" value="1">
-                                            <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Excluir</button>
-                                        </form>
+                                <tr class="align-middle">
+                                    <td class="p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 me-3">
+                                                <i class="bi bi-file-richtext fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark"><?php echo htmlspecialchars($pagina['titulo']); ?></div>
+                                                <div class="text-muted" style="font-size: 0.75rem;">URL: /pagina.php?slug=<?php echo htmlspecialchars($pagina['slug']); ?></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="p-3 text-muted">
+                                        <i class="bi bi-clock me-1"></i> <?php echo date('d/m/Y H:i', strtotime($pagina['data_modificacao'])); ?>
+                                    </td>
+                                    <td class="p-3 text-end">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a href="editor_pagina.php?id=<?php echo $pagina['id']; ?>" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm">
+                                                <i class="bi bi-pencil-square me-1"></i> Editar
+                                            </a>
+                                            <form method="POST" action="gerenciar_paginas.php" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir esta página?');">
+                                                <input type="hidden" name="id_pagina" value="<?php echo $pagina['id']; ?>">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
