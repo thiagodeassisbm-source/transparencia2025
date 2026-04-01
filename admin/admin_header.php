@@ -208,16 +208,35 @@ function isActive($pageName) {
                     </li>
                     <?php endif; ?>
 
-                    <?php if (tem_permissao('configuracoes', 'ver')): ?>
+                    <?php if (tem_permissao('ouvidoria', 'ver')): ?>
                     <li>
-                        <?php $prefeitura_active = isActive(['informacoes_prefeitura.php']); ?>
+                        <?php $ouvidoria_active = isActive(['ouvidoria_inbox.php', 'responder_manifestacao.php', 'config_ouvidoria.php']); ?>
+                        <a href="#collapseOuvidoria" class="nav-link has-submenu <?php echo $ouvidoria_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
+                            <span><i class="bi bi-chat-dots"></i> Ouvidoria</span>
+                            <i class="bi bi-chevron-down submenu-arrow"></i>
+                        </a>
+                        <div class="collapse <?php echo $ouvidoria_active ? 'show' : ''; ?>" id="collapseOuvidoria">
+                            <ul class="submenu">
+                                <li><a href="ouvidoria_inbox.php" class="nav-link <?php echo isActive(['ouvidoria_inbox.php', 'responder_manifestacao.php']); ?>">Inbox</a></li>
+                                <?php if (tem_permissao('ouvidoria', 'editar')): ?>
+                                    <li><a href="config_ouvidoria.php" class="nav-link <?php echo isActive('config_ouvidoria.php'); ?>">Configurações</a></li>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
+                    </li>
+                    <?php endif; ?>
+
+                    <?php if (tem_permissao('configuracoes', 'ver') || $_SESSION['admin_user_perfil'] === 'admin'): ?>
+                    <li>
+                        <?php $prefeitura_active = isActive(['informacoes_prefeitura.php', 'configurar_copyright.php']); ?>
                         <a href="#collapsePrefeitura" class="nav-link has-submenu <?php echo $prefeitura_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
                             <span><i class="bi bi-building"></i> Prefeitura</span>
                             <i class="bi bi-chevron-down submenu-arrow"></i>
                         </a>
                         <div class="collapse <?php echo $prefeitura_active ? 'show' : ''; ?>" id="collapsePrefeitura">
                             <ul class="submenu">
-                                <li><a href="informacoes_prefeitura.php" class="nav-link <?php echo isActive('informacoes_prefeitura.php'); ?>">Informações Gerais</a></li>
+                                <li><a href="informacoes_prefeitura.php" class="nav-link <?php echo isActive('informacoes_prefeitura.php'); ?>">Identidade & Cores</a></li>
+                                <li><a href="configurar_copyright.php" class="nav-link <?php echo isActive('configurar_copyright.php'); ?>">Rodapé & Copyright</a></li>
                             </ul>
                         </div>
                     </li>
@@ -235,24 +254,6 @@ function isActive($pageName) {
                                 <li><a href="sic_inbox.php" class="nav-link <?php echo isActive(['sic_inbox.php', 'responder_esic.php']); ?>">Caixa de Entrada</a></li>
                                 <?php if (tem_permissao('sic', 'editar')): ?>
                                     <li><a href="configuracoes_sic.php" class="nav-link <?php echo isActive('configuracoes_sic.php'); ?>">Configurações</a></li>
-                                <?php endif; ?>
-                            </ul>
-                        </div>
-                    </li>
-                    <?php endif; ?>
-
-                    <?php if (tem_permissao('ouvidoria', 'ver')): ?>
-                    <li>
-                        <?php $ouvidoria_active = isActive(['ouvidoria_inbox.php', 'responder_manifestacao.php', 'config_ouvidoria.php']); ?>
-                        <a href="#collapseOuvidoria" class="nav-link has-submenu <?php echo $ouvidoria_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
-                            <span><i class="bi bi-chat-dots"></i> Ouvidoria</span>
-                            <i class="bi bi-chevron-down submenu-arrow"></i>
-                        </a>
-                        <div class="collapse <?php echo $ouvidoria_active ? 'show' : ''; ?>" id="collapseOuvidoria">
-                            <ul class="submenu">
-                                <li><a href="ouvidoria_inbox.php" class="nav-link <?php echo isActive(['ouvidoria_inbox.php', 'responder_manifestacao.php']); ?>">Inbox</a></li>
-                                <?php if (tem_permissao('ouvidoria', 'editar')): ?>
-                                    <li><a href="config_ouvidoria.php" class="nav-link <?php echo isActive('config_ouvidoria.php'); ?>">Configurações</a></li>
                                 <?php endif; ?>
                             </ul>
                         </div>
