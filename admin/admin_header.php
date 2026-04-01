@@ -295,14 +295,29 @@ function isActive($pageName) {
 
                 <ul class="mt-4">
                     <li class="px-3 mb-2 small text-muted text-uppercase fw-bold">Configurações</li>
+                    <?php if ($_SESSION['admin_user_perfil'] === 'admin'): ?>
+                    <li>
+                        <?php $entrada_dados_active = isActive(['importar_xml.php', 'mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>
+                        <a href="#collapseEntradaDados" class="nav-link has-submenu <?php echo $entrada_dados_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
+                            <span><i class="bi bi-database-add"></i> Entrada de Dados</span>
+                            <i class="bi bi-chevron-down submenu-arrow"></i>
+                        </a>
+                        <div class="collapse <?php echo $entrada_dados_active ? 'show' : ''; ?>" id="collapseEntradaDados">
+                            <ul class="submenu">
+                                <li><a href="mapear_xml.php" class="nav-link <?php echo isActive(['mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>">Gerenciar XML</a></li>
+                                <li><a href="importar_xml.php" class="nav-link <?php echo isActive('importar_xml.php'); ?>">Importar XML</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <?php endif; ?>
                     <?php if (tem_permissao('usuarios', 'ver') || $_SESSION['admin_user_perfil'] === 'admin'): ?>
                     <li>
-                        <?php $entrada_active = isActive(['importar_xml.php', 'mapear_xml.php', 'gerenciar_tipos_xml.php', 'gerenciar_usuarios.php', 'gerenciar_perfis.php', 'editar_usuario.php', 'editar_permissoes_perfil.php', 'logs_gerais.php']); ?>
-                        <a href="#collapseConfig" class="nav-link has-submenu <?php echo $entrada_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
+                        <?php $admin_config_active = isActive(['gerenciar_usuarios.php', 'editar_usuario.php', 'gerenciar_perfis.php', 'editar_permissoes_perfil.php', 'logs_gerais.php']); ?>
+                        <a href="#collapseConfig" class="nav-link has-submenu <?php echo $admin_config_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
                             <span><i class="bi bi-gear-fill"></i> ADMINISTRAÇÃO</span>
                             <i class="bi bi-chevron-down submenu-arrow"></i>
                         </a>
-                        <div class="collapse <?php echo $entrada_active ? 'show' : ''; ?>" id="collapseConfig">
+                        <div class="collapse <?php echo $admin_config_active ? 'show' : ''; ?>" id="collapseConfig">
                             <ul class="submenu">
                                 <?php if (tem_permissao('usuarios', 'ver')): ?>
                                     <li><a href="gerenciar_usuarios.php" class="nav-link <?php echo isActive(['gerenciar_usuarios.php', 'editar_usuario.php']); ?>">Usuários</a></li>
@@ -310,8 +325,6 @@ function isActive($pageName) {
                                 <?php if ($_SESSION['admin_user_perfil'] === 'admin'): ?>
                                     <li><a href="gerenciar_perfis.php" class="nav-link <?php echo isActive(['gerenciar_perfis.php', 'editar_permissoes_perfil.php']); ?>">Perfis e Acessos</a></li>
                                     <li class="border-top my-1 opacity-25"></li>
-                                    <li><a href="mapear_xml.php" class="nav-link <?php echo isActive(['mapear_xml.php', 'gerenciar_tipos_xml.php']); ?>">Gerenciar XML</a></li>
-                                    <li><a href="importar_xml.php" class="nav-link <?php echo isActive('importar_xml.php'); ?>">Importar XML</a></li>
                                     <li><a href="logs_gerais.php" class="nav-link <?php echo isActive('logs_gerais.php'); ?>">Auditória</a></li>
                                 <?php endif; ?>
                             </ul>
