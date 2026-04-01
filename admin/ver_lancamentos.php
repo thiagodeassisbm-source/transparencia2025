@@ -44,7 +44,7 @@ $total_itens = (int) $stmt_total->fetchColumn();
 $total_paginas = (int) ceil($total_itens / $itens_por_pagina);
 
 $stmt_registros = $pdo->prepare(
-    'SELECT r.id, r.exercicio, r.mes, r.unidade_gestora, td.nome as nome_documento
+    'SELECT r.id, r.exercicio, r.mes, r.unidade_gestora, r.id_tipo_documento, td.nome AS nome_documento
      FROM registros r
      LEFT JOIN tipos_documento td ON r.id_tipo_documento = td.id
      WHERE r.id_portal = ?
@@ -57,6 +57,17 @@ $stmt_registros->bindValue(3, $offset, PDO::PARAM_INT);
 $stmt_registros->execute();
 $registros_base = $stmt_registros->fetchAll(PDO::FETCH_ASSOC);
 $registros_ids = array_column($registros_base, 'id');
+
+$map_nome_tipo_documento = [];
+$ids_tipo = array_unique(array_filter(array_map('intval', array_column($registros_base, 'id_tipo_documento'))));
+if ($ids_tipo !== []) {
+    $ph = implode(',', array_fill(0, count($ids_tipo), '?'));
+    $stmt_tipos = $pdo->prepare("SELECT id, nome FROM tipos_documento WHERE id IN ($ph)");
+    $stmt_tipos->execute(array_values($ids_tipo));
+    foreach ($stmt_tipos->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $map_nome_tipo_documento[(int) $row['id']] = (string) $row['nome'];
+    }
+}
 
 $stmt_campos = $pdo->prepare('SELECT id, nome_campo, tipo_campo FROM campos_portal WHERE id_portal = ? ORDER BY ordem, id');
 $stmt_campos->execute([$portal_id]);
@@ -219,7 +230,21 @@ include 'admin_header.php';
                                     <td><?php echo htmlspecialchars((string) $registro['exercicio']); ?></td>
                                     <td><?php echo htmlspecialchars((string) $registro['mes']); ?></td>
                                     <td><?php echo htmlspecialchars((string) $registro['unidade_gestora']); ?></td>
-                                    <td><?php echo htmlspecialchars($registro['nome_documento'] ?? '—'); ?></td>
+                                    <td><?php
+                                    $idTipo = $registro['id_tipo_documento'] ?? null;
+                                    $idTipoInt = ($idTipo !== null && $idTipo !== '') ? (int) $idTipo : 0;
+                                    $nomeTipo = '';
+                                    if ($idTipoInt > 0) {
+                                        $nomeTipo = $map_nome_tipo_documento[$idTipoInt] ?? '';
+                                    }
+                                    if ($nomeTipo === '' && isset($registro['nome_documento'])) {
+                                        $nomeTipo = trim((string) $registro['nome_documento']);
+                                    }
+                                    if ($nomeTipo === '') {
+                                        $nomeTipo = $idTipoInt > 0 ? 'Tipo não cadastrado' : 'Não se aplica';
+                                    }
+                                    echo htmlspecialchars($nomeTipo);
+                                    ?></td>
                                     <?php
                                     $valores_deste_registro = $valores_dinamicos[$registro['id']] ?? [];
                                     foreach ($campos_dinamicos as $campo) {
