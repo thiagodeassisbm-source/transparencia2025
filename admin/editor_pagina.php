@@ -15,12 +15,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conteudo = $_POST['conteudo'];
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $titulo)));
 
+        $pref_id = $_SESSION['id_prefeitura'];
+
         if ($id_pagina) { // Atualizar página existente
-            $stmt = $pdo->prepare("UPDATE paginas SET titulo = ?, conteudo = ?, slug = ? WHERE id = ?");
-            $stmt->execute([$titulo, $conteudo, $slug, $id_pagina]);
+            $stmt = $pdo->prepare("UPDATE paginas SET titulo = ?, conteudo = ?, slug = ? WHERE id = ? AND id_prefeitura = ?");
+            $stmt->execute([$titulo, $conteudo, $slug, $id_pagina, $pref_id]);
         } else { // Criar nova página
-            $stmt = $pdo->prepare("INSERT INTO paginas (titulo, conteudo, slug) VALUES (?, ?, ?)");
-            $stmt->execute([$titulo, $conteudo, $slug]);
+            $stmt = $pdo->prepare("INSERT INTO paginas (titulo, conteudo, slug, id_prefeitura) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$titulo, $conteudo, $slug, $pref_id]);
             $id_pagina = $pdo->lastInsertId();
         }
 
@@ -56,9 +58,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Se estiver editando, busca os dados da página e seus anexos
 if ($id_pagina) {
-    $stmt = $pdo->prepare("SELECT titulo, conteudo FROM paginas WHERE id = ?");
-    $stmt->execute([$id_pagina]);
+    $pref_id = $_SESSION['id_prefeitura'];
+    $stmt = $pdo->prepare("SELECT titulo, conteudo FROM paginas WHERE id = ? AND id_prefeitura = ?");
+    $stmt->execute([$id_pagina, $pref_id]);
     $pagina = $stmt->fetch();
+    
+    if (!$pagina) {
+        $_SESSION['mensagem_sucesso'] = "Página não encontrada ou sem permissão.";
+        header("Location: gerenciar_paginas.php");
+        exit;
+    }
     $stmt_anexos = $pdo->prepare("SELECT id, titulo_anexo, caminho_arquivo FROM pagina_anexos WHERE id_pagina = ?");
     $stmt_anexos->execute([$id_pagina]);
     $anexos_existentes = $stmt_anexos->fetchAll();

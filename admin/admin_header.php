@@ -199,6 +199,7 @@ function isActive($pageName) {
                         <div class="collapse <?php echo $cadastros_active ? 'show' : ''; ?>" id="collapseCadastros">
                             <ul class="submenu">
                                 <li><a href="criar_secoes.php" class="nav-link <?php echo isActive('criar_secoes.php'); ?>">Criar Seção / Card</a></li>
+                                <li><a href="gerenciar_paginas.php" class="nav-link <?php echo isActive(['gerenciar_paginas.php', 'editor_pagina.php']); ?>">Páginas de Conteúdo</a></li>
                                 <li><a href="gerenciar_categorias.php" class="nav-link <?php echo isActive('gerenciar_categorias.php'); ?>">Categorias</a></li>
                                 <li><a href="gerenciar_tipos_documento.php" class="nav-link <?php echo isActive('gerenciar_tipos_documento.php'); ?>">Tipos de Doc.</a></li>
                                 <li><a href="gerenciar_cards.php" class="nav-link <?php echo isActive('gerenciar_cards.php'); ?>">Gerenciar Cards</a></li>

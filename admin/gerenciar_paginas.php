@@ -10,18 +10,23 @@ if ($_SESSION['admin_user_perfil'] !== 'admin') {
 }
 
 // Lógica para excluir uma página
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_pagina'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_pagina'])) {
     $id_pagina = filter_input(INPUT_POST, 'id_pagina', FILTER_VALIDATE_INT);
+    $pref_id = $_SESSION['id_prefeitura'];
     if ($id_pagina) {
-        $stmt = $pdo->prepare("DELETE FROM paginas WHERE id = ?");
-        $stmt->execute([$id_pagina]);
+        // Verifica se a página pertence à prefeitura
+        $stmt_check = $pdo->prepare("DELETE FROM paginas WHERE id = ? AND id_prefeitura = ?");
+        $stmt_check->execute([$id_pagina, $pref_id]);
         $_SESSION['mensagem_sucesso'] = "Página excluída com sucesso!";
     }
     header("Location: gerenciar_paginas.php");
     exit;
 }
 
-$paginas = $pdo->query("SELECT id, titulo, slug, data_modificacao FROM paginas ORDER BY titulo ASC")->fetchAll();
+$pref_id = $_SESSION['id_prefeitura'];
+$stmt_get = $pdo->prepare("SELECT id, titulo, slug, data_modificacao FROM paginas WHERE id_prefeitura = ? ORDER BY titulo ASC");
+$stmt_get->execute([$pref_id]);
+$paginas = $stmt_get->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
