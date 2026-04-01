@@ -101,7 +101,7 @@ include 'admin_header.php';
 
 <div class="container-fluid container-custom-padding py-4">
     <div class="row">
-        <div class="col-xl-10 mx-auto">
+        <div class="col-12">
             
             <div class="d-flex align-items-center mb-4">
                 <a href="gerenciar_paginas.php" class="btn btn-light border-0 shadow-sm me-3 text-muted">
