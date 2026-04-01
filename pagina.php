@@ -1,5 +1,6 @@
 <?php
 require_once 'conexao.php';
+require_once 'bootstrap_portal.php'; // Carrega o contexto da prefeitura ativa (SaaS)
 
 $slug = filter_input(INPUT_GET, 'slug', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 if (empty($slug)) {
@@ -7,9 +8,9 @@ if (empty($slug)) {
     exit;
 }
 
-// Busca a página no banco de dados pelo slug
-$stmt = $pdo->prepare("SELECT id, titulo, conteudo FROM paginas WHERE TRIM(slug) = ?");
-$stmt->execute([$slug]);
+// Busca a página no banco de dados pelo slug e prefeitura ativa
+$stmt = $pdo->prepare("SELECT id, titulo, conteudo FROM paginas WHERE TRIM(slug) = ? AND id_prefeitura = ?");
+$stmt->execute([$slug, $id_prefeitura_ativa]);
 $pagina = $stmt->fetch();
 
 $anexos = [];
@@ -29,36 +30,20 @@ if ($pagina) {
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <base href="<?php echo $base_url; ?>">
     <title><?php echo htmlspecialchars($page_title); ?> - Portal da Transparência</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="<?php echo $base_url; ?>css/style.css?v=<?php echo time(); ?>">
 </head>
-<body>
+<body class="bg-light">
 
-<div class="accessibility-bar py-1">
-    <div class="container-fluid container-custom-padding">
-        <div class="d-flex justify-content-end align-items-center">
-            <span class="me-3 fw-bold d-none d-md-inline"><i class="bi bi-universal-access"></i> ACESSIBILIDADE</span>
-            <button id="font-increase" class="btn btn-sm btn-outline-dark me-1" title="Aumentar Fonte">A+</button>
-            <button id="font-reset" class="btn btn-sm btn-outline-dark me-1" title="Fonte Padrão">A</button>
-            <button id="font-decrease" class="btn btn-sm btn-outline-dark me-2" title="Diminuir Fonte">A-</button>
-            <button id="contrast-toggle" class="btn btn-sm btn-outline-dark" title="Alto Contraste"><i class="bi bi-circle-half"></i></button>
-        </div>
-    </div>
-</div>
-
-<header class="page-header">
-    <div class="container-fluid container-custom-padding">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.php">Início</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($pagina['titulo']); ?></li>
-            </ol>
-        </nav>
-        <h1><?php echo htmlspecialchars($pagina['titulo']); ?></h1>
-    </div>
-</header>
+<?php include 'header_publico.php'; ?>
 
 <div class="container-fluid py-4">
     <div class="row">
@@ -94,27 +79,9 @@ if ($pagina) {
     </div>
 </div>
 
-<footer class="p-3 mt-4">
-    <div class="container-fluid container-custom-padding">
-        <div class="d-flex justify-content-between align-items-center" style="font-size: 14px;">
-            <div>&copy; <?php echo date('Y'); ?> - Todos os direitos reservados.</div>
-            <div>
-                Desenvolvido por |
-                <a href="https://www.upgyn.com.br" target="_blank" class="ms-2">
-                    <img src="imagens/logo-up.png" alt="UPGYN" style="height: 40px; vertical-align: middle;">
-                </a>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-// Script de Acessibilidade (cole o seu código completo aqui)
-document.addEventListener('DOMContentLoaded', function() {
-    // ...
-});
-</script>
-
+<?php
+$custom_container_class = "container-custom-padding";
+include 'footer_publico.php';
+?>
 </body>
 </html>
