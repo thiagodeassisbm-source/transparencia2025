@@ -53,6 +53,28 @@ $config_ouvidoria['ouvidoria_telefone'] = $config_ouvidoria['ouvidoria_telefone'
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo $base_url; ?>css/style.css?v=<?php echo time(); ?>">
+    <style>
+        /* Mesmo padrão tipográfico do ESIC (sic.php) */
+        .sic-card { border-radius: 15px !important; border: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important; }
+        .sic-card-title { font-size: 24px !important; font-weight: 700 !important; color: #1a1a1a; margin-bottom: 25px; display: block; line-height: 1.3; }
+        .sic-info-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; }
+        .sic-info-item:last-child { border-bottom: none; }
+        .sic-info-label { display: block; font-weight: 700; color: #333; font-size: 14px; margin-bottom: 5px; }
+        .sic-info-value { font-size: 15px; color: #555; margin-bottom: 0; font-weight: 400; }
+        .section-desc-sac { font-size: 13px; color: #777; margin-bottom: 1.25rem; display: block; line-height: 1.5; }
+        .section-title-sac { font-weight: 700; font-size: 18px; color: #222; margin-bottom: 0.35rem; display: block; }
+        .btn-outline-dynamic {
+            border: 1px solid #eee;
+            color: #444;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .btn-outline-dynamic:hover {
+            border-color: var(--cor-principal);
+            background: rgba(var(--cor-principal-rgb), 0.05);
+        }
+        .sic-relatorio-head .sic-card-title { margin-bottom: 0 !important; }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -69,49 +91,45 @@ include 'header_publico.php';
 
         <!-- Conteúdo Principal -->
         <main class="col-md-9 ms-auto col-lg-10 px-md-5">
-            <h2 class="mb-4 fw-bold text-dark border-bottom pb-2">Ouvidoria Municipal</h2>
+            <div class="d-flex align-items-center justify-content-between mb-5 border-bottom pb-3">
+                <h2 class="fw-bold text-dark mb-0">Ouvidoria Municipal</h2>
+            </div>
             
             <?php if (isset($_GET['protocolo'])): ?>
                 <div class="alert alert-success shadow-sm border-0 rounded-4 p-4 mb-4">
                     <div class="d-flex align-items-center">
                         <i class="bi bi-check-circle-fill fs-2 me-3 text-success"></i>
                         <div>
-                            <h5 class="mb-1 fw-bold">Manifestação Registrada!</h5>
-                            <p class="mb-0">Sua manifestação foi enviada. Anote o protocolo: <strong><?php echo htmlspecialchars($_GET['protocolo']); ?></strong></p>
+                            <span class="section-title-sac">Manifestação Registrada!</span>
+                            <p class="mb-0 sic-info-value">Sua manifestação foi enviada. Anote o protocolo: <strong><?php echo htmlspecialchars($_GET['protocolo']); ?></strong></p>
                         </div>
                     </div>
                 </div>
             <?php endif; ?>
 
-            <div class="card mb-4 border-0 shadow-sm rounded-4 overlay-hidden bg-white">
-                <div class="card-body p-4 border-start border-4 border-primary">
-                    <p class="lead mb-0 fs-6">A ouvidoria é o seu canal direto com a gestão municipal. Aqui você pode registrar elogios, sugestões, reclamações, solicitações ou denúncias de forma segura e transparente.</p>
-                </div>
-            </div>
+            <p class="section-desc-sac mb-4">A ouvidoria é o seu canal direto com a gestão municipal. Aqui você pode registrar elogios, sugestões, reclamações, solicitações ou denúncias de forma segura e transparente.</p>
 
             <div class="row g-4 mb-4">
                 <!-- Informações de Atendimento -->
                 <div class="col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white py-3 border-0">
-                            <h5 class="mb-0 fw-bold"><i class="bi bi-headset text-primary me-2"></i> Atendimento</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="small text-muted fw-bold text-uppercase">Responsável:</label>
-                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($config_ouvidoria['ouvidoria_setor']); ?></p>
+                    <div class="card h-100 sic-card p-4">
+                        <span class="sic-card-title"><i class="bi bi-headset text-primary me-2"></i>Atendimento</span>
+                        <div class="card-body p-0">
+                            <div class="sic-info-item">
+                                <span class="sic-info-label">Responsável</span>
+                                <p class="sic-info-value"><?php echo htmlspecialchars($config_ouvidoria['ouvidoria_setor']); ?></p>
                             </div>
-                            <div class="mb-3">
-                                <label class="small text-muted fw-bold text-uppercase">Endereço:</label>
-                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($config_ouvidoria['ouvidoria_endereco']); ?></p>
+                            <div class="sic-info-item">
+                                <span class="sic-info-label">Endereço</span>
+                                <p class="sic-info-value"><?php echo htmlspecialchars($config_ouvidoria['ouvidoria_endereco']); ?></p>
                             </div>
-                            <div class="mb-3">
-                                <label class="small text-muted fw-bold text-uppercase">E-mail:</label>
-                                <p class="mb-0 fw-medium text-primary"><?php echo htmlspecialchars($config_ouvidoria['ouvidoria_email']); ?></p>
+                            <div class="sic-info-item">
+                                <span class="sic-info-label">E-mail</span>
+                                <p class="sic-info-value"><a href="mailto:<?php echo htmlspecialchars($config_ouvidoria['ouvidoria_email']); ?>" class="text-decoration-none" style="color: var(--cor-principal);"><?php echo htmlspecialchars($config_ouvidoria['ouvidoria_email']); ?></a></p>
                             </div>
-                            <div>
-                                <label class="small text-muted fw-bold text-uppercase">Telefone:</label>
-                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($config_ouvidoria['ouvidoria_telefone']); ?></p>
+                            <div class="sic-info-item">
+                                <span class="sic-info-label">Telefone</span>
+                                <p class="sic-info-value"><?php echo htmlspecialchars($config_ouvidoria['ouvidoria_telefone']); ?></p>
                             </div>
                         </div>
                     </div>
@@ -119,28 +137,24 @@ include 'header_publico.php';
 
                 <!-- Botões de Ação -->
                 <div class="col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 bg-white">
-                        <div class="card-header bg-white py-3 border-0">
-                            <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-fill text-success me-2"></i> Manifestar</h5>
-                        </div>
-                        <div class="card-body d-grid gap-2">
-                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Sugestão" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-lightbulb-fill me-2 text-warning"></i> Sugestão</a>
-                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Elogio" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-hand-thumbs-up-fill me-2 text-success"></i> Elogio</a>
-                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Solicitação" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-chat-left-dots-fill me-2 text-info"></i> Solicitação</a>
-                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Reclamação" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i> Reclamação</a>
-                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Denúncia" class="btn btn-outline-dynamic btn-sm text-start py-2 px-3 fw-bold"><i class="bi bi-shield-fill-exclamation me-2 text-danger"></i> Denúncia</a>
+                    <div class="card h-100 sic-card p-4 bg-white">
+                        <span class="sic-card-title"><i class="bi bi-pencil-fill text-success me-2"></i>Manifestar</span>
+                        <div class="card-body p-0 d-grid gap-2">
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Sugestão" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-lightbulb-fill me-2 text-warning"></i> Sugestão</a>
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Elogio" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-hand-thumbs-up-fill me-2 text-success"></i> Elogio</a>
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Solicitação" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-chat-left-dots-fill me-2 text-info"></i> Solicitação</a>
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Reclamação" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i> Reclamação</a>
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Denúncia" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-shield-fill-exclamation me-2 text-danger"></i> Denúncia</a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Consulta de Protocolo -->
                 <div class="col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white py-3 border-0">
-                            <h5 class="mb-0 fw-bold"><i class="bi bi-search text-info me-2"></i> Consultar</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="text-muted small mb-4">Acompanhe sua manifestação digitando o número do protocolo abaixo.</p>
+                    <div class="card h-100 sic-card p-4">
+                        <span class="sic-card-title"><i class="bi bi-search text-info me-2"></i>Consultar</span>
+                        <div class="card-body p-0">
+                            <p class="section-desc-sac mb-4">Acompanhe sua manifestação digitando o número do protocolo abaixo.</p>
                             <form action="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/consulta_protocolo.php" method="GET">
                                 <div class="mb-3">
                                     <input type="text" name="protocolo" class="form-control rounded-start-pill rounded-end-pill px-4" placeholder="Ex: 2024.030.001" required>
@@ -156,12 +170,12 @@ include 'header_publico.php';
 
             <!-- Dashboard Estatístico -->
             <?php if ($total_manifestacoes > 0): ?>
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold"><i class="bi bi-bar-chart-fill text-dark me-2"></i> Relatório em Tempo Real</h5>
-                    <span class="badge bg-light text-dark fw-normal border px-3">Total: <?php echo $total_manifestacoes; ?> manifestações</span>
+            <div class="card sic-card p-4">
+                <div class="sic-relatorio-head d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 pb-3 border-bottom">
+                    <span class="sic-card-title"><i class="bi bi-bar-chart-fill text-dark me-2"></i>Relatório em Tempo Real</span>
+                    <span class="badge bg-light text-dark fw-normal border px-3 py-2 sic-info-value">Total: <?php echo $total_manifestacoes; ?> manifestações</span>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-0 pt-2">
                     <div class="row">
                         <?php foreach ($stats as $tipo => $quantidade): 
                             $percentual = ($quantidade / $total_manifestacoes) * 100;
@@ -172,9 +186,9 @@ include 'header_publico.php';
                             if($tipo == 'Sugestão') $cor_barra = 'bg-warning-subtle';
                         ?>
                         <div class="col-md-6 mb-4">
-                            <div class="d-flex justify-content-between mb-1 small fw-bold">
-                                <span><?php echo $tipo; ?></span>
-                                <span><?php echo $quantidade; ?> (<?php echo round($percentual, 1); ?>%)</span>
+                            <div class="d-flex justify-content-between mb-1 align-items-baseline">
+                                <span class="sic-info-label mb-0"><?php echo htmlspecialchars($tipo); ?></span>
+                                <span class="sic-info-value"><?php echo (int)$quantidade; ?> <span class="text-muted">(<?php echo round($percentual, 1); ?>%)</span></span>
                             </div>
                             <div class="progress" style="height: 10px; border-radius: 5px;">
                                 <div class="progress-bar <?php echo $cor_barra; ?> shadow-sm" style="width: <?php echo $percentual; ?>%"></div>
@@ -183,7 +197,7 @@ include 'header_publico.php';
                         <?php endforeach; ?>
                     </div>
                     <div class="text-center mt-3 pt-3 border-top">
-                        <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/ouvidoria_relatorio.php" class="text-primary text-decoration-none fw-bold small">Ver Relatório Completo Detalhado <i class="bi bi-arrow-right"></i></a>
+                        <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/ouvidoria_relatorio.php" class="text-decoration-none fw-bold sic-info-value" style="color: var(--cor-principal);">Ver Relatório Completo Detalhado <i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -191,17 +205,6 @@ include 'header_publico.php';
         </main>
     </div>
 </div>
-
-<style>
-.btn-outline-dynamic {
-    border: 1px solid #eee;
-    color: #444;
-}
-.btn-outline-dynamic:hover {
-    border-color: var(--cor-principal);
-    background: rgba(var(--cor-principal-rgb), 0.05);
-}
-</style>
 
 <?php include 'footer_publico.php'; ?>
 </body>
