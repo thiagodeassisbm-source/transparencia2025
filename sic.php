@@ -241,7 +241,7 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
             </div>
             <div class="modal-body p-4">
                 <p class="text-muted small mb-3">Insira o número do protocolo fornecido no momento da solicitação.</p>
-                <form action="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/consulta_sic.php" method="GET">
+                <form action="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/sic_consulta.php" method="GET">
                     <div class="input-group mb-3">
                         <input type="text" name="protocolo" class="form-control rounded-start-pill ps-3" placeholder="Ex: 2024123456" required>
                         <button type="submit" class="btn btn-primary rounded-end-pill px-4">Consultar</button>
