@@ -9,7 +9,16 @@ $id_usuario_logado = $_SESSION['admin_user_id'];
 $nome_usuario_logado = $_SESSION['admin_user_nome'] ?? 'Usuário';
 
 $secao_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if (!$secao_id) { header("Location: criar_secoes.php"); exit; }
+$card_id = filter_input(INPUT_GET, 'card_id', FILTER_VALIDATE_INT);
+
+if (!$card_id && !$secao_id) { header("Location: criar_secoes.php"); exit; }
+
+// Se veio apenas o Portal ID, tenta achar o Card ID
+if (!$card_id && $secao_id) {
+    $stmt_c = $pdo->prepare("SELECT id FROM cards_informativos WHERE id_secao = ?");
+    $stmt_c->execute([$secao_id]);
+    $card_id = $stmt_c->fetchColumn();
+}
 
 // Processa o formulário de atualização
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -57,17 +66,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $link_url = $_POST['pagina_sistema'] ?? '';
         }
 
-        // --- Atualiza os dados da Seção (Portal) ---
-        $secao_nome = trim($_POST['secao_nome'] ?? '');
-        $secao_descricao = trim($_POST['secao_descricao'] ?? '');
-        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $secao_nome)));
-        
-        $stmt_secao = $pdo->prepare("UPDATE portais SET nome = ?, descricao = ?, slug = ?, id_categoria = ? WHERE id = ?");
-        $stmt_secao->execute([$secao_nome, $secao_descricao, $slug, $id_categoria, $secao_id]);
+        // --- Atualiza os dados da Seção (Portal) se existir ---
+        if ($secao_id) {
+            $secao_nome = trim($_POST['secao_nome'] ?? '');
+            $secao_descricao = trim($_POST['secao_descricao'] ?? '');
+            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $secao_nome)));
+            
+            $stmt_secao = $pdo->prepare("UPDATE portais SET nome = ?, descricao = ?, slug = ?, id_categoria = ? WHERE id = ?");
+            $stmt_secao->execute([$secao_nome, $secao_descricao, $slug, $id_categoria, $secao_id]);
+        }
 
         // --- Atualiza o Card ---
-        $stmt_card = $pdo->prepare("UPDATE cards_informativos SET id_categoria = ?, link_url = ?, titulo = ?, subtitulo = ?, caminho_icone = ?, tipo_icone = ?, ordem = ? WHERE id_secao = ?");
-        $stmt_card->execute([$id_categoria, $link_url, $card_titulo, $card_subtitulo, $caminho_icone, $tipo_icone, $card_ordem, $secao_id]);
+        $stmt_card = $pdo->prepare("UPDATE cards_informativos SET id_categoria = ?, link_url = ?, titulo = ?, subtitulo = ?, caminho_icone = ?, tipo_icone = ?, ordem = ? WHERE id = ?");
+        $stmt_card->execute([$id_categoria, $link_url, $card_titulo, $card_subtitulo, $caminho_icone, $tipo_icone, $card_ordem, $card_id]);
 
         $pdo->commit();
         registrar_log($pdo, 'EDIÇÃO', 'portais', "Atualizou a seção/card: $secao_nome (ID: $secao_id)");
@@ -81,14 +92,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Busca os dados para preencher o formulário
-$stmt_secao = $pdo->prepare("SELECT * FROM portais WHERE id = ?");
-$stmt_secao->execute([$secao_id]);
-$secao_atual = $stmt_secao->fetch();
-if (!$secao_atual) { header("Location: criar_secoes.php"); exit; }
+$secao_atual = null;
+if ($secao_id) {
+    $stmt_secao = $pdo->prepare("SELECT * FROM portais WHERE id = ?");
+    $stmt_secao->execute([$secao_id]);
+    $secao_atual = $stmt_secao->fetch();
+}
 
-$stmt_card = $pdo->prepare("SELECT * FROM cards_informativos WHERE id_secao = ?");
-$stmt_card->execute([$secao_id]);
+$stmt_card = $pdo->prepare("SELECT * FROM cards_informativos WHERE id = ?");
+$stmt_card->execute([$card_id]);
 $card_atual = $stmt_card->fetch();
+
+if (!$card_atual) { header("Location: criar_secoes.php"); exit; }
 
 $categorias = $pdo->query("SELECT id, nome FROM categorias ORDER BY ordem ASC")->fetchAll();
 $paginas = $pdo->query("SELECT slug, titulo FROM paginas ORDER BY titulo ASC")->fetchAll();
@@ -251,6 +266,7 @@ include 'admin_header.php';
                     </div>
                 </div>
 
+                <?php if ($secao_id && $secao_atual): ?>
                 <!-- 2. DADOS DA SEÇÃO -->
                 <div class="card mb-4 shadow-sm border-0" id="card_dados_secao">
                     <div class="card-header bg-white py-3 fw-bold text-success"><i class="bi bi-2-circle me-2"></i>2. Dados da Seção (Tabela de Dados)</div>
@@ -268,6 +284,7 @@ include 'admin_header.php';
                         </div>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <div class="d-flex gap-2 pb-5">
                     <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">Salvar Alterações</button>

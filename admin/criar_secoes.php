@@ -100,17 +100,21 @@ $secoes_agrupadas = [];
 if ($action === 'list') {
     $pref_id = $_SESSION['id_prefeitura'] ?? 0;
     $stmt = $pdo->prepare("
-        SELECT p.id, p.nome, p.slug, c.nome as nome_categoria,
-        (SELECT COUNT(*) FROM registros r WHERE r.id_portal = p.id) as total_registros,
-        (SELECT MIN(exercicio) FROM registros r WHERE r.id_portal = p.id) as ano_min,
-        (SELECT MAX(exercicio) FROM registros r WHERE r.id_portal = p.id) as ano_max,
-        (SELECT COUNT(*) FROM valores_registros vr 
-         JOIN campos_portal cp ON vr.id_campo = cp.id 
-         WHERE cp.id_portal = p.id AND cp.tipo_campo = 'anexo' AND vr.valor != '') as total_pdfs
-        FROM portais p
-        LEFT JOIN categorias c ON p.id_categoria = c.id
-        WHERE p.id_prefeitura = ?
-        ORDER BY c.ordem, c.nome, p.nome ASC
+        SELECT 
+            ci.id as card_id, ci.titulo, ci.subtitulo, ci.caminho_icone, ci.tipo_icone, ci.link_url, ci.id_secao,
+            p.id as portal_id, p.nome as portal_nome, p.slug as portal_slug,
+            c.nome as nome_categoria,
+            (SELECT COUNT(*) FROM registros r WHERE r.id_portal = p.id) as total_registros,
+            (SELECT MIN(exercicio) FROM registros r WHERE r.id_portal = p.id) as ano_min,
+            (SELECT MAX(exercicio) FROM registros r WHERE r.id_portal = p.id) as ano_max,
+            (SELECT COUNT(*) FROM valores_registros vr 
+             JOIN campos_portal cp ON vr.id_campo = cp.id 
+             WHERE cp.id_portal = p.id AND cp.tipo_campo = 'anexo' AND vr.valor != '') as total_pdfs
+        FROM cards_informativos ci
+        LEFT JOIN portais p ON ci.id_secao = p.id
+        LEFT JOIN categorias c ON ci.id_categoria = c.id
+        WHERE ci.id_prefeitura = ?
+        ORDER BY c.ordem ASC, c.nome ASC, ci.ordem ASC, ci.titulo ASC
     ");
     $stmt->execute([$pref_id]);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -196,65 +200,91 @@ include 'admin_header.php';
                                 </div>
                                 <div id="collapse-<?php echo $id_cat; ?>" class="collapse" data-bs-parent="#accordionCategorias">
                                     <?php foreach ($secoes as $s): ?>
-                                        <div class="inner-section-item shadow-sm">
-                                            <div class="d-flex flex-column">
-                                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                                    <div>
-                                                        <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
-                                                            <h6 class="fw-bold mb-0 me-1" style="font-size: 1.15rem; color: #2d3748;"><?php echo htmlspecialchars($s['nome']); ?></h6>
-                                                            <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2" style="font-size: 0.7rem;">ATIVO</span>
-                                                            
-                                                            <?php if ($s['total_pdfs'] > 0): ?>
-                                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle py-1 px-2" style="font-size: 0.7rem;">
-                                                                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> <?php echo $s['total_pdfs']; ?> ARQUIVOS PDF
-                                                                </span>
-                                                            <?php endif; ?>
-                                                            
-                                                            <span class="badge bg-info-subtle text-dark border border-info-subtle py-1 px-2" style="font-size: 0.7rem;">
-                                                                <i class="bi bi-calendar3 me-1"></i> <?php echo $s['ano_min'] ? ($s['ano_min'] == $s['ano_max'] ? $s['ano_min'] : $s['ano_min'].' - '.$s['ano_max']) : 'SEM DADOS'; ?>
-                                                            </span>
-                                                        </div>
-                                                        <small class="text-muted d-block" style="font-size: 0.85rem; opacity: 0.7;">
-                                                            Portal ID: #<?php echo str_pad($s['id'], 6, '0', STR_PAD_LEFT); ?>
-                                                        </small>
-                                                    </div>
-                                                    
-                                                    <div class="text-center d-none d-sm-block ms-3" style="min-width: 140px;">
-                                                        <div class="text-muted small fw-bold text-uppercase mb-0" style="font-size: 0.65rem; letter-spacing: 0.8px; opacity: 0.8;">Total Lançamentos</div>
-                                                        <div class="fw-bold text-success" style="font-size: 1.8rem; line-height: 1.1;">
-                                                            <?php echo number_format($s['total_registros'] ?: 0, 0, ',', '.'); ?>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="border-top pt-3 mt-1">
-                                                    <div class="d-flex flex-wrap gap-2">
-                                                        <a href="gerenciar_campos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-detalhes">
-                                                            <i class="bi bi-pencil-square"></i> Gerenciar Campos
-                                                        </a>
-                                                        <a href="lancar_dados.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-lancar">
-                                                            <i class="bi bi-plus-square"></i> Novo Lançamento
-                                                        </a>
-                                                        <a href="editar_secao.php?id=<?php echo $s['id']; ?>" class="btn-action-custom btn-editar">
-                                                            <i class="bi bi-pencil"></i> Editar
-                                                        </a>
-                                                        <a href="ver_lancamentos.php?portal_id=<?php echo $s['id']; ?>" class="btn-action-custom btn-ver">
-                                                            <i class="bi bi-file-earmark-bar-graph"></i> Planilha de Dados
-                                                        </a>
-                                                        <form method="POST" action="excluir_secao.php" class="d-inline" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir esta seção?');">
-                                                            <input type="hidden" name="portal_id" value="<?php echo $s['id']; ?>">
-                                                            <button type="submit" class="btn-action-custom btn-excluir">
-                                                                <i class="bi bi-trash"></i> Excluir
-                                                            </button>
-                                                        </form>
-                                                        <a href="../portal.php?slug=<?php echo $s['slug']; ?>" target="_blank" class="btn-action-custom btn-detalhes ms-md-auto">
-                                                            <i class="bi bi-box-arrow-up-right"></i> Ver Portal Público
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
+                                         <?php 
+                                             $is_portal = !empty($s['portal_id']);
+                                             $display_name = $s['portal_nome'] ?: $s['titulo'];
+                                             $display_id = $s['portal_id'] ? str_pad($s['portal_id'], 6, '0', STR_PAD_LEFT) : 'Card Link';
+                                             $edit_url = "editar_secao.php?card_id=" . $s['card_id'] . ($is_portal ? "&id=" . $s['portal_id'] : "");
+                                             $public_link = $is_portal && !empty($s['portal_slug']) ? "../portal/" . $_SESSION['pref_slug'] . "/" . $s['portal_slug'] : $s['link_url'];
+                                         ?>
+                                         <div class="inner-section-item shadow-sm">
+                                             <div class="d-flex flex-column">
+                                                 <div class="d-flex justify-content-between align-items-start mb-3">
+                                                     <div>
+                                                         <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                                                             <h6 class="fw-bold mb-0 me-1" style="font-size: 1.15rem; color: #2d3748;"><?php echo htmlspecialchars($display_name); ?></h6>
+                                                             <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2" style="font-size: 0.7rem;">ATIVO</span>
+                                                             
+                                                             <?php if ($is_portal): ?>
+                                                                 <?php if ($s['total_pdfs'] > 0): ?>
+                                                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle py-1 px-2" style="font-size: 0.7rem;">
+                                                                         <i class="bi bi-file-earmark-pdf-fill me-1"></i> <?php echo $s['total_pdfs']; ?> PDF
+                                                                     </span>
+                                                                 <?php endif; ?>
+                                                                 
+                                                                 <span class="badge bg-info-subtle text-dark border border-info-subtle py-1 px-2" style="font-size: 0.7rem;">
+                                                                     <i class="bi bi-calendar3 me-1"></i> <?php echo $s['ano_min'] ? ($s['ano_min'] == $s['ano_max'] ? $s['ano_min'] : $s['ano_min'].' - '.$s['ano_max']) : 'SEM DADOS'; ?>
+                                                                 </span>
+                                                             <?php else: ?>
+                                                                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2" style="font-size: 0.7rem;">
+                                                                     <i class="bi bi-link-45deg"></i> LINK DIRETO
+                                                                 </span>
+                                                             <?php endif; ?>
+                                                         </div>
+                                                         <small class="text-muted d-block" style="font-size: 0.85rem; opacity: 0.7;">
+                                                             <?php echo $is_portal ? "Portal ID: #$display_id" : "Tipo: Redirecionamento"; ?>
+                                                         </small>
+                                                     </div>
+                                                     
+                                                     <?php if ($is_portal): ?>
+                                                     <div class="text-center d-none d-sm-block ms-3" style="min-width: 140px;">
+                                                         <div class="text-muted small fw-bold text-uppercase mb-0" style="font-size: 0.65rem; letter-spacing: 0.8px; opacity: 0.8;">Total Lançamentos</div>
+                                                         <div class="fw-bold text-success" style="font-size: 1.8rem; line-height: 1.1;">
+                                                             <?php echo number_format($s['total_registros'] ?: 0, 0, ',', '.'); ?>
+                                                         </div>
+                                                     </div>
+                                                     <?php endif; ?>
+                                                 </div>
+ 
+                                                 <div class="border-top pt-3 mt-1">
+                                                     <div class="d-flex flex-wrap gap-2">
+                                                         <?php if ($is_portal): ?>
+                                                             <a href="gerenciar_campos.php?portal_id=<?php echo $s['portal_id']; ?>" class="btn-action-custom btn-detalhes">
+                                                                 <i class="bi bi-pencil-square"></i> Gerenciar Campos
+                                                             </a>
+                                                             <a href="lancar_dados.php?portal_id=<?php echo $s['portal_id']; ?>" class="btn-action-custom btn-lancar">
+                                                                 <i class="bi bi-plus-square"></i> Novo Lançamento
+                                                             </a>
+                                                         <?php endif; ?>
+ 
+                                                         <a href="<?php echo $edit_url; ?>" class="btn-action-custom btn-editar">
+                                                             <i class="bi bi-pencil"></i> Editar
+                                                         </a>
+ 
+                                                         <?php if ($is_portal): ?>
+                                                             <a href="ver_lancamentos.php?portal_id=<?php echo $s['portal_id']; ?>" class="btn-action-custom btn-ver">
+                                                                 <i class="bi bi-file-earmark-bar-graph"></i> Planilha de Dados
+                                                             </a>
+                                                         <?php endif; ?>
+ 
+                                                         <form method="POST" action="excluir_secao.php" class="d-inline" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir esta seção?');">
+                                                             <input type="hidden" name="card_id" value="<?php echo $s['card_id']; ?>">
+                                                             <?php if ($is_portal): ?>
+                                                                 <input type="hidden" name="portal_id" value="<?php echo $s['portal_id']; ?>">
+                                                             <?php endif; ?>
+                                                             <button type="submit" class="btn-action-custom btn-excluir">
+                                                                 <i class="bi bi-trash"></i> Excluir
+                                                             </button>
+                                                         </form>
+                                                         
+                                                         <a href="<?php echo $public_link; ?>" target="_blank" class="btn-action-custom btn-detalhes ms-md-auto">
+                                                             <i class="bi bi-box-arrow-up-right"></i> Ver Portal Público
+                                                         </a>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     <?php endforeach; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
