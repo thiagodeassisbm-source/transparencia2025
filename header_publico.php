@@ -106,6 +106,19 @@ $portal_home = $base_url . "portal/" . $slug_pref_header;
         background: rgba(255, 255, 255, 0.1);
     }
 </style>
+<script>
+(function () {
+    try {
+        var n = parseInt(localStorage.getItem('fontSize'), 10);
+        if (!isNaN(n) && n >= 12 && n <= 32) {
+            document.documentElement.style.fontSize = n + 'px';
+        }
+        if (localStorage.getItem('highContrast') === 'true') {
+            document.documentElement.classList.add('high-contrast');
+        }
+    } catch (e) {}
+})();
+</script>
 <header>
     <div class="top-utility-bar-wrapper">
         <div class="container-fluid container-custom-padding d-flex justify-content-between align-items-center">

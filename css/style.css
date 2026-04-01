@@ -385,47 +385,127 @@ footer {
     color: #F2F6FB;           /* Texto claro para contraste */
 }
 
-/* --- 9. Estilos de Acessibilidade (Alto Contraste) --- */
+/* --- 9. Acessibilidade — Alto contraste (classe em html, ver js/acessibilidade.js) --- */
 
-.high-contrast {
+html.high-contrast,
+html.high-contrast body {
     background-color: #000000 !important;
     color: #ffffff !important;
 }
 
-.high-contrast a {
-    color: #ffff00 !important; /* Amarelo para links */
+html.high-contrast .text-muted,
+html.high-contrast small {
+    color: #d0d0d0 !important;
 }
 
-/* Garante que elementos importantes também mudem */
-.high-contrast .card,
-.high-contrast .list-group-item,
-.high-contrast .table,
-.high-contrast .thead-blue th,
-.high-contrast .sidebar,
-.high-contrast .breadcrumb-item a,
-.high-contrast .page-header,
-.high-contrast footer,
-.high-contrast .sidebar .search-box,
-.high-contrast .table-dark th,
-.high-contrast .table-custom thead tr th { /* ADICIONADO: Contraste para nova tabela */
+html.high-contrast a {
+    color: #ffff00 !important;
+}
+
+/* Cabeçalho público (barra utilitária + banner) */
+html.high-contrast .top-utility-bar-wrapper,
+html.high-contrast .portal-main-banner {
+    background-color: #000000 !important;
+    background-image: none !important;
+    color: #ffffff !important;
+}
+
+html.high-contrast .portal-main-title,
+html.high-contrast .portal-subtitle,
+html.high-contrast .breadcrumb-utility,
+html.high-contrast .breadcrumb-utility span,
+html.high-contrast .breadcrumb-utility a {
+    color: #ffffff !important;
+}
+
+html.high-contrast .accessibility-label {
+    color: #ffffff !important;
+}
+
+/* Menu lateral (sidebar-v2 em menu.php) */
+html.high-contrast .sidebar-v2,
+html.high-contrast .sidebar {
+    background-color: #0a0a0a !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+    background-image: none !important;
+}
+
+html.high-contrast .sidebar-heading {
+    color: #e0e0e0 !important;
+}
+
+html.high-contrast .menu-item {
+    color: #ffffff !important;
+}
+
+html.high-contrast .menu-item:hover {
+    background-color: #333333 !important;
+    color: #ffff00 !important;
+}
+
+html.high-contrast .menu-item.active {
+    background-color: #444444 !important;
+    color: #ffff00 !important;
+}
+
+html.high-contrast .search-box {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+html.high-contrast .search-box h5 {
+    color: #ffffff !important;
+}
+
+/* Cards e conteúdo */
+html.high-contrast .card,
+html.high-contrast .list-group-item,
+html.high-contrast .table,
+html.high-contrast .thead-blue th,
+html.high-contrast .breadcrumb-item a,
+html.high-contrast .page-header,
+html.high-contrast footer,
+html.high-contrast .table-dark th,
+html.high-contrast .table-custom thead tr th {
     background-color: #111111 !important;
     color: #ffffff !important;
     border-color: #ffffff !important;
-    background-image: none !important; /* Remove o degradê no alto contraste */
+    background-image: none !important;
 }
 
-.high-contrast .btn-outline-secondary,
-.high-contrast .btn-outline-dark {
+html.high-contrast .card-header,
+html.high-contrast .card-body {
+    background-color: #111111 !important;
+    color: #ffffff !important;
+}
+
+html.high-contrast .btn-outline-secondary,
+html.high-contrast .btn-outline-dark {
     color: #ffffff !important;
     border-color: #ffffff !important;
 }
 
-.high-contrast .info-card {
-    background-color: #222 !important;
+html.high-contrast .info-card {
+    background-color: #222222 !important;
+    border-color: #ffffff !important;
 }
 
-.high-contrast .info-card:hover {
-    background-color: #333 !important;
+html.high-contrast .info-card:hover {
+    background-color: #333333 !important;
+}
+
+html.high-contrast .form-control,
+html.high-contrast .form-select {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.high-contrast .modal-content {
+    background-color: #111111 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
 }
 
 /* --- ESTILO PARA A BARRA DE TÍTULO DA PREFEITURA --- */

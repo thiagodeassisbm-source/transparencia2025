@@ -40,6 +40,19 @@ function isActive($pageName) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="admin_style.css?v=<?php echo time(); ?>">
+    <script>
+    (function () {
+        try {
+            var n = parseInt(localStorage.getItem('fontSize'), 10);
+            if (!isNaN(n) && n >= 12 && n <= 32) {
+                document.documentElement.style.fontSize = n + 'px';
+            }
+            if (localStorage.getItem('highContrast') === 'true') {
+                document.documentElement.classList.add('high-contrast');
+            }
+        } catch (e) {}
+    })();
+    </script>
 </head>
 <body>
 

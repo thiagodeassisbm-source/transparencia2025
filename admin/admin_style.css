@@ -540,3 +540,75 @@ body {
     font-weight: 500;
 }
 
+/* Acessibilidade — alto contraste (classe em html; fonte via js/acessibilidade.js) */
+html.high-contrast body {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+html.high-contrast .admin-main,
+html.high-contrast .admin-content {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+html.high-contrast .admin-sidebar {
+    background-color: #0a0a0a !important;
+    color: #ffffff !important;
+    border-right: 1px solid #ffffff !important;
+}
+
+html.high-contrast .sidebar-header {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+html.high-contrast .sidebar-nav a,
+html.high-contrast .sidebar-nav .nav-link {
+    color: #ffffff !important;
+}
+
+html.high-contrast .sidebar-nav a:hover,
+html.high-contrast .sidebar-nav .nav-link:hover {
+    background-color: #333333 !important;
+    color: #ffff00 !important;
+}
+
+html.high-contrast .card {
+    background-color: #111111 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.high-contrast .table {
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.high-contrast .table thead th,
+html.high-contrast .table tbody td {
+    background-color: #111111 !important;
+    color: #ffffff !important;
+    border-color: #444444 !important;
+}
+
+html.high-contrast .admin-footer {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.high-contrast .text-muted {
+    color: #cccccc !important;
+}
+
+html.high-contrast .form-control,
+html.high-contrast .form-select {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.high-contrast a {
+    color: #ffff00 !important;
+}

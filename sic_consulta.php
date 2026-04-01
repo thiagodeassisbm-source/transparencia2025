@@ -158,6 +158,5 @@ include 'footer_publico.php';
     .btn-outline-dynamic:hover { border-color: var(--cor-principal); background: rgba(var(--cor-principal-rgb), 0.05); color: #111; }
     .italic { font-style: italic; }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -84,7 +84,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso Restrito - <?php echo htmlspecialchars($titulo_portal); ?></title>
-    
+    <script>
+    (function () {
+        try {
+            var n = parseInt(localStorage.getItem('fontSize'), 10);
+            if (!isNaN(n) && n >= 12 && n <= 32) document.documentElement.style.fontSize = n + 'px';
+            if (localStorage.getItem('highContrast') === 'true') document.documentElement.classList.add('high-contrast');
+        } catch (e) {}
+    })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -418,6 +426,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .brand-content h1 { font-size: 2.5rem; }
             .feature-list { align-self: center; }
         }
+
+        html.high-contrast body {
+            background: #000000 !important;
+            background-image: none !important;
+        }
+        html.high-contrast .login-card {
+            background: #111111 !important;
+            border-color: #ffffff !important;
+            color: #ffffff !important;
+        }
+        html.high-contrast .brand-content h1 {
+            -webkit-text-fill-color: #ffffff;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -538,6 +560,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
     </script>
+    <script src="../js/acessibilidade.js"></script>
 
 </body>
 </html>

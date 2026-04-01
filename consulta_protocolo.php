@@ -16,7 +16,16 @@ $page_title = "Consulta de Protocolo";
     <meta charset="UTF-8">
     <title><?php echo htmlspecialchars($page_title); ?> - Portal da Transparência</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>css/style.css?v=<?php echo time(); ?>">
+    <script>
+    (function () {
+        try {
+            var n = parseInt(localStorage.getItem('fontSize'), 10);
+            if (!isNaN(n) && n >= 12 && n <= 32) document.documentElement.style.fontSize = n + 'px';
+            if (localStorage.getItem('highContrast') === 'true') document.documentElement.classList.add('high-contrast');
+        } catch (e) {}
+    })();
+    </script>
 </head>
 <body>
 <header class="page-header">
@@ -81,5 +90,6 @@ $page_title = "Consulta de Protocolo";
     </div>
 </div>
 <footer class="text-center p-3 mt-4"></footer>
+<script src="<?php echo $base_url; ?>js/acessibilidade.js"></script>
 </body>
 </html>

@@ -53,6 +53,15 @@ if (!empty($termo_busca)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?php echo $base_url; ?>css/style.css?v=<?php echo time(); ?>">
+    <script>
+    (function () {
+        try {
+            var n = parseInt(localStorage.getItem('fontSize'), 10);
+            if (!isNaN(n) && n >= 12 && n <= 32) document.documentElement.style.fontSize = n + 'px';
+            if (localStorage.getItem('highContrast') === 'true') document.documentElement.classList.add('high-contrast');
+        } catch (e) {}
+    })();
+    </script>
 </head>
 <body>
 
@@ -119,5 +128,6 @@ if (!empty($termo_busca)) {
     &copy; <?php echo date('Y'); ?> - Todos os direitos reservados.
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo $base_url; ?>js/acessibilidade.js"></script>
 </body>
 </html>

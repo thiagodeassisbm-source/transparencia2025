@@ -7,30 +7,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo $base_url; ?>js/acessibilidade.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const body = document.body;
-    const btnIncrease = document.getElementById('font-increase');
-    const btnReset = document.getElementById('font-reset');
-    const btnDecrease = document.getElementById('font-decrease');
-    const btnContrast = document.getElementById('contrast-toggle');
-
-    let currentFontSize = parseInt(localStorage.getItem('fontSize') || 16);
-    let highContrast = localStorage.getItem('highContrast') === 'true';
-
-    function applySettings() {
-        body.style.fontSize = currentFontSize + 'px';
-        if (highContrast) { body.classList.add('high-contrast'); } 
-        else { body.classList.remove('high-contrast'); }
-    }
-
-    if(btnIncrease) { btnIncrease.addEventListener('click', function() { if (currentFontSize < 24) { currentFontSize += 2; localStorage.setItem('fontSize', currentFontSize); applySettings(); } }); }
-    if(btnDecrease) { btnDecrease.addEventListener('click', function() { if (currentFontSize > 12) { currentFontSize -= 2; localStorage.setItem('fontSize', currentFontSize); applySettings(); } }); }
-    if(btnReset) { btnReset.addEventListener('click', function() { currentFontSize = 16; localStorage.removeItem('fontSize'); applySettings(); }); }
-    if(btnContrast) { btnContrast.addEventListener('click', function() { highContrast = !highContrast; localStorage.setItem('highContrast', highContrast); applySettings(); }); }
-    
-    applySettings();
-
     // --- NOVA LÓGICA DE FAVORITOS (LOCAL STORAGE) ---
     // Inicializa o array de IDs favoritados a partir do LocalStorage
     let favoritosLocal = JSON.parse(localStorage.getItem('favoritos_maquina')) || [];
