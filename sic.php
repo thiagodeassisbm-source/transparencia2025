@@ -122,7 +122,9 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
 
         <!-- Conteúdo Principal -->
         <main class="col-md-9 ms-auto col-lg-10 px-md-5">
-            <h2 class="mb-5 fw-bold text-dark border-bottom pb-3">Serviço de Informação ao Cidadão (SIC)</h2>
+            <div class="d-flex align-items-center justify-content-between mb-5 border-bottom pb-3">
+                <h2 class="fw-bold text-dark mb-0">Serviço de Informação ao Cidadão (SIC)</h2>
+            </div>
             
             <div class="row g-5">
                 <!-- SIC Físico -->
@@ -249,6 +251,38 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
         </div>
     </div>
 </div>
+
+<!-- Modal Sucesso Pedido -->
+<?php if (isset($_GET['protocolo'])): ?>
+<div class="modal fade" id="modalSucesso" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg p-3">
+            <div class="modal-body text-center p-4">
+                <div class="mb-3 text-success display-1">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-2">Pedido Enviado!</h3>
+                <p class="text-muted mb-4">Sua solicitação foi registrada com sucesso. Utilize o protocolo abaixo para acompanhar o andamento.</p>
+                
+                <div class="bg-light p-3 rounded-4 border border-dashed mb-4">
+                    <span class="d-block small text-muted text-uppercase fw-bold mb-1">Número do Protocolo</span>
+                    <h2 class="fw-bold text-primary mb-0"><?php echo htmlspecialchars($_GET['protocolo']); ?></h2>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-secondary rounded-pill py-2" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var myModal = new bootstrap.Modal(document.getElementById('modalSucesso'));
+        myModal.show();
+    });
+</script>
+<?php endif; ?>
 
 <?php include 'footer_publico.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
