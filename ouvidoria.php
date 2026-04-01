@@ -35,11 +35,15 @@ try {
     $config_ouvidoria = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
 } catch (Exception $e) {}
 
-// Fallbacks de contato
+// Fallbacks de contato e textos dos cards (admin: config_ouvidoria.php)
 $config_ouvidoria['ouvidoria_setor'] = $config_ouvidoria['ouvidoria_setor'] ?? 'Ouvidoria Municipal';
 $config_ouvidoria['ouvidoria_endereco'] = $config_ouvidoria['ouvidoria_endereco'] ?? 'Sede Administrativa';
 $config_ouvidoria['ouvidoria_email'] = $config_ouvidoria['ouvidoria_email'] ?? 'ouvidoria@municipio.gov.br';
 $config_ouvidoria['ouvidoria_telefone'] = $config_ouvidoria['ouvidoria_telefone'] ?? '(62) 0000-0000';
+$config_ouvidoria['ouvidoria_pagina_intro'] = $config_ouvidoria['ouvidoria_pagina_intro'] ?? 'A ouvidoria é o seu canal direto com a gestão municipal. Aqui você pode registrar elogios, sugestões, reclamações, solicitações ou denúncias de forma segura e transparente.';
+$config_ouvidoria['ouvidoria_manifestar_descricao'] = $config_ouvidoria['ouvidoria_manifestar_descricao'] ?? '';
+$config_ouvidoria['ouvidoria_consultar_descricao'] = $config_ouvidoria['ouvidoria_consultar_descricao'] ?? 'Acompanhe sua manifestação digitando o número do protocolo abaixo.';
+$config_ouvidoria['ouvidoria_relatorio_descricao'] = $config_ouvidoria['ouvidoria_relatorio_descricao'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -107,7 +111,7 @@ include 'header_publico.php';
                 </div>
             <?php endif; ?>
 
-            <p class="section-desc-sac mb-4">A ouvidoria é o seu canal direto com a gestão municipal. Aqui você pode registrar elogios, sugestões, reclamações, solicitações ou denúncias de forma segura e transparente.</p>
+            <p class="section-desc-sac mb-4"><?php echo nl2br(htmlspecialchars($config_ouvidoria['ouvidoria_pagina_intro'])); ?></p>
 
             <div class="row g-4 mb-4">
                 <!-- Informações de Atendimento -->
@@ -140,6 +144,9 @@ include 'header_publico.php';
                     <div class="card h-100 sic-card p-4 bg-white">
                         <span class="sic-card-title"><i class="bi bi-pencil-fill text-success me-2"></i>Manifestar</span>
                         <div class="card-body p-0 d-grid gap-2">
+                            <?php if (trim($config_ouvidoria['ouvidoria_manifestar_descricao']) !== ''): ?>
+                                <p class="section-desc-sac mb-3"><?php echo nl2br(htmlspecialchars($config_ouvidoria['ouvidoria_manifestar_descricao'])); ?></p>
+                            <?php endif; ?>
                             <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Sugestão" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-lightbulb-fill me-2 text-warning"></i> Sugestão</a>
                             <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Elogio" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-hand-thumbs-up-fill me-2 text-success"></i> Elogio</a>
                             <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/abrir_manifestacao.php?tipo=Solicitação" class="btn btn-outline-dynamic text-start py-2 px-3"><i class="bi bi-chat-left-dots-fill me-2 text-info"></i> Solicitação</a>
@@ -154,7 +161,7 @@ include 'header_publico.php';
                     <div class="card h-100 sic-card p-4">
                         <span class="sic-card-title"><i class="bi bi-search text-info me-2"></i>Consultar</span>
                         <div class="card-body p-0">
-                            <p class="section-desc-sac mb-4">Acompanhe sua manifestação digitando o número do protocolo abaixo.</p>
+                            <p class="section-desc-sac mb-4"><?php echo nl2br(htmlspecialchars($config_ouvidoria['ouvidoria_consultar_descricao'])); ?></p>
                             <form action="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/consulta_protocolo.php" method="GET">
                                 <div class="mb-3">
                                     <input type="text" name="protocolo" class="form-control rounded-start-pill rounded-end-pill px-4" placeholder="Ex: 2024.030.001" required>
@@ -176,6 +183,9 @@ include 'header_publico.php';
                     <span class="badge bg-light text-dark fw-normal border px-3 py-2 sic-info-value">Total: <?php echo $total_manifestacoes; ?> manifestações</span>
                 </div>
                 <div class="card-body p-0 pt-2">
+                    <?php if (trim($config_ouvidoria['ouvidoria_relatorio_descricao']) !== ''): ?>
+                        <p class="section-desc-sac mb-3"><?php echo nl2br(htmlspecialchars($config_ouvidoria['ouvidoria_relatorio_descricao'])); ?></p>
+                    <?php endif; ?>
                     <div class="row">
                         <?php foreach ($stats as $tipo => $quantidade): 
                             $percentual = ($quantidade / $total_manifestacoes) * 100;
