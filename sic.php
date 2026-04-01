@@ -2,14 +2,10 @@
 require_once 'conexao.php';
 require_once 'bootstrap_portal.php';
 
-// O bootstrap_portal.php já deve ter sido carregado se viermos via rewrite, 
-// senão o header_publico se encarrega de detectar.
-
 // Busca as configurações do SIC do banco de dados para a prefeitura ativa
 $info_sic = [];
 try {
     $id_pref = $id_prefeitura_ativa ?? 0;
-    // Padrão SaaS: busca global (0) e específica (id), a específica sobrescreve por vir depois no fetch
     $stmt = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE (id_prefeitura = ? OR id_prefeitura = 0) AND chave LIKE 'sic_%' ORDER BY id_prefeitura ASC");
     $stmt->execute([$id_pref]);
     $info_sic = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
@@ -40,68 +36,123 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo $base_url; ?>css/style.css?v=<?php echo time(); ?>">
+    <style>
+        .sic-card { border-radius: 15px !important; border: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important; }
+        .sic-card-title { font-size: 26px !important; font-weight: 700 !important; color: #1a1a1a; margin-bottom: 25px; display: block; }
+        
+        /* Layout do SIC Físico */
+        .sic-info-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; }
+        .sic-info-item:last-child { border-bottom: none; }
+        .sic-info-label { display: block; font-weight: 700; color: #333; font-size: 16px; margin-bottom: 5px; }
+        .sic-info-value { font-size: 17px; color: #555; margin-bottom: 0; font-weight: 400; }
+
+        /* Botões Solicitações */
+        .btn-sac { 
+            display: flex; 
+            align-items: center; 
+            width: 100%; 
+            background: #fff; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            text-decoration: none; 
+            color: #333; 
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .btn-sac:hover { border-color: #d4a35d; transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); color: #1a1a1a; }
+        .btn-sac-icon { 
+            background: #d4a35d; 
+            color: #fff; 
+            padding: 22px 25px; 
+            font-size: 32px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        .btn-sac-text { padding: 0 25px; font-weight: 700; font-size: 19px; }
+
+        /* Box Informativo */
+        .info-box-sac { 
+            background: #fdfdfd; 
+            border: 1px solid #f0f0f0;
+            border-radius: 12px; 
+            padding: 20px; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .info-box-sac i { font-size: 28px; color: #ced4da; }
+        .info-box-sac p { margin: 0; font-size: 15px; color: #6c757d; line-height: 1.6; }
+        .info-box-sac strong { color: #d4a35d; }
+
+        /* Listas Legislação */
+        .legis-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #fff;
+            border: 1px solid #eeeeee;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #444;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        .legis-item:hover { border-color: #d4a35d; background: #fffcf8; color: #1a1a1a; }
+        .legis-item span { font-size: 17px; font-weight: 400; }
+        .legis-item i.bi-chevron-right { font-size: 14px; color: #bbb; }
+        
+        .section-title-sac { font-weight: 700; font-size: 20px; color: #222; margin-top: 30px; margin-bottom: 12px; display: block; }
+        .section-desc-sac { font-size: 15px; color: #777; margin-bottom: 20px; display: block; line-height: 1.5; }
+    </style>
 </head>
 <body class="bg-light">
 
-<?php 
-// O header_publico.php gerencia o slug_pref_header
-include 'header_publico.php'; 
-?>
+<?php include 'header_publico.php'; ?>
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-5">
     <div class="row">
         <!-- Menu Lateral -->
-        <div class="col-md-3 col-lg-2 d-none d-md-block p-0 mb-4">
+        <div class="col-md-3 col-lg-2 d-none d-md-block px-0 ps-3 mb-4">
             <?php include 'menu.php'; ?>
         </div>
 
         <!-- Conteúdo Principal -->
-        <main class="col-md-9 ms-auto col-lg-10 px-md-4">
-            <h2 class="mb-4 fw-bold text-dark border-bottom pb-2">Serviço de Informação ao Cidadão (SIC)</h2>
+        <main class="col-md-9 ms-auto col-lg-10 px-md-5">
+            <h2 class="mb-5 fw-bold text-dark border-bottom pb-3">Serviço de Informação ao Cidadão (SIC)</h2>
             
-            <?php if (isset($_GET['protocolo'])): ?>
-                <div class="alert alert-success shadow-sm border-0 rounded-4 p-4 mb-4">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-check-circle-fill fs-2 me-3 text-success"></i>
-                        <div>
-                            <h5 class="mb-1 fw-bold">Solicitação Enviada com Sucesso!</h5>
-                            <p class="mb-0">Seu pedido foi registrado. Guarde seu protocolo: <strong><?php echo htmlspecialchars($_GET['protocolo']); ?></strong></p>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <div class="row g-4">
+            <div class="row g-5">
                 <!-- SIC Físico -->
                 <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden sic-card">
-                        <div class="card-header bg-white py-3 border-0">
-                            <h5 class="mb-0 fw-bold"><i class="bi bi-geo-alt-fill text-primary me-2"></i> SIC Físico</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="small text-muted fw-bold text-uppercase">Setor:</label>
-                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($info_sic['sic_setor']); ?></p>
+                    <div class="card h-100 sic-card p-4">
+                        <span class="sic-card-title">SIC Físico</span>
+                        <div class="card-body p-0">
+                            <div class="sic-info-item">
+                                <span class="sic-info-label">Setor</span>
+                                <p class="sic-info-value"><?php echo htmlspecialchars($info_sic['sic_setor']); ?></p>
                             </div>
-                            <div class="mb-3">
-                                <label class="small text-muted fw-bold text-uppercase">Endereço:</label>
-                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($info_sic['sic_endereco']); ?></p>
+                            <div class="sic-info-item">
+                                <span class="sic-info-label">Endereço</span>
+                                <p class="sic-info-value"><?php echo htmlspecialchars($info_sic['sic_endereco']); ?></p>
                             </div>
-                            <div class="mb-3">
-                                <label class="small text-muted fw-bold text-uppercase">Responsável:</label>
-                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($info_sic['sic_responsavel']); ?></p>
+                            <div class="sic-info-item">
+                                <span class="sic-info-label">Responsável</span>
+                                <p class="sic-info-value"><?php echo htmlspecialchars($info_sic['sic_responsavel']); ?></p>
                             </div>
-                            <div class="mb-3">
-                                <label class="small text-muted fw-bold text-uppercase">E-mail:</label>
-                                <p class="mb-0 fw-medium text-primary"><?php echo htmlspecialchars($info_sic['sic_email']); ?></p>
+                            <div class="sic-info-item">
+                                <span class="sic-info-label">E-mail</span>
+                                <p class="sic-info-value"><?php echo htmlspecialchars($info_sic['sic_email']); ?></p>
                             </div>
-                            <div class="mb-3">
-                                <label class="small text-muted fw-bold text-uppercase">Telefone:</label>
-                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($info_sic['sic_telefone']); ?></p>
+                            <div class="sic-info-item">
+                                <span class="sic-info-label">Telefone</span>
+                                <p class="sic-info-value"><?php echo htmlspecialchars($info_sic['sic_telefone']); ?></p>
                             </div>
-                            <div>
-                                <label class="small text-muted fw-bold text-uppercase">Horário:</label>
-                                <p class="mb-0 fw-medium"><?php echo htmlspecialchars($info_sic['sic_horario']); ?></p>
+                            <div class="sic-info-item">
+                                <span class="sic-info-label">Horário de Funcionamento</span>
+                                <p class="sic-info-value"><?php echo htmlspecialchars($info_sic['sic_horario']); ?></p>
                             </div>
                         </div>
                     </div>
@@ -109,30 +160,24 @@ include 'header_publico.php';
 
                 <!-- Solicitações Online -->
                 <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden sic-card">
-                        <div class="card-header bg-white py-3 border-0">
-                            <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square text-success me-2"></i> Solicitações</h5>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <div class="mb-4">
-                                <h6 class="fw-bold">Fazer uma Solicitação</h6>
-                                <p class="text-muted small">Clique no botão abaixo para preencher o formulário do seu pedido de informação online.</p>
-                                <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/solicitacao_sic.php" class="btn btn-dynamic-primary btn-lg w-100 rounded-pill py-2 shadow-sm">
-                                    <i class="bi bi-plus-circle me-2"></i> Iniciar Solicitação
-                                </a>
-                            </div>
+                    <div class="card h-100 sic-card p-4">
+                        <span class="sic-card-title text-start">Solicitações</span>
+                        <div class="card-body p-0">
+                            <p class="section-desc-sac">Encaminhe aqui suas solicitações de acesso à informação e acompanhe pedidos em andamento.</p>
                             
-                            <div class="mt-auto pt-4 border-top">
-                                <h6 class="fw-bold">Acompanhar Pedido</h6>
-                                <p class="text-muted small">Consulte o andamento de um pedido existente usando seu protocolo.</p>
-                                <form action="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/consulta_sic.php" method="GET">
-                                    <div class="input-group mb-2">
-                                        <input type="text" name="protocolo" class="form-control rounded-start-pill ps-3" placeholder="Número do Protocolo" required>
-                                        <button type="submit" class="btn btn-primary rounded-end-pill px-3">
-                                            <i class="bi bi-search"></i>
-                                        </button>
-                                    </div>
-                                </form>
+                            <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/solicitacao_sic.php" class="btn-sac">
+                                <div class="btn-sac-icon"><i class="bi bi-file-earmark-plus"></i></div>
+                                <div class="btn-sac-text">Fazer uma solicitação</div>
+                            </a>
+
+                            <a href="#" class="btn-sac" data-bs-toggle="modal" data-bs-target="#modalAcompanhar">
+                                <div class="btn-sac-icon"><i class="bi bi-search"></i></div>
+                                <div class="btn-sac-text">Acompanhar solicitação</div>
+                            </a>
+
+                            <div class="info-box-sac shadow-sm">
+                                <i class="bi bi-info-circle"></i>
+                                <p>Caso prefira fazer sua solicitação pessoalmente, <strong>baixe o formulário</strong> de requerimento de informações e entregue no endereço do SIC Físico informado.</p>
                             </div>
                         </div>
                     </div>
@@ -140,31 +185,34 @@ include 'header_publico.php';
 
                 <!-- Legislação -->
                 <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden sic-card">
-                        <div class="card-header bg-white py-3 border-0">
-                            <h5 class="mb-0 fw-bold"><i class="bi bi-journal-text text-warning me-2"></i> Legislação e Dados</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-4">
-                                <p class="fw-bold mb-1 small text-uppercase text-muted">Legislação Federal</p>
-                                <a href="https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm" target="_blank" class="text-decoration-none d-block p-2 bg-light rounded text-dark hover-shadow-sm transition">
-                                    <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i> Lei Federal nº 12.527/2011 (LAI)
-                                </a>
-                            </div>
+                    <div class="card h-100 sic-card p-4">
+                        <span class="sic-card-title">Legislação</span>
+                        <div class="card-body p-0">
+                            <p class="section-desc-sac">Conheça as leis que garantem ao cidadão o direito constitucional de acesso às informações públicas.</p>
+                            
+                            <a href="https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm" target="_blank" class="legis-item shadow-sm">
+                                <span>Lei Federal nº 12.527/2011</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
 
-                            <div class="mb-4">
-                                <p class="fw-bold mb-1 small text-uppercase text-muted">Regulamentação Municipal</p>
-                                <a href="#" class="text-decoration-none d-block p-2 bg-light rounded text-dark opacity-50">
-                                    <i class="bi bi-file-earmark-pdf-fill text-primary me-2"></i> Lei Municipal da LAI
-                                </a>
-                            </div>
+                            <span class="section-title-sac">Regulamentação Municipal da LAI</span>
+                            <a href="#" class="legis-item shadow-sm">
+                                <span>Decreto Municipal nº 44.385/2019</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
 
-                            <div class="pt-3 border-top">
-                                <p class="fw-bold mb-1 small text-uppercase text-muted">Dados Sigilosos</p>
-                                <div class="list-group list-group-flush small">
-                                    <a href="#" class="list-group-item list-group-item-action px-0 border-0 text-muted italic">Informações Classificadas</a>
-                                    <a href="#" class="list-group-item list-group-item-action px-0 border-0 text-muted italic">Informações Desclassificadas</a>
-                                </div>
+                            <span class="section-title-sac">Dados sigilosos</span>
+                            <p class="section-desc-sac">Acesse os dados que foram classificados como sigilosos e os perderam a classificação de sigilosos.</p>
+                            
+                            <div class="list-group list-group-flush border-0">
+                                <a href="#" class="legis-item shadow-sm">
+                                    <span>Informações classificadas</span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                                <a href="#" class="legis-item shadow-sm">
+                                    <span>Informações desclassificadas</span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -174,24 +222,28 @@ include 'header_publico.php';
     </div>
 </div>
 
+<!-- Modal Acompanhar Pedido -->
+<div class="modal fade" id="modalAcompanhar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Acompanhar Pedido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-3">Insira o número do protocolo fornecido no momento da solicitação.</p>
+                <form action="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/consulta_sic.php" method="GET">
+                    <div class="input-group mb-3">
+                        <input type="text" name="protocolo" class="form-control rounded-start-pill ps-3" placeholder="Ex: 2024123456" required>
+                        <button type="submit" class="btn btn-primary rounded-end-pill px-4">Consultar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php include 'footer_publico.php'; ?>
-
-<style>
-    .sic-card h5 { font-size: 17px !important; font-weight: 700 !important; }
-    .sic-card h6 { font-size: 17px !important; font-weight: 700 !important; }
-    .sic-card p, 
-    .sic-card a, 
-    .sic-card label, 
-    .sic-card .list-group-item,
-    .sic-card .btn,
-    .sic-card input { 
-        font-size: 17px !important; 
-    }
-    .sic-card label {
-        opacity: 0.8;
-        letter-spacing: 0.5px;
-    }
-</style>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
