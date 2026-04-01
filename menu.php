@@ -11,7 +11,10 @@ if (!isset($slug_prefeitura_ativa)) {
     $slug_contexto = $slug_prefeitura_ativa;
 }
 
-$categorias = $pdo->query("SELECT id, nome, slug FROM categorias ORDER BY ordem ASC")->fetchAll();
+$id_pref_menu = $id_prefeitura_ativa ?? 0;
+$stmt_cats = $pdo->prepare("SELECT id, nome, slug FROM categorias WHERE id_prefeitura = ? ORDER BY ordem ASC");
+$stmt_cats->execute([$id_pref_menu]);
+$categorias = $stmt_cats->fetchAll();
 $categoria_ativa_id = $categoria_id ?? ($_GET['categoria_id'] ?? 0); 
 ?>
 <div class="sidebar-v2 bg-white shadow-sm h-100" style="border-radius: 12px; overflow: hidden;">

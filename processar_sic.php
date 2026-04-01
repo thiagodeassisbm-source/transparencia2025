@@ -9,14 +9,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome_solicitante']))
         $protocolo = 'SIC' . date('Y') . rand(10000, 99999);
         $status = 'Recebido';
 
+        // Detecta prefeitura (Contexto SaaS)
+        $id_prefeitura_form = $_POST['pref_id'] ?? ($_GET['pref_id'] ?? 0);
+        if (!$id_prefeitura_form && isset($_SESSION['id_prefeitura'])) $id_prefeitura_form = $_SESSION['id_prefeitura'];
+
         $stmt = $pdo->prepare(
             "INSERT INTO sic_solicitacoes 
-                (protocolo, nome_solicitante, email, telefone, tipo_documento, numero_documento, descricao_pedido, status) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                (protocolo, id_prefeitura, nome_solicitante, email, telefone, tipo_documento, numero_documento, descricao_pedido, status) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         
         $stmt->execute([
             $protocolo,
+            $id_prefeitura_form,
             $_POST['nome_solicitante'],
             $_POST['email'],
             $_POST['telefone'],

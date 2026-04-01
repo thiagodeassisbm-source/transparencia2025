@@ -8,14 +8,25 @@ if ($_SESSION['admin_user_perfil'] !== 'admin') {
     exit;
 }
 
+$pref_id = $_SESSION['id_prefeitura'] ?? 0;
+
 // Lógica para salvar as configurações
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $configuracoes = $_POST['config'];
     
-    $stmt = $pdo->prepare("UPDATE configuracoes SET valor = ? WHERE chave = ?");
-    
     foreach ($configuracoes as $chave => $valor) {
-        $stmt->execute([trim($valor), $chave]);
+        // Verifica se a configuração já existe para esta prefeitura
+        $stmt_check = $pdo->prepare("SELECT id FROM configuracoes WHERE id_prefeitura = ? AND chave = ?");
+        $stmt_check->execute([$pref_id, $chave]);
+        $exists = $stmt_check->fetch();
+        
+        if ($exists) {
+            $stmt = $pdo->prepare("UPDATE configuracoes SET valor = ? WHERE id_prefeitura = ? AND chave = ?");
+            $stmt->execute([trim($valor), $pref_id, $chave]);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO configuracoes (chave, valor, id_prefeitura) VALUES (?, ?, ?)");
+            $stmt->execute([$chave, trim($valor), $pref_id]);
+        }
     }
 
     registrar_log($pdo, 'EDIÇÃO', 'configuracoes', "Atualizou as configurações da Ouvidoria.");
@@ -25,8 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Busca as configurações atuais do banco para preencher o formulário
-$stmt = $pdo->query("SELECT chave, valor FROM configuracoes WHERE chave LIKE 'ouvidoria_%'");
+// Busca as configurações atuais filtradas por prefeitura
+$stmt = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE id_prefeitura = ? AND chave LIKE 'ouvidoria_%'");
+$stmt->execute([$pref_id]);
 $configuracoes_atuais = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 ?>
 <!DOCTYPE html>

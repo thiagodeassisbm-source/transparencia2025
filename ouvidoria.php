@@ -1,5 +1,6 @@
 <?php
 require_once 'conexao.php';
+require_once 'bootstrap_portal.php';
 $page_title = "Ouvidoria Municipal";
 
 // Lógica para estatísticas (Específicas da prefeitura se necessário)
@@ -25,11 +26,12 @@ catch (Exception $e) {
     $total_manifestacoes = 0;
 }
 
-// Busca as configurações da ouvidoria para a prefeitura ativa
+// Busca as configurações da ouvidoria (SaaS Overrides: id_prefeitura > 0 > FALLBACK)
 $config_ouvidoria = [];
 try {
-    $stmt_config = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE id_prefeitura = ? AND chave LIKE 'ouvidoria_%'");
-    $stmt_config->execute([$curr_pref_id]);
+    $id_pref_config = $id_prefeitura_ativa ?? 0;
+    $stmt_config = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE (id_prefeitura = ? OR id_prefeitura = 0) AND chave LIKE 'ouvidoria_%' ORDER BY id_prefeitura ASC");
+    $stmt_config->execute([$id_pref_config]);
     $config_ouvidoria = $stmt_config->fetchAll(PDO::FETCH_KEY_PAIR);
 } catch (Exception $e) {}
 

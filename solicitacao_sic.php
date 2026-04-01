@@ -1,5 +1,6 @@
 <?php
 require_once 'conexao.php';
+require_once 'bootstrap_portal.php';
 $page_title = "Fazer Solicitação ao SIC";
 
 // Detecta o ID da prefeitura para associar o pedido no futuro (se necessário)

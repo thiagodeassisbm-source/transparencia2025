@@ -9,14 +9,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_manifestacao'])
         $protocolo = date('Ymd') . strtoupper(substr(uniqid(), 7, 6));
         $status = 'Recebida';
 
+        // Detecta prefeitura (SaaS Context)
+        $id_prefeitura_form = $_POST['pref_id'] ?? ($_GET['pref_id'] ?? 0);
+        if (!$id_prefeitura_form && isset($_SESSION['id_prefeitura'])) $id_prefeitura_form = $_SESSION['id_prefeitura'];
+
         $stmt = $pdo->prepare(
             "INSERT INTO ouvidoria_manifestacoes 
-                (protocolo, tipo_manifestacao, assunto, descricao, nome_cidadao, email, telefone, status) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                (protocolo, id_prefeitura, tipo_manifestacao, assunto, descricao, nome_cidadao, email, telefone, status) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         
         $stmt->execute([
             $protocolo,
+            $id_prefeitura_form,
             $_POST['tipo_manifestacao'],
             $_POST['assunto'],
             $_POST['descricao'],

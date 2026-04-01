@@ -13,8 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_resposta'])) {
     $novo_status = $_POST['status'];
     $nova_resposta = $_POST['resposta'];
     
-    $stmt = $pdo->prepare("UPDATE sic_solicitacoes SET status = ?, resposta = ?, data_resposta = NOW() WHERE id = ?");
-    $stmt->execute([$novo_status, $nova_resposta, $solicitacao_id]);
+    $pref_id = $_SESSION['id_prefeitura'];
+    $stmt = $pdo->prepare("UPDATE sic_solicitacoes SET status = ?, resposta = ?, data_resposta = NOW() WHERE id = ? AND id_prefeitura = ?");
+    $stmt->execute([$novo_status, $nova_resposta, $solicitacao_id, $pref_id]);
     
     $_SESSION['mensagem_sucesso'] = "Solicitação respondida com sucesso!";
     header("Location: sic_inbox.php");
@@ -22,8 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_resposta'])) {
 }
 
 // Busca a solicitação para exibir no formulário
-$stmt = $pdo->prepare("SELECT * FROM sic_solicitacoes WHERE id = ?");
-$stmt->execute([$solicitacao_id]);
+$pref_id = $_SESSION['id_prefeitura'];
+$stmt = $pdo->prepare("SELECT * FROM sic_solicitacoes WHERE id = ? AND id_prefeitura = ?");
+$stmt->execute([$solicitacao_id, $pref_id]);
 $solicitacao = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$solicitacao) {

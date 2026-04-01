@@ -2,7 +2,9 @@
 require_once 'auth_check.php';
 require_once '../conexao.php';
 
-$stmt = $pdo->query("SELECT id, protocolo, assunto, nome_cidadao, status, data_criacao FROM ouvidoria_manifestacoes ORDER BY data_criacao DESC");
+$pref_id = $_SESSION['id_prefeitura'];
+$stmt = $pdo->prepare("SELECT id, protocolo, assunto, nome_cidadao, status, data_criacao FROM ouvidoria_manifestacoes WHERE id_prefeitura = ? ORDER BY data_criacao DESC");
+$stmt->execute([$pref_id]);
 $manifestacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>

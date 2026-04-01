@@ -1,5 +1,6 @@
 <?php
 require_once 'conexao.php';
+require_once 'bootstrap_portal.php';
 
 // O bootstrap_portal.php já deve ter sido carregado se viermos via rewrite, 
 // senão o header_publico se encarrega de detectar.
@@ -8,7 +9,8 @@ require_once 'conexao.php';
 $info_sic = [];
 try {
     $id_pref = $id_prefeitura_ativa ?? 0;
-    $stmt = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE id_prefeitura = ? AND chave LIKE 'sic_%'");
+    // Padrão SaaS: busca global (0) e específica (id), a específica sobrescreve por vir depois no fetch
+    $stmt = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE (id_prefeitura = ? OR id_prefeitura = 0) AND chave LIKE 'sic_%' ORDER BY id_prefeitura ASC");
     $stmt->execute([$id_pref]);
     $info_sic = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 }

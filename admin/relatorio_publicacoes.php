@@ -3,7 +3,7 @@ require_once 'auth_check.php';
 require_once '../conexao.php';
 
 // Variáveis de sessão do usuário
-$perfil_usuario = $_SESSION['admin_user_perfil'];
+$pref_id = $_SESSION['id_prefeitura'];
 
 // --- CONFIGURAÇÕES DA PAGINAÇÃO ---
 $itens_por_pagina = 15;
@@ -22,23 +22,22 @@ $filtros = [
 ];
 
 $sql_base = "FROM registros r 
-             LEFT JOIN portais p ON r.id_portal = p.id
+             INNER JOIN portais p ON r.id_portal = p.id
              LEFT JOIN categorias cat ON p.id_categoria = cat.id
              LEFT JOIN tipos_documento td ON r.id_tipo_documento = td.id";
-$sql_where = " WHERE 1=1 ";
-$params = [];
+$sql_where = " WHERE p.id_prefeitura = ? ";
+$params = [$pref_id];
 
 // Monta a cláusula WHERE dinamicamente
-if (!empty($filtros['data_inicio'])) { $sql_where .= " AND r.data_criacao >= ? "; $params[] = $filtros['data_inicio']; }
-if (!empty($filtros['data_fim'])) { $sql_where .= " AND r.data_criacao <= ? "; $params[] = $filtros['data_fim']; }
+if (!empty($filtros['data_inicio'])) { $sql_where .= " AND r.data_criacao >= ? "; $params[] = $filtros['data_inicio'] . ' 00:00:00'; }
+if (!empty($filtros['data_fim'])) { $sql_where .= " AND r.data_criacao <= ? "; $params[] = $filtros['data_fim'] . ' 23:59:59'; }
 if (!empty($filtros['categoria_id'])) { $sql_where .= " AND p.id_categoria = ? "; $params[] = $filtros['categoria_id']; }
 if (!empty($filtros['secao_id'])) { $sql_where .= " AND r.id_portal = ? "; $params[] = $filtros['secao_id']; }
 if (!empty($filtros['tipo_documento_id'])) { $sql_where .= " AND r.id_tipo_documento = ? "; $params[] = $filtros['tipo_documento_id']; }
 if (!empty($filtros['palavra_chave'])) {
-    $sql_where .= " AND (p.nome LIKE ? OR td.nome LIKE ? OR EXISTS (SELECT 1 FROM valores_registros vr WHERE vr.id_registro = r.id AND vr.valor LIKE ?))";
-    $params[] = '%' . $filtros['palavra_chave'] . '%';
-    $params[] = '%' . $filtros['palavra_chave'] . '%';
-    $params[] = '%' . $filtros['palavra_chave'] . '%';
+    $sql_where .= " AND (p.nome LIKE ? OR td.nome LIKE ? OR cat.nome LIKE ?)";
+    $termo = '%' . $filtros['palavra_chave'] . '%';
+    $params[] = $termo; $params[] = $termo; $params[] = $termo;
 }
 
 // --- CONTAGEM TOTAL DE ITENS ---
@@ -56,10 +55,18 @@ $stmt = $pdo->prepare($sql_select . $sql_base . $sql_where . $sql_order . $sql_l
 $stmt->execute($params);
 $publicacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Busca dados para os dropdowns do formulário
-$categorias = $pdo->query("SELECT id, nome FROM categorias ORDER BY nome ASC")->fetchAll();
-$secoes = $pdo->query("SELECT id, nome FROM portais ORDER BY nome ASC")->fetchAll();
-$tipos_documento = $pdo->query("SELECT id, nome FROM tipos_documento ORDER BY nome ASC")->fetchAll();
+// Busca dados para os dropdowns (Filtrado por prefeitura)
+$stmt_cats = $pdo->prepare("SELECT id, nome FROM categorias WHERE id_prefeitura = ? ORDER BY nome ASC");
+$stmt_cats->execute([$pref_id]);
+$categorias = $stmt_cats->fetchAll();
+
+$stmt_secs = $pdo->prepare("SELECT id, nome FROM portais WHERE id_prefeitura = ? ORDER BY nome ASC");
+$stmt_secs->execute([$pref_id]);
+$secoes = $stmt_secs->fetchAll();
+
+$stmt_tipos = $pdo->prepare("SELECT id, nome FROM tipos_documento WHERE id_prefeitura = ? ORDER BY nome ASC");
+$stmt_tipos->execute([$pref_id]);
+$tipos_documento = $stmt_tipos->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -67,7 +74,13 @@ $tipos_documento = $pdo->query("SELECT id, nome FROM tipos_documento ORDER BY no
     <meta charset="UTF-8">
     <title>Relatório de Publicações - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../css/style.css?v=<?php echo time(); ?>">
+    <style>
+        .filter-card { border-radius: 15px; border: none; background: #fff; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
+        .table-rounded { border-radius: 12px; overflow: hidden; border: 1px solid #f1f5f9; }
+        .badge-cat { background-color: #f1f5f9; color: #475569; font-weight: 600; font-size: 0.75rem; }
+    </style>
 </head>
 <body class="bg-light-subtle">
 
@@ -76,44 +89,111 @@ $page_title_for_header = 'Relatório de Publicações';
 include 'admin_header.php';
 ?>
 
-<div class="container-fluid container-custom-padding">
+<div class="container-fluid container-custom-padding py-4">
     <div class="row">
         <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header"><i class="bi bi-search"></i> Pesquisa Avançada</div>
-                <div class="card-body">
-                    <form method="GET" action="relatorio_publicacoes.php">
-                        <div class="row">
-                            <div class="col-md-3 mb-3"><label for="data_inicio" class="form-label">Data de (Início)</label><input type="date" class="form-control" name="data_inicio" id="data_inicio" value="<?php echo htmlspecialchars($filtros['data_inicio']); ?>"></div>
-                            <div class="col-md-3 mb-3"><label for="data_fim" class="form-label">Data de (Fim)</label><input type="date" class="form-control" name="data_fim" id="data_fim" value="<?php echo htmlspecialchars($filtros['data_fim']); ?>"></div>
-                            <div class="col-md-3 mb-3"><label for="categoria_id" class="form-label">Categoria</label><select class="form-select" name="categoria_id"><option value="">Todas</option><?php foreach($categorias as $cat): ?><option value="<?php echo $cat['id']; ?>" <?php if($cat['id'] == $filtros['categoria_id']) echo 'selected'; ?>><?php echo htmlspecialchars($cat['nome']); ?></option><?php endforeach; ?></select></div>
-                            <div class="col-md-3 mb-3"><label for="secao_id" class="form-label">Seção</label><select class="form-select" name="secao_id"><option value="">Todas</option><?php foreach($secoes as $sec): ?><option value="<?php echo $sec['id']; ?>" <?php if($sec['id'] == $filtros['secao_id']) echo 'selected'; ?>><?php echo htmlspecialchars($sec['nome']); ?></option><?php endforeach; ?></select></div>
-                            <div class="col-md-6 mb-3"><label for="tipo_documento_id" class="form-label">Tipo de Documento</label><select class="form-select" name="tipo_documento_id"><option value="">Todos</option><?php foreach($tipos_documento as $tipo): ?><option value="<?php echo $tipo['id']; ?>" <?php if($tipo['id'] == $filtros['tipo_documento_id']) echo 'selected'; ?>><?php echo htmlspecialchars($tipo['nome']); ?></option><?php endforeach; ?></select></div>
-                            <div class="col-md-6 mb-3"><label for="palavra_chave" class="form-label">Palavra-chave</label><input type="text" class="form-control" name="palavra_chave" id="palavra_chave" value="<?php echo htmlspecialchars($filtros['palavra_chave']); ?>"></div>
+            
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6">
+                    <h3 class="fw-bold text-dark mb-1">Relatório de Publicações</h3>
+                    <p class="text-muted small mb-0"><i class="bi bi-clock-history me-1"></i> Acompanhe cronologicamente tudo o que foi publicado no portal.</p>
+                </div>
+            </div>
+
+            <!-- Card Informativo -->
+            <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; border-radius: 15px;">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="me-4 d-none d-md-block">
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                            <i class="bi bi-bar-chart-fill fs-2"></i>
                         </div>
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Pesquisar</button>
-                        <a href="relatorio_publicacoes.php" class="btn btn-secondary">Limpar Filtros</a>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Auditoria e Controle</h5>
+                        <p class="mb-0 opacity-90 small">
+                            Utilize os filtros abaixo para localizar publicações específicas por período ou categoria. Este relatório ajuda a manter o controle sobre o fluxo de transparência da prefeitura.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card filter-card mb-4">
+                <div class="card-body p-4">
+                    <form method="GET" action="relatorio_publicacoes.php" class="row g-3">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold small">Início</label>
+                            <input type="date" class="form-control form-control-sm" name="data_inicio" value="<?php echo htmlspecialchars($filtros['data_inicio']); ?>">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold small">Fim</label>
+                            <input type="date" class="form-control form-control-sm" name="data_fim" value="<?php echo htmlspecialchars($filtros['data_fim']); ?>">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold small">Categoria</label>
+                            <select class="form-select form-select-sm" name="categoria_id">
+                                <option value="">Todas</option>
+                                <?php foreach($categorias as $cat): ?>
+                                    <option value="<?php echo $cat['id']; ?>" <?php if($cat['id'] == $filtros['categoria_id']) echo 'selected'; ?>><?php echo htmlspecialchars($cat['nome']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold small">Seção</label>
+                            <select class="form-select form-select-sm" name="secao_id">
+                                <option value="">Todas</option>
+                                <?php foreach($secoes as $sec): ?>
+                                    <option value="<?php echo $sec['id']; ?>" <?php if($sec['id'] == $filtros['secao_id']) echo 'selected'; ?>><?php echo htmlspecialchars($sec['nome']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold small">Palavra-chave</label>
+                            <input type="text" class="form-control form-control-sm" name="palavra_chave" value="<?php echo htmlspecialchars($filtros['palavra_chave']); ?>" placeholder="Buscar...">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary btn-sm px-3 w-100"><i class="bi bi-search me-1"></i> Filtrar</button>
+                            <a href="relatorio_publicacoes.php" class="btn btn-outline-secondary btn-sm"><i class="bi bi-x-circle"></i></a>
+                        </div>
                     </form>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-header"><?php echo $total_itens; ?> publicações encontradas</div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-list-check me-2 text-primary"></i><?php echo number_format($total_itens, 0, ',', '.'); ?> Publicações Encontradas</h6>
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover mb-0">
-                        <thead class="table-dark">
-                            <tr><th>Publicado em</th><th>Categoria</th><th>Seção</th><th>Tipo do Documento</th><th class="text-end">Ações</th></tr>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="p-3 text-muted small text-uppercase">Data/Hora</th>
+                                <th class="p-3 text-muted small text-uppercase">Categoria</th>
+                                <th class="p-3 text-muted small text-uppercase">Seção / Documento</th>
+                                <th class="p-3 text-muted small text-uppercase text-end">Ações</th>
+                            </tr>
                         </thead>
                         <tbody>
                             <?php if(empty($publicacoes)): ?>
-                                <tr><td colspan="5" class="text-center">Nenhuma publicação encontrada para os critérios informados.</td></tr>
+                                <tr><td colspan="4" class="text-center p-5 text-muted">Nenhuma publicação encontrada para os critérios informados.</td></tr>
                             <?php else: ?>
                                 <?php foreach($publicacoes as $pub): ?>
                                 <tr>
-                                    <td><?php echo date('d/m/Y H:i', strtotime($pub['data_criacao'])); ?></td>
-                                    <td><?php echo htmlspecialchars($pub['nome_categoria'] ?? 'N/A'); ?></td>
-                                    <td><?php echo htmlspecialchars($pub['nome_secao'] ?? 'N/A'); ?></td>
-                                    <td><?php echo htmlspecialchars($pub['nome_documento'] ?? 'N/A'); ?></td>
-                                    <td class="text-end"><a href="ver_lancamentos.php?portal_id=<?php echo htmlspecialchars($pub['portal_id'] ?? 0); ?>" class="btn btn-sm btn-info">Ver Lançamentos</a></td>
+                                    <td class="p-3">
+                                        <div class="fw-bold text-dark"><i class="bi bi-calendar3 me-2 text-primary small"></i><?php echo date('d/m/Y', strtotime($pub['data_criacao'])); ?></div>
+                                        <div class="text-muted small ms-4"><?php echo date('H:i', strtotime($pub['data_criacao'])); ?></div>
+                                    </td>
+                                    <td class="p-3">
+                                        <span class="badge badge-cat rounded-pill px-3 py-2"><?php echo htmlspecialchars($pub['nome_categoria'] ?? 'N/A'); ?></span>
+                                    </td>
+                                    <td class="p-3">
+                                        <div class="fw-bold text-dark mb-1"><?php echo htmlspecialchars($pub['nome_secao'] ?? 'N/A'); ?></div>
+                                        <div class="text-muted small"><i class="bi bi-file-earmark-text me-1"></i><?php echo htmlspecialchars($pub['nome_documento'] ?? 'N/A'); ?></div>
+                                    </td>
+                                    <td class="p-3 text-end">
+                                        <a href="ver_lancamentos.php?portal_id=<?php echo htmlspecialchars($pub['portal_id'] ?? 0); ?>" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                            Visualizar <i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -121,14 +201,17 @@ include 'admin_header.php';
                     </table>
                 </div>
                 <?php if ($total_paginas > 1): ?>
-                <div class="card-footer">
-                    <nav><ul class="pagination justify-content-center mb-0">
+                <div class="card-footer bg-white border-top-0 py-4">
+                    <nav><ul class="pagination pagination-sm justify-content-center mb-0">
                         <?php $query_params = $_GET; ?>
-                        <li class="page-item <?php if($pagina_atual <= 1) echo 'disabled'; ?>"><?php $query_params['page'] = $pagina_atual - 1; ?><a class="page-link" href="?<?php echo http_build_query($query_params); ?>">Anterior</a></li>
-                        <?php for($i=1; $i<=$total_paginas; $i++): $query_params['page'] = $i; ?>
-                        <li class="page-item <?php if($pagina_atual == $i) echo 'active'; ?>"><a class="page-link" href="?<?php echo http_build_query($query_params); ?>"><?php echo $i; ?></a></li>
+                        <li class="page-item <?php if($pagina_atual <= 1) echo 'disabled'; ?>"><?php $query_params['page'] = $pagina_atual - 1; ?><a class="page-link shadow-none" href="?<?php echo http_build_query($query_params); ?>"><i class="bi bi-chevron-left"></i></a></li>
+                        <?php 
+                        $start = max(1, $pagina_atual - 2);
+                        $end = min($total_paginas, $pagina_atual + 2);
+                        for($i=$start; $i<=$end; $i++): $query_params['page'] = $i; ?>
+                        <li class="page-item <?php if($pagina_atual == $i) echo 'active'; ?>"><a class="page-link shadow-none" href="?<?php echo http_build_query($query_params); ?>"><?php echo $i; ?></a></li>
                         <?php endfor; ?>
-                        <li class="page-item <?php if($pagina_atual >= $total_paginas) echo 'disabled'; ?>"><?php $query_params['page'] = $pagina_atual + 1; ?><a class="page-link" href="?<?php echo http_build_query($query_params); ?>">Próximo</a></li>
+                        <li class="page-item <?php if($pagina_atual >= $total_paginas) echo 'disabled'; ?>"><?php $query_params['page'] = $pagina_atual + 1; ?><a class="page-link shadow-none" href="?<?php echo http_build_query($query_params); ?>"><i class="bi bi-chevron-right"></i></a></li>
                     </ul></nav>
                 </div>
                 <?php endif; ?>

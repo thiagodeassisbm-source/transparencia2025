@@ -1,13 +1,13 @@
-<?php
 require_once 'conexao.php';
+require_once 'bootstrap_portal.php';
 $page_title = "Consulta de Solicitação SIC";
 $protocolo_busca = $_GET['protocolo'] ?? '';
 $solicitacao = null;
 
 if (!empty($protocolo_busca)) {
-    // Busca a solicitação na tabela dedicada 'sic_solicitacoes'
-    $stmt = $pdo->prepare("SELECT * FROM sic_solicitacoes WHERE protocolo = ?");
-    $stmt->execute([$protocolo_busca]);
+    $id_pref = $id_prefeitura_ativa ?? 0;
+    $stmt = $pdo->prepare("SELECT * FROM sic_solicitacoes WHERE protocolo = ? AND id_prefeitura = ?");
+    $stmt->execute([$protocolo_busca, $id_pref]);
     $solicitacao = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 ?>

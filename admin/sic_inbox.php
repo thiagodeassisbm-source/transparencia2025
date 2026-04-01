@@ -2,8 +2,9 @@
 require_once 'auth_check.php';
 require_once '../conexao.php';
 
-// CORRECTED QUERY: Fetches existing columns from the 'sic_solicitacoes' table.
-$stmt = $pdo->query("SELECT id, protocolo, nome_solicitante, status, data_solicitacao FROM sic_solicitacoes ORDER BY data_solicitacao DESC");
+$pref_id = $_SESSION['id_prefeitura'];
+$stmt = $pdo->prepare("SELECT id, protocolo, nome_solicitante, status, data_solicitacao FROM sic_solicitacoes WHERE id_prefeitura = ? ORDER BY data_solicitacao DESC");
+$stmt->execute([$pref_id]);
 $solicitacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>

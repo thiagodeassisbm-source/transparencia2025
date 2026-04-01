@@ -10,8 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_resposta'])) {
     $novo_status = $_POST['status'];
     $nova_resposta = $_POST['resposta'];
     
-    $stmt = $pdo->prepare("UPDATE ouvidoria_manifestacoes SET status = ?, resposta = ?, data_resposta = NOW() WHERE id = ?");
-    $stmt->execute([$novo_status, $nova_resposta, $manifestacao_id]);
+    $pref_id = $_SESSION['id_prefeitura'];
+    $stmt = $pdo->prepare("UPDATE ouvidoria_manifestacoes SET status = ?, resposta = ?, data_resposta = NOW() WHERE id = ? AND id_prefeitura = ?");
+    $stmt->execute([$novo_status, $nova_resposta, $manifestacao_id, $pref_id]);
     
     $_SESSION['mensagem_sucesso'] = "Manifestação respondida com sucesso!";
     header("Location: ouvidoria_inbox.php");
@@ -19,8 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_resposta'])) {
 }
 
 // Busca a manifestação para exibir no formulário
-$stmt = $pdo->prepare("SELECT * FROM ouvidoria_manifestacoes WHERE id = ?");
-$stmt->execute([$manifestacao_id]);
+$pref_id = $_SESSION['id_prefeitura'];
+$stmt = $pdo->prepare("SELECT * FROM ouvidoria_manifestacoes WHERE id = ? AND id_prefeitura = ?");
+$stmt->execute([$manifestacao_id, $pref_id]);
 $manifestacao = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$manifestacao) { header("Location: ouvidoria_inbox.php"); exit; }
 ?>
