@@ -13,6 +13,7 @@ backup/
 *.sql
 
 # Arquivos temporários e de sistema
+tmp/
 migrar_slugs.php
 .DS_Store
 Thumbs.db
