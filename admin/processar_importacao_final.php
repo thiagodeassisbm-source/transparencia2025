@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
         // --- INÍCIO DO NOVO CÓDIGO DINÂMICO ---
-        $stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1');
+        $stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1 ORDER BY id ASC');
         $tags_validas = $stmt_tags->fetchAll(PDO::FETCH_COLUMN);
 
         $dados_xml = xml_import_listar_registros(

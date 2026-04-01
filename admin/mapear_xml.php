@@ -56,7 +56,7 @@ $campos_destino = $stmt_campos->fetchAll();
 
 $tags_xml = [];
 
-$stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1');
+$stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1 ORDER BY id ASC');
 $tags_validas = $stmt_tags ? $stmt_tags->fetchAll(PDO::FETCH_COLUMN) : [];
 
 $primeiro_registro = xml_import_obter_primeiro_registro($xml, $tags_validas);

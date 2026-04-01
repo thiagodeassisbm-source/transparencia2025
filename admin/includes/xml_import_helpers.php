@@ -1,7 +1,10 @@
 <?php
 /**
- * Funções para importação XML quando a estrutura não bate com tipos_xml cadastrados.
- * Ex.: xml/relatorio-receitas.xml usa <relatorio> repetido, não <Receita>.
+ * Importação XML alinhada a gerenciar_tipos_xml (tabela tipos_xml).
+ *
+ * Prioridade:
+ * 1) Tags cadastradas (tag_registro), na ordem definida no SELECT (ORDER BY id).
+ * 2) Só se nenhuma tag cadastrada existir no arquivo: detecção automática (fallback).
  */
 
 /**
@@ -14,26 +17,22 @@ function xml_import_sanitize_tag(string $tag): string
 
 /**
  * Primeiro elemento "linha" para montar o mapeamento De/Para.
- * 1) Tags cadastradas em tipos_xml (//Tag[1])
- * 2) Detecção automática: ancestral com 2+ filhos homônimos (lista de registros)
- * 3) Detecção: único bloco-filho com campos folha (arquivo com uma linha)
+ * 1) Cada tag cadastrada em tipos_xml, em ordem — primeiro match vence (não usa união XPath,
+ *    que pegava o primeiro nó no documento e ignorava a prioridade do cadastro).
+ * 2) Detecção automática só se nenhuma tag cadastrada existir no XML.
+ * 3) Detecção: único bloco-filho com campos folha (arquivo com uma linha).
  */
 function xml_import_obter_primeiro_registro(SimpleXMLElement $xml, array $tags_validas): ?SimpleXMLElement
 {
-    $tags_validas = array_filter(array_map('xml_import_sanitize_tag', $tags_validas));
+    $tags_validas = array_values(array_unique(array_filter(array_map('xml_import_sanitize_tag', $tags_validas))));
 
-    if (!empty($tags_validas)) {
-        $parts = [];
-        foreach ($tags_validas as $tag) {
-            if ($tag !== '') {
-                $parts[] = '//' . $tag . '[1]';
-            }
+    foreach ($tags_validas as $tag) {
+        if ($tag === '') {
+            continue;
         }
-        if ($parts !== []) {
-            $found = $xml->xpath(implode(' | ', $parts));
-            if (!empty($found[0])) {
-                return $found[0];
-            }
+        $found = $xml->xpath('//' . $tag . '[1]');
+        if (!empty($found[0])) {
+            return $found[0];
         }
     }
 
@@ -89,9 +88,15 @@ function xml_import_obter_primeiro_registro(SimpleXMLElement $xml, array $tags_v
 }
 
 /**
- * Lista todos os nós de registro a importar (mesma tag detectada no passo 2 ou tipos_xml).
+ * Lista todos os nós de registro a importar.
  *
- * @param  string|null $tag_registro_fixo  ex.: "relatorio" vindo da sessão após detecção
+ * Se $tag_registro_fixo vier do passo 2 (sessão), usa só essa tag — deve ser a mesma
+ * escolhida em obter_primeiro_registro (cadastrada ou fallback automático).
+ *
+ * Sem tag fixa: percorre tags cadastradas na mesma ordem e devolve o primeiro tipo que existir
+ * no XML (evita misturar //Contrato com //Despesa num único fluxo).
+ *
+ * @param  string|null $tag_registro_fixo  ex.: "relatorio" ou "Contrato"
  * @return array<int, SimpleXMLElement>
  */
 function xml_import_listar_registros(SimpleXMLElement $xml, array $tags_validas, ?string $tag_registro_fixo): array
@@ -103,12 +108,16 @@ function xml_import_listar_registros(SimpleXMLElement $xml, array $tags_validas,
         return is_array($rows) ? $rows : [];
     }
 
-    $tags_validas = array_filter(array_map('xml_import_sanitize_tag', $tags_validas));
-    if ($tags_validas === []) {
-        return [];
+    $tags_validas = array_values(array_unique(array_filter(array_map('xml_import_sanitize_tag', $tags_validas))));
+    foreach ($tags_validas as $tag) {
+        if ($tag === '') {
+            continue;
+        }
+        $rows = $xml->xpath('//' . $tag);
+        if (!empty($rows)) {
+            return $rows;
+        }
     }
-    $xpath_query = '//' . implode(' | //', $tags_validas);
-    $rows = $xml->xpath($xpath_query);
 
-    return is_array($rows) ? $rows : [];
+    return [];
 }

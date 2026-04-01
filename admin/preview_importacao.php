@@ -78,7 +78,7 @@ if (!empty($tipos_xml)) {
 }
 
 // 3. Lista registros: tag do passo 2 (detecção automática ou tipos_xml) ou união de tags do cadastro
-$stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1');
+$stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1 ORDER BY id ASC');
 $tags_validas = $stmt_tags->fetchAll(PDO::FETCH_COLUMN);
 
 $tag_registro_sessao = $dados_importacao['tag_registro_importacao'] ?? null;
