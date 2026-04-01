@@ -160,10 +160,10 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
 
                 <!-- Solicitações Online -->
                 <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 sic-card p-4">
+                    <div class="card h-100 sic-card p-4 shadow-sm border-0">
                         <span class="sic-card-title text-start">Solicitações</span>
                         <div class="card-body p-0">
-                            <p class="section-desc-sac">Encaminhe aqui suas solicitações de acesso à informação e acompanhe pedidos em andamento.</p>
+                            <p class="section-desc-sac"><?php echo nl2br(htmlspecialchars($info_sic['sic_solicitacoes_descricao'] ?? 'Encaminhe aqui suas solicitações de acesso à informação e acompanhe pedidos em andamento.')); ?></p>
                             
                             <a href="<?php echo $base_url; ?>portal/<?php echo $slug_pref_header; ?>/solicitacao_sic.php" class="btn-sac">
                                 <div class="btn-sac-icon"><i class="bi bi-file-earmark-plus"></i></div>
@@ -177,7 +177,15 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
 
                             <div class="info-box-sac shadow-sm">
                                 <i class="bi bi-info-circle"></i>
-                                <p>Caso prefira fazer sua solicitação pessoalmente, <strong>baixe o formulário</strong> de requerimento de informações e entregue no endereço do SIC Físico informado.</p>
+                                <p>
+                                    Caso prefira fazer sua solicitação pessoalmente, 
+                                    <?php if(!empty($info_sic['sic_formulario_pedido_pdf'])): ?>
+                                        <a href="<?php echo $base_url . $info_sic['sic_formulario_pedido_pdf']; ?>" target="_blank" class="fw-bold text-decoration-none" style="color: var(--cor-principal);">baixe o formulário</a>
+                                    <?php else: ?>
+                                        <strong>baixe o formulário</strong>
+                                    <?php endif; ?>
+                                    de requerimento de informações e entregue no endereço do SIC Físico informado.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -185,21 +193,33 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
 
                 <!-- Legislação -->
                 <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 sic-card p-4">
+                    <div class="card h-100 sic-card p-4 shadow-sm border-0">
                         <span class="sic-card-title">Legislação</span>
                         <div class="card-body p-0">
-                            <p class="section-desc-sac">Conheça as leis que garantem ao cidadão o direito constitucional de acesso às informações públicas.</p>
+                            <p class="section-desc-sac"><?php echo nl2br(htmlspecialchars($info_sic['sic_legislacao_descricao'] ?? 'Conheça as leis que garantem ao cidadão o direito constitucional de acesso às informações públicas.')); ?></p>
                             
-                            <a href="https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm" target="_blank" class="legis-item shadow-sm">
-                                <span>Lei Federal nº 12.527/2011</span>
+                            <!-- Lei Federal -->
+                            <?php 
+                                $link_federal = !empty($info_sic['sic_legislacao_federal_pdf']) ? $base_url . $info_sic['sic_legislacao_federal_pdf'] : "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm";
+                            ?>
+                            <a href="<?php echo $link_federal; ?>" target="_blank" class="legis-item shadow-sm">
+                                <span><?php echo htmlspecialchars($info_sic['sic_legislacao_federal_titulo'] ?? 'Lei Federal nº 12.527/2011'); ?></span>
                                 <i class="bi bi-chevron-right"></i>
                             </a>
 
+                            <!-- Regulamentação Municipal -->
                             <span class="section-title-sac">Regulamentação Municipal da LAI</span>
-                            <a href="#" class="legis-item shadow-sm">
-                                <span>Decreto Municipal nº 44.385/2019</span>
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
+                            <?php if(!empty($info_sic['sic_legislacao_municipal_titulo'])): ?>
+                                <?php 
+                                    $link_municipal = !empty($info_sic['sic_legislacao_municipal_pdf']) ? $base_url . $info_sic['sic_legislacao_municipal_pdf'] : "#";
+                                ?>
+                                <a href="<?php echo $link_municipal; ?>" target="_blank" class="legis-item shadow-sm">
+                                    <span><?php echo htmlspecialchars($info_sic['sic_legislacao_municipal_titulo']); ?></span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            <?php else: ?>
+                                <p class="text-muted small italic">Nenhum decreto municipal cadastrado.</p>
+                            <?php endif; ?>
 
                         </div>
                     </div>
