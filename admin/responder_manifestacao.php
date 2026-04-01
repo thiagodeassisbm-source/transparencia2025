@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 $manifestacao_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$manifestacao_id) { header("Location: ouvidoria_inbox.php"); exit; }
@@ -13,7 +14,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_resposta'])) {
     $pref_id = $_SESSION['id_prefeitura'];
     $stmt = $pdo->prepare("UPDATE ouvidoria_manifestacoes SET status = ?, resposta = ?, data_resposta = NOW() WHERE id = ? AND id_prefeitura = ?");
     $stmt->execute([$novo_status, $nova_resposta, $manifestacao_id, $pref_id]);
-    
+    $st_proto = $pdo->prepare('SELECT protocolo FROM ouvidoria_manifestacoes WHERE id = ? AND id_prefeitura = ?');
+    $st_proto->execute([$manifestacao_id, $pref_id]);
+    $proto = $st_proto->fetchColumn();
+    registrar_log(
+        $pdo,
+        'EDIÇÃO',
+        'ouvidoria_manifestacoes',
+        'Atualizou resposta/status ouvidoria — protocolo ' . ($proto ?: '#' . $manifestacao_id) . " (status: $novo_status)."
+    );
+
     $_SESSION['mensagem_sucesso'] = "Manifestação respondida com sucesso!";
     header("Location: ouvidoria_inbox.php");
     exit;

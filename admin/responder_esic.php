@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 $solicitacao_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$solicitacao_id) {
@@ -16,7 +17,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_resposta'])) {
     $pref_id = $_SESSION['id_prefeitura'];
     $stmt = $pdo->prepare("UPDATE sic_solicitacoes SET status = ?, resposta = ?, data_resposta = NOW() WHERE id = ? AND id_prefeitura = ?");
     $stmt->execute([$novo_status, $nova_resposta, $solicitacao_id, $pref_id]);
-    
+    $st_proto = $pdo->prepare('SELECT protocolo FROM sic_solicitacoes WHERE id = ? AND id_prefeitura = ?');
+    $st_proto->execute([$solicitacao_id, $pref_id]);
+    $proto = $st_proto->fetchColumn();
+    registrar_log(
+        $pdo,
+        'EDIÇÃO',
+        'sic_solicitacoes',
+        'Atualizou resposta/status e-SIC — protocolo ' . ($proto ?: '#' . $solicitacao_id) . " (status: $novo_status)."
+    );
+
     $_SESSION['mensagem_sucesso'] = "Solicitação respondida com sucesso!";
     header("Location: sic_inbox.php");
     exit;

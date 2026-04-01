@@ -19,7 +19,7 @@ if ($id && in_array($status, ['ativo', 'suspenso', 'pendente_pagamento'])) {
 
     $stmt = $pdo->prepare("UPDATE prefeituras SET status = ? WHERE id = ?");
     if ($stmt->execute([$status, $id])) {
-        registrar_log($id, 'PREFEITURA', 'STATUS_ALTERADO', "Status da prefeitura $nome_pref alterado para $status");
+        registrar_log($pdo, 'SUPERADMIN', 'prefeituras', "Alterou status da prefeitura \"$nome_pref\" (ID: $id) para $status.");
         header("Location: super_dashboard.php?msg=Status atualizado com sucesso");
     } else {
         header("Location: super_dashboard.php?error=Não foi possível atualizar o status");

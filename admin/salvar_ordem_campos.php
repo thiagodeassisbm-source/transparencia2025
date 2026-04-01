@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 header('Content-Type: application/json');
 
@@ -16,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$posicao + 1, $id_campo]);
             }
             $pdo->commit();
+            registrar_log($pdo, 'EDIÇÃO', 'campos_portal', 'Reordenou campos de um formulário de seção (campo ordem).');
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
             $pdo->rollBack();

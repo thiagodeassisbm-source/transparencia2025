@@ -1,6 +1,7 @@
 <?php
 // /admin/salvar_ordem.php
-require_once '../conexao.php';
+require_once 'auth_check.php';
+require_once 'functions_logs.php';
 
 // Define o cabeçalho da resposta como JSON
 header('Content-Type: application/json');
@@ -25,7 +26,9 @@ if ($dados && isset($dados['ordem'])) {
         }
 
         $pdo->commit();
-        
+
+        registrar_log($pdo, 'EDIÇÃO', 'portais', 'Reordenou a exibição das seções (campo ordem em portais).');
+
         // Retorna uma resposta de sucesso em JSON
         echo json_encode(['success' => true]);
 

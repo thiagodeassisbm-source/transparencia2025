@@ -1,6 +1,11 @@
 <?php
-session_start();
-require_once '../conexao.php';
+require_once 'auth_check.php';
+require_once 'functions_logs.php';
+
+if ($_SESSION['admin_user_perfil'] !== 'admin') {
+    header('Location: index.php');
+    exit;
+}
 
 // Lógica para processar o formulário de novo ícone
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_icone'])) {
@@ -19,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_icone'])) {
             $caminho_icone = $caminho_destino;
             $stmt = $pdo->prepare("INSERT INTO icones_menu (titulo, caminho_icone, link_url, ordem) VALUES (?, ?, ?, ?)");
             $stmt->execute([$titulo, $caminho_icone, $link_url, $ordem]);
+            $novo_icone_id = (int) $pdo->lastInsertId();
+            registrar_log($pdo, 'ADIÇÃO', 'icones_menu', "Cadastrou ícone do menu: $titulo (ID: $novo_icone_id).");
             $_SESSION['mensagem_sucesso'] = "Ícone cadastrado com sucesso!";
         } else {
             $_SESSION['mensagem_sucesso'] = "Erro ao mover o arquivo de upload.";

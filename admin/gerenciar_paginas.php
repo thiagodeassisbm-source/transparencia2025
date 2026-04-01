@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 // Apenas admins podem gerenciar páginas
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
@@ -14,9 +15,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_pagina'])) {
     $id_pagina = filter_input(INPUT_POST, 'id_pagina', FILTER_VALIDATE_INT);
     $pref_id = $_SESSION['id_prefeitura'];
     if ($id_pagina) {
-        // Verifica se a página pertence à prefeitura
-        $stmt_check = $pdo->prepare("DELETE FROM paginas WHERE id = ? AND id_prefeitura = ?");
+        $stmt_tit = $pdo->prepare('SELECT titulo FROM paginas WHERE id = ? AND id_prefeitura = ?');
+        $stmt_tit->execute([$id_pagina, $pref_id]);
+        $titulo_pg = $stmt_tit->fetchColumn();
+        $stmt_check = $pdo->prepare('DELETE FROM paginas WHERE id = ? AND id_prefeitura = ?');
         $stmt_check->execute([$id_pagina, $pref_id]);
+        if ($stmt_check->rowCount() > 0) {
+            registrar_log(
+                $pdo,
+                'EXCLUSÃO',
+                'paginas',
+                'Excluiu página: ' . ($titulo_pg ?: "ID $id_pagina") . " (ID: $id_pagina)."
+            );
+        }
         $_SESSION['mensagem_sucesso'] = "Página excluída com sucesso!";
     }
     header("Location: gerenciar_paginas.php");

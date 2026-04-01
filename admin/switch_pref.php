@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 // Verifica se é superadmin
 if (!isset($_SESSION['is_superadmin']) || $_SESSION['is_superadmin'] !== 1) {
@@ -18,7 +19,14 @@ if ($id) {
     if ($pref) {
         // Redireciona o contexto da sessão para esta prefeitura
         $_SESSION['id_prefeitura'] = $pref['id'];
-        
+
+        registrar_log(
+            $pdo,
+            'SUPERADMIN',
+            'CONTEXTO_PREFEITURA',
+            'Alterou o contexto de trabalho para a prefeitura "' . $pref['nome'] . '" (ID: ' . $pref['id'] . ').'
+        );
+
         // Redireciona para o dashboard comum (agora filtrado por esta prefeitura)
         header("Location: dashboard.php");
     } else {

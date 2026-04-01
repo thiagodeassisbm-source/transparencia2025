@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 if ($_SESSION['admin_user_perfil'] !== 'admin') {
     header("Location: index.php");
@@ -29,6 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
              WHERE id = ?"
         );
         $stmt->execute([$nome_campo, $tipo_campo, $opcoes_campo, $pesquisavel, $detalhes_apenas, $campo_id]);
+        registrar_log(
+            $pdo,
+            'EDIÇÃO',
+            'campos_portal',
+            "Editou campo \"$nome_campo\" (ID campo: $campo_id, portal_id: $portal_id)."
+        );
         $_SESSION['mensagem_sucesso'] = "Campo atualizado com sucesso!";
     } else {
         $_SESSION['mensagem_sucesso'] = "Erro: Nome e tipo do campo são obrigatórios.";

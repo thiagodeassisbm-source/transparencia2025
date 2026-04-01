@@ -88,8 +88,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
         
         $stmt_card = $pdo->prepare("INSERT INTO cards_informativos (id_categoria, id_secao, link_url, titulo, subtitulo, caminho_icone, tipo_icone, ordem, id_prefeitura) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt_card->execute([$id_categoria, $id_secao, $link_url, $card_titulo, $card_subtitulo, $caminho_icone, $tipo_icone, $card_ordem, ($_SESSION['id_prefeitura'] ?? 0)]);
-        
+        $novo_card_id = (int) $pdo->lastInsertId();
+
         $pdo->commit();
+        $det_log = 'Criou card: ' . $card_titulo . ' (card ID: ' . $novo_card_id;
+        if ($id_secao) {
+            $det_log .= ', nova seção ID: ' . $id_secao;
+        }
+        $det_log .= ')';
+        registrar_log($pdo, 'ADIÇÃO', 'cards_informativos', $det_log);
         $_SESSION['mensagem_sucesso'] = "Nova seção/card criado com sucesso!";
         header("Location: criar_secoes.php");
         exit;

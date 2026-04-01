@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 if ($_SESSION['admin_user_perfil'] !== 'admin') { header("Location: index.php"); exit; }
 
 $id_pagina = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -11,6 +12,7 @@ $anexos_existentes = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pdo->beginTransaction();
     try {
+        $pagina_ja_existia = (bool) $id_pagina;
         $titulo = trim($_POST['titulo']);
         $conteudo = $_POST['conteudo'];
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $titulo)));
@@ -45,6 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         $pdo->commit();
+        $id_final = (int) $id_pagina;
+        $acao_log = $pagina_ja_existia ? 'EDIÇÃO' : 'ADIÇÃO';
+        registrar_log(
+            $pdo,
+            $acao_log,
+            'paginas',
+            ($acao_log === 'ADIÇÃO' ? 'Criou página: ' : 'Editou página: ') . $titulo . " (ID: $id_final)."
+        );
         $_SESSION['mensagem_sucesso'] = "Página salva com sucesso!";
         header("Location: gerenciar_paginas.php");
         exit;

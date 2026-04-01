@@ -1,5 +1,6 @@
 <?php
-require_once '../conexao.php';
+require_once 'auth_check.php';
+require_once 'functions_logs.php';
 header('Content-Type: application/json');
 
 $dados = json_decode(file_get_contents('php://input'), true);
@@ -13,6 +14,7 @@ if ($dados && isset($dados['ordem'])) {
             $stmt->execute([$posicao, $id]);
         }
         $pdo->commit();
+        registrar_log($pdo, 'EDIÇÃO', 'categorias', 'Reordenou categorias no menu (campo ordem).');
         echo json_encode(['success' => true]);
     } catch (Exception $e) {
         $pdo->rollBack();

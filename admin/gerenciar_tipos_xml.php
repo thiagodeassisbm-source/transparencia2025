@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 
 if ($_SESSION['admin_user_perfil'] !== 'admin' && ($_SESSION['admin_user_nome'] ?? '') !== 'admin') {
     $_SESSION['mensagem_sucesso'] = 'Acesso negado.';
@@ -19,10 +20,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
         if ($id) {
             $stmt = $pdo->prepare('UPDATE tipos_xml SET nome_amigavel=?, tag_container=?, tag_registro=? WHERE id=?');
             $stmt->execute([$nome_amigavel, $tag_container, $tag_registro, $id]);
+            registrar_log($pdo, 'EDIÇÃO', 'tipos_xml', "Atualizou tipo de XML: $nome_amigavel (ID: $id).");
             $_SESSION['mensagem_sucesso'] = 'Tipo de XML atualizado com sucesso!';
         } else {
             $stmt = $pdo->prepare('INSERT INTO tipos_xml (nome_amigavel, tag_container, tag_registro) VALUES (?, ?, ?)');
             $stmt->execute([$nome_amigavel, $tag_container, $tag_registro]);
+            $novo_id = (int) $pdo->lastInsertId();
+            registrar_log($pdo, 'ADIÇÃO', 'tipos_xml', "Adicionou tipo de XML: $nome_amigavel (ID: $novo_id).");
             $_SESSION['mensagem_sucesso'] = 'Tipo de XML adicionado com sucesso!';
         }
     }
@@ -34,8 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
 if (isset($_GET['deletar'])) {
     $id = filter_input(INPUT_GET, 'deletar', FILTER_VALIDATE_INT);
     if ($id) {
+        $stmt_nm = $pdo->prepare('SELECT nome_amigavel FROM tipos_xml WHERE id = ?');
+        $stmt_nm->execute([$id]);
+        $nome_del = $stmt_nm->fetchColumn();
         $stmt = $pdo->prepare('DELETE FROM tipos_xml WHERE id = ?');
         $stmt->execute([$id]);
+        registrar_log($pdo, 'EXCLUSÃO', 'tipos_xml', 'Excluiu tipo de XML: ' . ($nome_del ?: "ID $id") . " (ID: $id).");
         $_SESSION['mensagem_sucesso'] = 'Tipo de XML excluído com sucesso!';
     }
     header('Location: gerenciar_tipos_xml.php');

@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
 require_once '../conexao.php';
+require_once 'functions_logs.php';
 require_once __DIR__ . '/includes/xml_import_helpers.php';
 set_time_limit(300); // Aumenta o limite de tempo de execução para 5 minutos
 
@@ -119,6 +120,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->commit();
             $sucessos++;
         }
+
+        $stmt_nome_sec = $pdo->prepare('SELECT nome FROM portais WHERE id = ?');
+        $stmt_nome_sec->execute([$id_portal]);
+        $nome_secao_import = $stmt_nome_sec->fetchColumn() ?: ('ID ' . $id_portal);
+        registrar_log(
+            $pdo,
+            'ADIÇÃO',
+            'registros',
+            "Importação XML: $sucessos registro(s) na seção \"" . $nome_secao_import . "\" (portal_id $id_portal)."
+        );
 
         // Redireciona para a página de lançamentos com mensagem de sucesso
         $_SESSION['mensagem_sucesso'] = "$sucessos registro(s) importado(s) com sucesso!";
