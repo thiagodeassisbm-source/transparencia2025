@@ -60,9 +60,9 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
             overflow: hidden;
             transition: all 0.3s ease;
         }
-        .btn-sac:hover { border-color: #d4a35d; transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); color: #1a1a1a; }
+        .btn-sac:hover { border-color: var(--cor-principal); transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); color: #1a1a1a; }
         .btn-sac-icon { 
-            background: #d4a35d; 
+            background: var(--cor-principal); 
             color: #fff; 
             padding: 22px 25px; 
             font-size: 30px; 
@@ -85,7 +85,7 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
         }
         .info-box-sac i { font-size: 26px; color: #ced4da; }
         .info-box-sac p { margin: 0; font-size: 13px; color: #6c757d; line-height: 1.6; }
-        .info-box-sac strong { color: #d4a35d; }
+        .info-box-sac strong { color: var(--cor-principal); }
 
         /* Listas Legislação */
         .legis-item {
@@ -101,7 +101,7 @@ $page_title = "Serviço de Informação ao Cidadão (SIC)";
             margin-bottom: 15px;
             transition: all 0.2s;
         }
-        .legis-item:hover { border-color: #d4a35d; background: #fffcf8; color: #1a1a1a; }
+        .legis-item:hover { border-color: var(--cor-principal); background: #fffcf8; color: #1a1a1a; }
         .legis-item span { font-size: 15px; font-weight: 400; }
         .legis-item i.bi-chevron-right { font-size: 14px; color: #bbb; }
         
