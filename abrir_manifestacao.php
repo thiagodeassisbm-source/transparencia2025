@@ -1,9 +1,10 @@
 <?php
 require_once 'conexao.php';
+require_once 'bootstrap_portal.php';
 $tipo_manifestacao = $_GET['tipo'] ?? 'Sugestão';
 $page_title = "Abrir Manifestação - " . $tipo_manifestacao;
 
-// O header já identifica a prefeitura pelo slug na URL /portal/catalao/abrir_manifestacao.php
+// O header identifica a prefeitura pelo rewrite: /portal/{slug}/abrir_manifestacao.php?pref_slug=...
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -44,12 +45,13 @@ include 'header_publico.php';
                     
                     <form action="processar_ouvidoria.php" method="POST">
                         <input type="hidden" name="tipo_manifestacao" value="<?php echo htmlspecialchars($tipo_manifestacao); ?>">
-                        <input type="hidden" name="id_prefeitura" value="<?php echo $id_pref_header; ?>">
+                        <input type="hidden" name="pref_id" value="<?php echo (int)$id_pref_header; ?>">
+                        <input type="hidden" name="pref_slug" value="<?php echo htmlspecialchars($slug_pref_header, ENT_QUOTES, 'UTF-8'); ?>">
 
                         <div class="row g-3">
                             <div class="col-md-12">
-                                <label for="nome_solicitante" class="form-label fw-bold text-muted small mb-1">Cidadão / Nome Completo*</label>
-                                <input type="text" name="nome_solicitante" id="nome_solicitante" class="form-control rounded-3" placeholder="Seu nome completo" required>
+                                <label for="nome_cidadao" class="form-label fw-bold text-muted small mb-1">Cidadão / Nome Completo*</label>
+                                <input type="text" name="nome_cidadao" id="nome_cidadao" class="form-control rounded-3" placeholder="Seu nome completo" required>
                             </div>
                             
                             <div class="col-md-6 mt-3">
@@ -68,8 +70,8 @@ include 'header_publico.php';
                             </div>
 
                             <div class="col-12 mt-3">
-                                <label for="mensagem" class="form-label fw-bold text-muted small mb-1">Descrição Detalhada*</label>
-                                <textarea name="mensagem" id="mensagem" class="form-control rounded-3" rows="8" placeholder="Descreva sua manifestação de forma clara e detalhada..." required></textarea>
+                                <label for="descricao" class="form-label fw-bold text-muted small mb-1">Descrição Detalhada*</label>
+                                <textarea name="descricao" id="descricao" class="form-control rounded-3" rows="8" placeholder="Descreva sua manifestação de forma clara e detalhada..." required></textarea>
                             </div>
 
                             <div class="col-12 mt-5 text-end border-top pt-4">

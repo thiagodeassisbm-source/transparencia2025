@@ -9,8 +9,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_manifestacao'])
         $protocolo = date('Ymd') . strtoupper(substr(uniqid(), 7, 6));
         $status = 'Recebida';
 
-        // Detecta prefeitura (SaaS Context)
-        $id_prefeitura_form = $_POST['pref_id'] ?? ($_GET['pref_id'] ?? 0);
+        // Detecta prefeitura (SaaS) — mesmo padrão do processar_sic.php; formulários antigos enviam id_prefeitura
+        $id_prefeitura_form = (int)($_POST['pref_id'] ?? $_POST['id_prefeitura'] ?? $_GET['pref_id'] ?? 0);
+        $pref_slug_post = trim((string)($_POST['pref_slug'] ?? ''));
+        if ($id_prefeitura_form <= 0 && $pref_slug_post !== '') {
+            $stmt_slug = $pdo->prepare('SELECT id FROM prefeituras WHERE slug = ? LIMIT 1');
+            $stmt_slug->execute([$pref_slug_post]);
+            $id_prefeitura_form = (int)$stmt_slug->fetchColumn();
+        }
         // --- REPARAÇÃO DE EMERGÊNCIA ON-THE-FLY ---
         $stmt_debug = $pdo->query("SHOW COLUMNS FROM ouvidoria_manifestacoes");
         $cols_debug = $stmt_debug->fetchAll(PDO::FETCH_COLUMN);
@@ -25,15 +31,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_manifestacao'])
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         
+        $nome_cidadao = trim((string)($_POST['nome_cidadao'] ?? $_POST['nome_solicitante'] ?? ''));
+        $descricao = (string)($_POST['descricao'] ?? $_POST['mensagem'] ?? '');
+        $assunto = trim((string)($_POST['assunto'] ?? ''));
+
         $stmt->execute([
             $protocolo,
             $id_prefeitura_form,
             $_POST['tipo_manifestacao'],
-            $_POST['assunto'],
-            $_POST['descricao'],
-            $_POST['nome_cidadao'],
-            $_POST['email'],
-            $_POST['telefone'],
+            $assunto,
+            $descricao,
+            $nome_cidadao,
+            $_POST['email'] ?? '',
+            $_POST['telefone'] ?? '',
             $status
         ]);
 

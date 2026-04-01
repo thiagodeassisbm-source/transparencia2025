@@ -2,7 +2,12 @@
 require_once 'auth_check.php';
 require_once '../conexao.php';
 
-$pref_id = $_SESSION['id_prefeitura'];
+$pref_id = (int)($_SESSION['id_prefeitura'] ?? 0);
+if ($pref_id === 0 && (int)($_SESSION['is_superadmin'] ?? 0) !== 1) {
+    $_SESSION['mensagem_erro'] = 'Contexto de prefeitura não identificado. Faça login novamente pelo link do seu município.';
+    header('Location: index.php');
+    exit;
+}
 
 $busca = trim($_GET['busca'] ?? '');
 $data_inicio = $_GET['data_inicio'] ?? '';
