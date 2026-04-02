@@ -627,51 +627,8 @@ html.high-contrast a {
 }
 
 /* Superadmin Theme */
-body.superadmin-theme .admin-sidebar {
-    background-color: #111111;
-    color: #e5e7eb;
-    border-right: 1px solid #222;
-}
-
 body.superadmin-theme .sidebar-header {
     background-color: #000000;
-}
-
-body.superadmin-theme .sidebar-nav .nav-link {
-    color: #e5e7eb;
-}
-
-body.superadmin-theme .sidebar-nav .nav-link i {
-    color: #9ca3af;
-}
-
-body.superadmin-theme .sidebar-nav .nav-link:hover {
-    background-color: #1f2937;
-    color: #ffffff;
-}
-
-body.superadmin-theme .sidebar-nav .nav-link.active {
-    background-color: #0b0b0b;
-    color: #ffffff;
-    box-shadow: inset 4px 0 0 #ffffff;
-}
-
-body.superadmin-theme .sidebar-nav .submenu {
-    background-color: #151515;
-}
-
-body.superadmin-theme .sidebar-nav .submenu .nav-link {
-    color: #cbd5e1;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-body.superadmin-theme .sidebar-nav .submenu .nav-link:hover {
-    background-color: #1f2937 !important;
-    color: #ffffff;
-}
-
-body.superadmin-theme .sidebar-nav ul li {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 body.superadmin-theme .super-kpi-card {
