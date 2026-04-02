@@ -40,26 +40,26 @@ include 'admin_header.php';
     <!-- Row de Stats Principais -->
     <div class="row g-4 mb-5">
         <div class="col-md-6 col-xl-6">
-            <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 super-kpi-card super-kpi-receita">
                 <div class="card-body p-4 d-flex align-items-center">
-                    <div class="bg-primary bg-opacity-10 p-3 rounded-4 me-3">
-                        <i class="bi bi-cash-stack fs-3 text-primary"></i>
+                    <div class="p-3 rounded-4 me-3 kpi-icon-wrap">
+                        <i class="bi bi-cash-stack fs-3"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted small text-uppercase mb-1 fw-bold">Receita (MRR)</h6>
+                        <h6 class="small text-uppercase mb-1 fw-bold kpi-label">Receita (MRR)</h6>
                         <h3 class="mb-0 fw-bold">R$ <?php echo number_format($receita_mensal, 2, ',', '.'); ?></h3>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6 col-xl-6">
-            <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 super-kpi-card super-kpi-prefeituras">
                 <div class="card-body p-4 d-flex align-items-center">
-                    <div class="bg-info bg-opacity-10 p-3 rounded-4 me-3">
-                        <i class="bi bi-buildings-fill fs-3 text-info"></i>
+                    <div class="p-3 rounded-4 me-3 kpi-icon-wrap">
+                        <i class="bi bi-buildings-fill fs-3"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted small text-uppercase mb-1 fw-bold">Prefeituras</h6>
+                        <h6 class="small text-uppercase mb-1 fw-bold kpi-label">Prefeituras</h6>
                         <h3 class="mb-0 fw-bold"><?php echo $total_clientes; ?></h3>
                     </div>
                 </div>
