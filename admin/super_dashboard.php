@@ -12,10 +12,8 @@ if (!isset($_SESSION['is_superadmin']) || $_SESSION['is_superadmin'] !== 1) {
 $total_clientes = $pdo->query("SELECT COUNT(*) FROM prefeituras")->fetchColumn();
 $receita_mensal = $pdo->query("SELECT SUM(valor_mensalidade) FROM prefeituras WHERE status = 'ativo'")->fetchColumn() ?: 0;
 
-// 2. Próximos Vencimentos (próximos 7 dias)
-$dia_hoje = date('d');
-$stmt_venc = $pdo->prepare("SELECT nome, dia_vencimento, valor_mensalidade FROM prefeituras WHERE status = 'ativo' AND dia_vencimento >= ? AND dia_vencimento <= ? + 7 ORDER BY dia_vencimento ASC");
-$stmt_venc->execute([$dia_hoje, $dia_hoje]);
+// 2. Recebíveis do mês (todos os vencimentos das prefeituras ativas)
+$stmt_venc = $pdo->query("SELECT nome, dia_vencimento, valor_mensalidade FROM prefeituras WHERE status = 'ativo' ORDER BY dia_vencimento ASC, nome ASC");
 $vencimentos = $stmt_venc->fetchAll();
 
 // 3. Volume de Dados por Prefeitura (Contagem de lançamentos/registros)
@@ -70,11 +68,11 @@ include 'admin_header.php';
     </div>
 
     <div class="row g-4">
-        <!-- Próximos Vencimentos -->
+        <!-- Recebíveis do Mês -->
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-white py-3 border-0">
-                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-calendar-check me-2 text-warning"></i> Próximos Recebíveis (7 dias)</h6>
+                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-calendar-check me-2 text-warning"></i> Recebíveis do Mês (todas as prefeituras)</h6>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -95,7 +93,7 @@ include 'admin_header.php';
                                 </tr>
                                 <?php endforeach; ?>
                                 <?php if (empty($vencimentos)): ?>
-                                <tr><td colspan="3" class="text-center py-4 text-muted small">Nenhum vencimento próximo.</td></tr>
+                                <tr><td colspan="3" class="text-center py-4 text-muted small">Nenhuma prefeitura ativa com vencimento cadastrado.</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
