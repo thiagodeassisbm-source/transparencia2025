@@ -206,7 +206,7 @@ function isActive($pageName) {
                     </li>
                     <?php endif; ?>
 
-                    <?php if (tem_permissao('secoes', 'editar')): ?>
+                    <?php if (tem_permissao('secoes', 'editar') || tem_permissao('estrutura', 'editar')): ?>
                     <li>
                         <?php $cadastros_active = isActive(['criar_secoes.php', 'gerenciar_categorias.php', 'gerenciar_tipos_documento.php', 'gerenciar_cards.php']); ?>
                         <a href="#collapseCadastros" class="nav-link has-submenu <?php echo $cadastros_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
@@ -261,7 +261,7 @@ function isActive($pageName) {
                     </li>
                     <?php endif; ?>
 
-                    <?php if (tem_permissao('configuracoes', 'ver') || $_SESSION['admin_user_perfil'] === 'admin'): ?>
+                    <?php if (tem_permissao('configuracoes', 'ver') || tem_permissao('prefeitura', 'ver') || $_SESSION['admin_user_perfil'] === 'admin'): ?>
                     <li>
                         <?php $prefeitura_active = isActive(['informacoes_prefeitura.php', 'configurar_copyright.php']); ?>
                         <a href="#collapsePrefeitura" class="nav-link has-submenu <?php echo $prefeitura_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">

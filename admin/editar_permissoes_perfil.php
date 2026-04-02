@@ -105,13 +105,15 @@ include 'admin_header.php';
                                             <?php 
                                             $modulos = [
                                                 'dashboard' => 'Painel de Controle (Dashboard)',
-                                                'secoes' => 'Menu: Lançamentos (Lista Geral)',
-                                                'estrutura' => 'Menu: Estrutura (Criação de Seções)',
-                                                'prefeitura' => 'Menu: Prefeitura (Info Gerais)',
+                                                'secoes' => 'Menu: Lançamentos + Estrutura (Lista e Gestão de Seções)',
                                                 'sic' => 'Módulo: E-Sic (Inbox e Resp.)',
                                                 'ouvidoria' => 'Módulo: Ouvidoria',
+                                                'configuracoes' => 'Módulo: Prefeitura / Configurações',
                                                 'relatorios' => 'Módulo: Relatórios',
-                                                'usuarios' => 'Módulo: Usuários e Perfis'
+                                                'usuarios' => 'Módulo: Usuários e Perfis',
+                                                // Legado: mantém visível para migrar perfis antigos
+                                                'prefeitura' => 'LEGADO: Prefeitura (compatibilidade)',
+                                                'estrutura' => 'LEGADO: Estrutura (compatibilidade)'
                                             ];
                                             foreach($modulos as $slug => $label): 
                                                 $p = $permissoes[$slug] ?? ['p_ver'=>0,'p_lancar'=>0,'p_editar'=>0,'p_excluir'=>0];
