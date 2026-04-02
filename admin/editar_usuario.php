@@ -98,6 +98,10 @@ $perfis = $pdo->query("SELECT id, nome FROM perfis ORDER BY nome ASC")->fetchAll
 
 $page_title_for_header = 'Editar Perfil'; 
 include 'admin_header.php'; 
+
+$url_voltar = (!empty($_SESSION['is_superadmin']) && (int) $_SESSION['is_superadmin'] === 1)
+    ? 'super_dashboard.php'
+    : 'gerenciar_usuarios.php';
 ?>
 
 <div class="container-fluid container-custom-padding">
@@ -169,7 +173,7 @@ include 'admin_header.php';
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary px-4 py-2">Salvar Alterações</button>
-                            <a href="gerenciar_usuarios.php" class="btn btn-light px-4 py-2 border">Voltar</a>
+                            <a href="<?php echo $url_voltar; ?>" class="btn btn-light px-4 py-2 border">Voltar</a>
                         </div>
                     </form>
                 </div>
