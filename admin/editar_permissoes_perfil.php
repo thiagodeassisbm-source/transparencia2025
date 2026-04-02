@@ -52,13 +52,17 @@ foreach ($permissoes_raw as $p) {
 }
 
 // Busca recursos dinâmicos (Seções/Portais) agrupados por Categoria
+$pref_id_sess = (int) ($_SESSION['id_prefeitura'] ?? 0);
 $sql_secoes = "
     SELECT p.id, p.nome as portal_nome, c.nome as categoria_nome 
     FROM portais p 
     LEFT JOIN categorias c ON p.id_categoria = c.id 
+    WHERE (p.id_prefeitura = :pref_id OR p.id_prefeitura IS NULL)
     ORDER BY c.ordem ASC, c.nome ASC, p.nome ASC
 ";
-$secoes_raw = $pdo->query($sql_secoes)->fetchAll();
+$stmt_secoes = $pdo->prepare($sql_secoes);
+$stmt_secoes->execute([':pref_id' => $pref_id_sess]);
+$secoes_raw = $stmt_secoes->fetchAll();
 $secoes_agrupadas = [];
 foreach ($secoes_raw as $s) {
     $cat_nome = $s['categoria_nome'] ?? 'Outros / Sem Categoria';
