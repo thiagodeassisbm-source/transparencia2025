@@ -44,14 +44,49 @@ $smtp_secure = $config_raw['smtp_secure'] ?? 'tls';
 $smtp_from_email = $config_raw['smtp_from_email'] ?? '';
 $smtp_from_name = $config_raw['smtp_from_name'] ?? 'Prefeitura Municipal';
 
-$page_title_for_header = 'Configurar SMTP Global';
+$page_title_for_header = 'Configuração SMTP Global';
 include 'admin_header.php';
 ?>
 
 <div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            
+    <div class="row g-4">
+        <!-- Card de Orientação (IMPORTANTE) -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-primary bg-gradient text-white">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="fw-bold mb-3"><i class="bi bi-info-circle-fill me-2"></i> Como configurar o SMTP?</h2>
+                            <p class="lead mb-4 opacity-75">O SMTP é responsável por enviar e-mails em nome da prefeitura. Configure corretamente abaixo para que os protocolos sejam enviados aos cidadãos.</p>
+                            
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-10 h-100">
+                                        <h6 class="fw-bold"><i class="bi bi-google me-1"></i> Para Gmail / Google</h6>
+                                        <ul class="small mb-0 opacity-75">
+                                            <li>Use Host: <strong>smtp.gmail.com</strong></li>
+                                            <li>Porta: <strong>587 (TLS)</strong></li>
+                                            <li>Ative a <strong>"Senha de Aplicativo"</strong> em sua conta Google.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-10 h-100">
+                                        <h6 class="fw-bold"><i class="bi bi-shield-check me-1"></i> Remetente Válido</h6>
+                                        <p class="small mb-0 opacity-75">O e-mail configurado no campo "Usuário" deve ser o mesmo do campo "Email Remetente" para evitar que caia no SPAM.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-none d-md-block text-center">
+                            <i class="bi bi-envelope-check display-1 opacity-25"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
             <?php if ($mensagem_sucesso): ?>
                 <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i> <?php echo $mensagem_sucesso; ?>
@@ -60,101 +95,87 @@ include 'admin_header.php';
             <?php endif; ?>
 
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-header bg-dark text-white p-4 pt-5 pb-5 text-center position-relative">
-                    <div class="bg-primary bg-opacity-25 p-3 rounded-circle d-inline-flex mb-3 shadow-sm" style="backdrop-filter: blur(5px);">
-                        <i class="bi bi-envelope-at fs-3 text-white"></i>
-                    </div>
-                    <h4 class="fw-bold mb-1">Configuração de E-mail (SMTP)</h4>
-                    <p class="text-white-50 small mb-0">Configure as credenciais de envio de e-mails automáticos do sistema.</p>
-                </div>
-                <div class="card-body p-4 p-md-5">
-                    <form method="POST">
-                        <div class="row g-4">
-                            <div class="col-md-8">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Servidor SMTP (Host)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><i class="bi bi-server text-muted"></i></span>
-                                    <input type="text" name="smtp_host" class="form-control form-control-lg bg-light border-0" value="<?php echo htmlspecialchars($smtp_host); ?>" placeholder="ex: smtp.gmail.com" required>
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <!-- Coluna do Formulário -->
+                        <div class="col-lg-12">
+                            <div class="p-4 p-md-5">
+                                <div class="d-flex align-items-center mb-5">
+                                    <div class="bg-dark p-3 rounded-4 me-3">
+                                        <i class="bi bi-gear-fill text-white fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="fw-bold mb-0">Credenciais de Autenticação</h4>
+                                        <p class="text-muted mb-0 small">Campos obrigatórios para o funcionamento do motor de e-mail.</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Porta</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><i class="bi bi-door-open text-muted"></i></span>
-                                    <input type="number" name="smtp_port" class="form-control form-control-lg bg-light border-0" value="<?php echo htmlspecialchars($smtp_port); ?>" placeholder="587" required>
-                                </div>
-                            </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Usuário / E-mail</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><i class="bi bi-person-fill text-muted"></i></span>
-                                    <input type="text" name="smtp_user" class="form-control form-control-lg bg-light border-0" value="<?php echo htmlspecialchars($smtp_user); ?>" placeholder="usuario@dominio.com" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Senha</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><i class="bi bi-key-fill text-muted"></i></span>
-                                    <input type="password" name="smtp_pass" class="form-control form-control-lg bg-light border-0" value="<?php echo htmlspecialchars($smtp_pass); ?>" placeholder="••••••••" required>
-                                </div>
-                            </div>
+                                <form method="POST">
+                                    <div class="row g-4">
+                                        <!-- Servidor e Porta -->
+                                        <div class="col-md-8">
+                                            <div class="form-floating">
+                                                <input type="text" name="smtp_host" id="smtp_host" class="form-control bg-light border-0" value="<?php echo htmlspecialchars($smtp_host); ?>" placeholder="ex: smtp.gmail.com" required>
+                                                <label for="smtp_host" class="text-muted fw-bold">Servidor SMTP (Host)</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating">
+                                                <input type="number" name="smtp_port" id="smtp_port" class="form-control bg-light border-0" value="<?php echo htmlspecialchars($smtp_port); ?>" placeholder="587" required>
+                                                <label for="smtp_port" class="text-muted fw-bold">Porta</label>
+                                            </div>
+                                        </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Segurança</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><i class="bi bi-shield-lock-fill text-muted"></i></span>
-                                    <select name="smtp_secure" class="form-select form-select-lg bg-light border-0">
-                                        <option value="tls" <?php echo $smtp_secure === 'tls' ? 'selected' : ''; ?>>TLS (Recomendado)</option>
-                                        <option value="ssl" <?php echo $smtp_secure === 'ssl' ? 'selected' : ''; ?>>SSL</option>
-                                        <option value="" <?php echo $smtp_secure === '' ? 'selected' : ''; ?>>Nenhuma</option>
-                                    </select>
-                                </div>
-                            </div>
+                                        <!-- Usuário e Senha -->
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="text" name="smtp_user" id="smtp_user" class="form-control bg-light border-0" value="<?php echo htmlspecialchars($smtp_user); ?>" placeholder="usuario@dominio.com" required>
+                                                <label for="smtp_user" class="text-muted fw-bold">Usuário / E-mail</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="password" name="smtp_pass" id="smtp_pass" class="form-control bg-light border-0" value="<?php echo htmlspecialchars($smtp_pass); ?>" placeholder="••••••••" required>
+                                                <label for="smtp_pass" class="text-muted fw-bold">Senha</label>
+                                            </div>
+                                        </div>
 
-                            <div class="col-12"><hr class="my-3 opacity-10"></div>
+                                        <!-- Segurança -->
+                                        <div class="col-md-12">
+                                            <div class="form-floating">
+                                                <select name="smtp_secure" id="smtp_secure" class="form-select bg-light border-0">
+                                                    <option value="tls" <?php echo $smtp_secure === 'tls' ? 'selected' : ''; ?>>TLS (Segurança Padrão / Recomendado)</option>
+                                                    <option value="ssl" <?php echo $smtp_secure === 'ssl' ? 'selected' : ''; ?>>SSL (Portas Legacy)</option>
+                                                    <option value="" <?php echo $smtp_secure === '' ? 'selected' : ''; ?>>Nenhuma / Apenas Conexão Aberta</option>
+                                                </select>
+                                                <label for="smtp_secure" class="text-muted fw-bold">Protocolo de Segurança</label>
+                                            </div>
+                                        </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Email Remetente</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><i class="bi bi-send-fill text-muted"></i></span>
-                                    <input type="email" name="smtp_from_email" class="form-control form-control-lg bg-light border-0" value="<?php echo htmlspecialchars($smtp_from_email); ?>" placeholder="nao-responda@dominio.com" required>
-                                </div>
-                                <div class="form-text mt-2 small">Este é o e-mail que o cidadão verá como remetente.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Nome do Remetente</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><i class="bi bi-building text-muted"></i></span>
-                                    <input type="text" name="smtp_from_name" class="form-control form-control-lg bg-light border-0" value="<?php echo htmlspecialchars($smtp_from_name); ?>" placeholder="Prefeitura de ..." required>
-                                </div>
-                            </div>
+                                        <!-- Identidade do Remetente -->
+                                        <div class="col-12"><hr class="my-3 opacity-10"></div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="email" name="smtp_from_email" id="smtp_from_email" class="form-control bg-light border-0" value="<?php echo htmlspecialchars($smtp_from_email); ?>" placeholder="nao-responda@dominio.com" required>
+                                                <label for="smtp_from_email" class="text-muted fw-bold">E-mail Remetente (Exibido ao Cidadão)</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="text" name="smtp_from_name" id="smtp_from_name" class="form-control bg-light border-0" value="<?php echo htmlspecialchars($smtp_from_name); ?>" placeholder="Prefeitura de ..." required>
+                                                <label for="smtp_from_name" class="text-muted fw-bold">Nome do Remetente (Ex: Prefeitura de Orizona)</label>
+                                            </div>
+                                        </div>
 
-                            <div class="col-12 mt-5 text-center">
-                                <button type="submit" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-lg transition-all hover-lift">
-                                    <i class="bi bi-check2-circle mb-0 me-2"></i> Salvar e Validar Configurações
-                                </button>
+                                        <div class="col-12 mt-5 text-end">
+                                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow transition-all hover-lift w-100 w-md-auto">
+                                                <i class="bi bi-save2 me-2"></i> Aplicar e Guardar Configurações
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Ajuda / Dicas -->
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-body p-4">
-                            <h6 class="fw-bold mb-3"><i class="bi bi-info-circle text-primary me-2"></i>Como configurar?</h6>
-                            <p class="small text-muted mb-0">Para Gmail, use a porta 587 (TLS) e crie uma "Senha de Aplicativo" nas configurações de segurança da sua conta Google. Para outros provedores, consulte o suporte técnico do seu e-mail.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-body p-4">
-                            <h6 class="fw-bold mb-3"><i class="bi bi-lightning text-warning me-2"></i>Ação do Sistema</h6>
-                            <p class="small text-muted mb-0">Após configurado, o sistema enviará automaticamente o protocolo e as orientações de acesso para o e-mail informado pelo cidadão ao abrir solicitações no E-SIC e Ouvidoria.</p>
                         </div>
                     </div>
                 </div>
@@ -164,8 +185,20 @@ include 'admin_header.php';
 </div>
 
 <style>
-.hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
-.transition-all { transition: all 0.3s ease; }
+.hover-lift:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
+.transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.form-floating > .form-control:focus ~ label, .form-floating > .form-control:not(:placeholder-shown) ~ label {
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: var(--bs-primary) !important;
+}
+.form-floating > .form-control {
+    border-radius: 0.75rem !important;
+}
+.form-floating > .form-select {
+    border-radius: 0.75rem !important;
+}
 </style>
 
 <?php include 'admin_footer.php'; ?>

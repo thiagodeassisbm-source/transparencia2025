@@ -18,7 +18,7 @@ if ($nome_completo_boas_vindas === '') {
 
 // Define um título padrão para a página
 $page_title_for_header = $page_title_for_header ?? 'Painel Administrativo';
-$super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php', 'gerenciar_prefeituras.php', 'switch_pref.php', 'alterar_status_pref.php', 'gerenciar_landing_recursos.php', 'editar_landing_recurso.php', 'gerenciar_mensagens.php', 'enviar_mensagem.php', 'configurar_copyright.php', 'gerenciar_superadmins.php', 'editar_usuario.php'];
+$super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php', 'gerenciar_prefeituras.php', 'switch_pref.php', 'alterar_status_pref.php', 'gerenciar_landing_recursos.php', 'editar_landing_recurso.php', 'gerenciar_mensagens.php', 'enviar_mensagem.php', 'configurar_copyright.php', 'configurar_smtp.php', 'gerenciar_superadmins.php', 'editar_usuario.php'];
 $is_super_context = in_array(basename($_SERVER['PHP_SELF']), $super_pages) && isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1;
 
 // Função para verificar se a página atual é a ativa
