@@ -85,20 +85,38 @@ include 'admin_header.php';
 
 <div class="container-fluid container-custom-padding py-4">
     <div class="row">
-        <div class="col-lg-10 col-xl-8 mx-auto">
+        <div class="col-12">
             
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <a href="sic_inbox.php" class="btn btn-light rounded-pill px-3 shadow-sm border fw-bold small">
-                    <i class="bi bi-arrow-left me-1"></i> Voltar
+            <!-- Card Informativo do Sistema -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: linear-gradient(135deg, #0d6efd 0%, #003d99 100%);">
+                <div class="card-body p-4 p-md-5 text-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="badge bg-white bg-opacity-20 mb-3 px-3 py-2 rounded-pill">
+                                <i class="bi bi-megaphone-fill me-1"></i> Comunicação Automática Ativa
+                            </div>
+                            <h2 class="fw-bold mb-2">Responder Solicitação de Informação</h2>
+                            <p class="lead mb-0 opacity-75">Ao salvar uma resposta com o status <strong>Respondida</strong> ou <strong>Finalizada</strong>, o sistema enviará automaticamente um aviso para o e-mail do cidadão.</p>
+                        </div>
+                        <div class="col-md-4 text-end d-none d-md-block">
+                            <i class="bi bi-envelope-check" style="font-size: 8rem; opacity: 0.15; position: absolute; right: 20px; top: -10px;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between mb-4 px-2">
+                <a href="sic_inbox.php" class="btn btn-light rounded-pill px-4 shadow-sm border fw-bold">
+                    <i class="bi bi-arrow-left me-1"></i> Voltar para Inbox
                 </a>
                 <div class="text-end">
                     <span class="label-admin">Protocolo</span>
-                    <h5 class="fw-bold mb-0 text-primary"><?php echo htmlspecialchars($solicitacao['protocolo']); ?></h5>
+                    <h4 class="fw-bold mb-0 text-primary"><?php echo htmlspecialchars($solicitacao['protocolo']); ?></h4>
                 </div>
             </div>
 
             <div class="card card-admin">
-                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white py-4 border-0 d-flex justify-content-between align-items-center px-4">
                     <h5 class="mb-0 fw-bold"><i class="bi bi-info-circle-fill text-primary me-2"></i> Informações do Pedido</h5>
                     <?php 
                         $status_class = 'bg-primary';
