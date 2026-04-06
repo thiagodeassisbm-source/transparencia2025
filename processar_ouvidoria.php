@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_manifestacao'])
         require_once 'includes/functions_email.php';
         $email_solicitante = $_POST['email'] ?? '';
         if (!empty($email_solicitante)) {
-            enviar_email_protocolo($pdo, $email_solicitante, $nome_cidadao, $protocolo, 'Ouvidoria');
+            enviar_email_protocolo($pdo, $email_solicitante, $nome_cidadao, $protocolo, 'Ouvidoria', $id_prefeitura_form);
         }
         // ------------------------------
 

@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome_solicitante']))
         $email_solicitante = $_POST['email'] ?? '';
         $nome_solicitante = $_POST['nome_solicitante'] ?? '';
         if (!empty($email_solicitante)) {
-            enviar_email_protocolo($pdo, $email_solicitante, $nome_solicitante, $protocolo, 'E-SIC');
+            enviar_email_protocolo($pdo, $email_solicitante, $nome_solicitante, $protocolo, 'E-SIC', $id_prefeitura_form);
         }
         // ------------------------------
 

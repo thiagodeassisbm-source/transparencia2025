@@ -6,16 +6,35 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 /**
  * Envia e-mail de confirmação de protocolo para o cidadão
+ * @param PDO $pdo
+ * @param string $email_destinatario
+ * @param string $nome_destinatario
+ * @param string $protocolo
+ * @param string $tipo_servico
+ * @param int $id_prefeitura ID da prefeitura para buscar SMTP específico
  */
-function enviar_email_protocolo($pdo, $email_destinatario, $nome_destinatario, $protocolo, $tipo_servico) {
+function enviar_email_protocolo($pdo, $email_destinatario, $nome_destinatario, $protocolo, $tipo_servico, $id_prefeitura = 0) {
     if (empty($email_destinatario)) return false;
 
-    // Busca configurações de SMTP
-    $stmt = $pdo->query("SELECT chave, valor FROM config_global WHERE chave LIKE 'smtp_%'");
-    $config = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    // 1. TENTA BUSCAR CONFIGURAÇÃO ESPECÍFICA DA PREFEITURA
+    $config = [];
+    if ($id_prefeitura > 0) {
+        $stmt = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE id_prefeitura = ? AND chave LIKE 'smtp_%'");
+        $stmt->execute([$id_prefeitura]);
+        $config = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
+
+    // 2. SE NÃO ENCONTROU HOST NA PREFEITURA, BUSCA NO GLOBAL (FALLBACK)
+    if (empty($config['smtp_host'])) {
+        $stmt_global = $pdo->query("SELECT chave, valor FROM config_global WHERE chave LIKE 'smtp_%'");
+        $config = $stmt_global->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
 
     $host = $config['smtp_host'] ?? '';
-    if (empty($host)) return false; // SMTP não configurado
+    if (empty($host)) {
+        error_log("Tentativa de envio de e-mail sem SMTP configurado (Pref: $id_prefeitura)");
+        return false; 
+    }
 
     $port = $config['smtp_port'] ?? 587;
     $user = $config['smtp_user'] ?? '';

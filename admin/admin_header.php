@@ -264,7 +264,7 @@ function isActive($pageName) {
 
                     <?php if (tem_permissao('configuracoes', 'ver') || tem_permissao('prefeitura', 'ver') || $_SESSION['admin_user_perfil'] === 'admin'): ?>
                     <li>
-                        <?php $prefeitura_active = isActive(['informacoes_prefeitura.php', 'configurar_copyright.php']); ?>
+                        <?php $prefeitura_active = isActive(['informacoes_prefeitura.php', 'configurar_copyright.php', 'configurar_smtp.php']); ?>
                         <a href="#collapsePrefeitura" class="nav-link has-submenu <?php echo $prefeitura_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
                             <span><i class="bi bi-building"></i> Prefeitura</span>
                             <i class="bi bi-chevron-down submenu-arrow"></i>
@@ -272,6 +272,7 @@ function isActive($pageName) {
                         <div class="collapse <?php echo $prefeitura_active ? 'show' : ''; ?>" id="collapsePrefeitura">
                             <ul class="submenu">
                                 <li><a href="informacoes_prefeitura.php" class="nav-link <?php echo isActive('informacoes_prefeitura.php'); ?>">Identidade & Cores</a></li>
+                                <li><a href="configurar_smtp.php" class="nav-link <?php echo isActive('configurar_smtp.php'); ?>">E-mail (SMTP)</a></li>
                                 <li><a href="configurar_copyright.php" class="nav-link <?php echo isActive('configurar_copyright.php'); ?>">Rodapé & Copyright</a></li>
                             </ul>
                         </div>
