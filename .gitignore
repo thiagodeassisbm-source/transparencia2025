@@ -15,6 +15,7 @@ banco de dados/*
 
 # Arquivos temporários e de sistema
 tmp/
+admin/.clone_debug
 migrar_slugs.php
 .DS_Store
 Thumbs.db

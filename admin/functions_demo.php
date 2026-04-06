@@ -1,6 +1,8 @@
 <?php
 // /admin/functions_demo.php
 
+require_once __DIR__ . '/includes/clone_debug.php';
+
 /**
  * Lista nomes de colunas da tabela (cache por BD + tabela; evita colisão entre conexões).
  */
@@ -55,6 +57,9 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
     $should_manage_transaction = !$pdo->inTransaction();
     
     try {
+        clone_debug_log('clonar_dados_demonstrativos START origem=' . $id_origem . ' destino=' . $id_destino);
+        clone_debug_log('functions_demo: ' . json_encode(clone_debug_file_fingerprint(clone_debug_functions_demo_path()), JSON_UNESCAPED_UNICODE));
+
         if ($should_manage_transaction) {
             $pdo->beginTransaction();
         }
@@ -79,6 +84,7 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
 
         $map_categorias = []; // old_id => new_id
         $cols_cat = demo_colunas_tabela($pdo, 'categorias');
+        clone_debug_log('categorias: ' . count($categorias_origem) . ' linhas | SHOW COLUMNS: ' . json_encode($cols_cat, JSON_UNESCAPED_UNICODE));
 
         foreach ($categorias_origem as $cat) {
             $insert_cols = [];
@@ -208,7 +214,10 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $nom_caminho = demo_col_nome($cols_cards, 'caminho_icone');
         $nom_tipo = demo_col_nome($cols_cards, 'tipo_icone');
         $nom_icone_leg = demo_col_nome($cols_cards, 'icone');
+        clone_debug_log('cards_informativos: ' . count($all_cards) . ' linhas | cols=' . json_encode($cols_cards, JSON_UNESCAPED_UNICODE));
+        clone_debug_log('resolve icone: caminho_icone=' . ($nom_caminho ?? 'null') . ' tipo_icone=' . ($nom_tipo ?? 'null') . ' icone(leg)=' . ($nom_icone_leg ?? 'null'));
 
+        $card_i = 0;
         foreach ($all_cards as $card) {
             $nova_secao = null;
             if (!empty($card['id_secao']) && isset($map_portais[$card['id_secao']])) {
@@ -264,18 +273,31 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
                 return '`' . str_replace('`', '``', $c) . '`';
             }, $insert_cols);
             $sql_ins = 'INSERT INTO cards_informativos (' . implode(', ', $quoted) . ') VALUES (' . $ph . ')';
+            if ($card_i === 0) {
+                clone_debug_log('cards INSERT exemplo (1ª linha): ' . $sql_ins);
+            }
+            $card_i++;
             $pdo->prepare($sql_ins)->execute($insert_vals);
         }
 
         if ($should_manage_transaction) {
             $pdo->commit();
         }
+        clone_debug_log('clonar_dados_demonstrativos OK');
         return true;
     } catch (Exception $e) {
+        clone_debug_log('EXCEPTION: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+        if (clone_debug_verbose()) {
+            clone_debug_log($e->getTraceAsString());
+        }
         if ($should_manage_transaction && $pdo->inTransaction()) { 
             $pdo->rollBack(); 
         }
-        throw new Exception("Falha na clonagem (Banco de Dados): " . $e->getMessage());
+        $msg = 'Falha na clonagem (Banco de Dados): ' . $e->getMessage();
+        if (clone_debug_verbose()) {
+            $msg .= "\n\n--- Trace (debug) ---\n" . $e->getTraceAsString();
+        }
+        throw new Exception($msg);
     }
 }
 ?>

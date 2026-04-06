@@ -2,12 +2,21 @@
 require_once 'auth_check.php';
 require_once '../conexao.php';
 require_once 'functions_logs.php';
+require_once 'includes/clone_debug.php';
 require_once 'functions_demo.php'; // Adiciona motor de clonagem demo
 
 // Bloqueia se não for superadmin
 if (!isset($_SESSION['is_superadmin']) || $_SESSION['is_superadmin'] !== 1) {
     header("Location: dashboard.php");
     exit;
+}
+
+if (isset($_GET['debug_clone'])) {
+    if ($_GET['debug_clone'] === '1') {
+        $_SESSION['clone_debug_verbose'] = 1;
+    } elseif ($_GET['debug_clone'] === '0') {
+        $_SESSION['clone_debug_verbose'] = 0;
+    }
 }
 
 $erro = '';
@@ -73,6 +82,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
+        clone_debug_write_last_result($pdo, [
+            'ok' => true,
+            'id_prefeitura' => (int) $id_prefeitura,
+            'demo_carregada' => $carregar_demo === 1,
+        ]);
         $sucesso = "Cliente cadastrado com sucesso$demo_status! O acesso já está liberado.";
         
         // Limpa campos após sucesso
@@ -82,12 +96,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } catch (Exception $e) {
         if ($pdo->inTransaction()) { $pdo->rollBack(); }
+        clone_debug_write_last_result($pdo, [
+            'ok' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
         $erro = "Erro ao cadastrar: " . $e->getMessage();
     }
 }
 
 $page_title_for_header = 'Cadastrar Novo Cliente';
 include 'admin_header.php';
+$clone_debug_on = clone_debug_verbose();
 ?>
 
 <div class="container-fluid py-4">
@@ -99,7 +119,15 @@ include 'admin_header.php';
                     <p class="mb-0 text-white-50 opacity-75">Configure os dados contratuais e o acesso administrativo inicial</p>
                 </div>
                 <div class="card-body p-4">
-                    <?php if ($erro): ?><div class="alert alert-danger shadow-sm"><?php echo $erro; ?></div><?php endif; ?>
+                    <?php if ($clone_debug_on): ?>
+                        <?php echo clone_debug_html_banner(); ?>
+                        <p class="small text-muted">Log detalhado: <code>tmp/clone_debug.log</code> · último resultado: <code>tmp/clone_last_result.json</code> · <a href="debug_clone_ambiente.php">Diagnóstico completo</a> · <a href="cadastrar_prefeitura.php?debug_clone=0">Desativar debug</a></p>
+                    <?php else: ?>
+                        <p class="small text-muted mb-3"><a href="cadastrar_prefeitura.php?debug_clone=1">Ativar debug da clonagem</a> (superadmin)</p>
+                    <?php endif; ?>
+                    <?php if ($erro): ?>
+                        <div class="alert alert-danger shadow-sm"><?php echo (strpos($erro, '--- Trace (debug) ---') !== false) ? '<pre class="small mb-0 text-wrap" style="white-space:pre-wrap;">' . htmlspecialchars($erro) . '</pre>' : $erro; ?></div>
+                    <?php endif; ?>
                     <?php if ($sucesso): ?><div class="alert alert-success shadow-sm"><?php echo $sucesso; ?></div><?php endif; ?>
 
                     <form method="POST" class="row g-4">
