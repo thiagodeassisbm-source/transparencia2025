@@ -2,6 +2,32 @@
 // /admin/functions_demo.php
 
 /**
+ * Lista nomes de colunas da tabela (cache por conexão/instância da função).
+ */
+function demo_colunas_tabela(PDO $pdo, string $tabela): array {
+    static $cache = [];
+    if (isset($cache[$tabela])) {
+        return $cache[$tabela];
+    }
+    $safe = str_replace('`', '``', $tabela);
+    $stmt = $pdo->query("SHOW COLUMNS FROM `{$safe}`");
+    $cache[$tabela] = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    return $cache[$tabela];
+}
+
+/**
+ * Monta valores de ícone a partir de uma linha de cards (compatível com schema antigo ou novo).
+ */
+function demo_card_valores_icone(array $card): array {
+    $caminho = $card['caminho_icone'] ?? $card['icone'] ?? '';
+    $tipo = $card['tipo_icone'] ?? null;
+    if ($tipo === null || $tipo === '') {
+        $tipo = (is_string($caminho) && preg_match('/^\s*bi-/i', $caminho)) ? 'bootstrap' : 'imagem';
+    }
+    return ['caminho' => $caminho, 'tipo' => $tipo];
+}
+
+/**
  * Clona toda a estrutura e dados de uma prefeitura para outra como "Demonstração".
  */
 function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
@@ -32,14 +58,36 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $categorias_origem = $stmt_cat->fetchAll();
 
         $map_categorias = []; // old_id => new_id
-        $ins_cat = $pdo->prepare("INSERT INTO categorias (id_prefeitura, nome, ordem) VALUES (?, ?, ?)");
+        $cols_cat = demo_colunas_tabela($pdo, 'categorias');
+        $has_cat = array_flip($cols_cat);
 
         foreach ($categorias_origem as $cat) {
-            $ins_cat->execute([
-                $id_destino,
-                $cat['nome'],
-                $cat['ordem']
-            ]);
+            $insert_cols = [];
+            $insert_vals = [];
+            $push_cat = function (string $col, $val) use (&$insert_cols, &$insert_vals, $has_cat) {
+                if (isset($has_cat[$col])) {
+                    $insert_cols[] = $col;
+                    $insert_vals[] = $val;
+                }
+            };
+
+            $push_cat('id_prefeitura', $id_destino);
+            $push_cat('nome', $cat['nome']);
+            $push_cat('ordem', $cat['ordem']);
+            if (isset($has_cat['slug'])) {
+                $push_cat('slug', $cat['slug'] ?? null);
+            }
+            if (isset($has_cat['icone'])) {
+                $push_cat('icone', $cat['icone'] ?? '');
+            }
+
+            if ($insert_cols === []) {
+                throw new Exception('Tabela categorias sem colunas reconhecidas para INSERT.');
+            }
+
+            $ph = implode(', ', array_fill(0, count($insert_cols), '?'));
+            $sql_cat = 'INSERT INTO categorias (' . implode(', ', $insert_cols) . ') VALUES (' . $ph . ')';
+            $pdo->prepare($sql_cat)->execute($insert_vals);
             $map_categorias[$cat['id']] = $pdo->lastInsertId();
         }
 
@@ -49,19 +97,38 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $portais_origem = $stmt_p->fetchAll();
         
         $map_portais = []; // old_id => new_id
-        $ins_p = $pdo->prepare("INSERT INTO portais (id_prefeitura, id_categoria, nome, descricao, slug) VALUES (?, ?, ?, ?, ?)");
+        $cols_portais = demo_colunas_tabela($pdo, 'portais');
+        $has_p = array_flip($cols_portais);
         
         foreach ($portais_origem as $p) {
             // Mapeia a nova categoria
             $nova_cat_id = isset($map_categorias[$p['id_categoria']]) ? $map_categorias[$p['id_categoria']] : null;
 
-            $ins_p->execute([
-                $id_destino, 
-                $nova_cat_id, 
-                $p['nome'], 
-                $p['descricao'] ?? '', 
-                $p['slug']
-            ]);
+            $insert_cols = [];
+            $insert_vals = [];
+            $push_p = function (string $col, $val) use (&$insert_cols, &$insert_vals, $has_p) {
+                if (isset($has_p[$col])) {
+                    $insert_cols[] = $col;
+                    $insert_vals[] = $val;
+                }
+            };
+
+            $push_p('id_prefeitura', $id_destino);
+            $push_p('id_categoria', $nova_cat_id);
+            $push_p('nome', $p['nome']);
+            $push_p('descricao', $p['descricao'] ?? '');
+            $push_p('slug', $p['slug']);
+            if (isset($has_p['ordem'])) {
+                $push_p('ordem', $p['ordem'] ?? 0);
+            }
+
+            if ($insert_cols === []) {
+                throw new Exception('Tabela portais sem colunas reconhecidas para INSERT.');
+            }
+
+            $ph = implode(', ', array_fill(0, count($insert_cols), '?'));
+            $sql_p = 'INSERT INTO portais (' . implode(', ', $insert_cols) . ') VALUES (' . $ph . ')';
+            $pdo->prepare($sql_p)->execute($insert_vals);
             $new_p_id = $pdo->lastInsertId();
             $map_portais[$p['id']] = $new_p_id;
             
@@ -116,30 +183,61 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $stmt_cards_all = $pdo->prepare("SELECT * FROM cards_informativos WHERE id_prefeitura = ?");
         $stmt_cards_all->execute([$id_origem]);
         $all_cards = $stmt_cards_all->fetchAll();
-        
-        $ins_card = $pdo->prepare("INSERT INTO cards_informativos (id_prefeitura, id_secao, id_categoria, titulo, subtitulo, caminho_icone, tipo_icone, link_url, ordem) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        
+
+        $cols_cards = demo_colunas_tabela($pdo, 'cards_informativos');
+        $has_card = array_flip($cols_cards);
+
         foreach ($all_cards as $card) {
-            // Mapeia o ID da seção se o card estiver vinculado a uma seção clonada
             $nova_secao = null;
             if (!empty($card['id_secao']) && isset($map_portais[$card['id_secao']])) {
                 $nova_secao = $map_portais[$card['id_secao']];
             }
 
-            // Mapeia o ID da categoria
             $nova_cat_id_card = isset($map_categorias[$card['id_categoria']]) ? $map_categorias[$card['id_categoria']] : null;
-            
-            $ins_card->execute([
-                $id_destino,
-                $nova_secao,
-                $nova_cat_id_card,
-                $card['titulo'],
-                $card['subtitulo'],
-                $card['caminho_icone'],
-                $card['tipo_icone'],
-                $card['link_url'],
-                $card['ordem']
-            ]);
+
+            $ico = demo_card_valores_icone($card);
+
+            $insert_cols = [];
+            $insert_vals = [];
+            $push_card = function (string $col, $val) use (&$insert_cols, &$insert_vals, $has_card) {
+                if (isset($has_card[$col])) {
+                    $insert_cols[] = $col;
+                    $insert_vals[] = $val;
+                }
+            };
+
+            $push_card('id_prefeitura', $id_destino);
+            $push_card('id_secao', $nova_secao);
+            $push_card('id_categoria', $nova_cat_id_card);
+            $push_card('titulo', $card['titulo']);
+            $push_card('subtitulo', $card['subtitulo']);
+            $push_card('link_url', $card['link_url']);
+            $push_card('ordem', $card['ordem']);
+
+            if (isset($has_card['caminho_icone'])) {
+                $push_card('caminho_icone', $ico['caminho']);
+            }
+            if (isset($has_card['tipo_icone'])) {
+                $push_card('tipo_icone', $ico['tipo']);
+            }
+            if (isset($has_card['icone']) && !isset($has_card['caminho_icone'])) {
+                $push_card('icone', $ico['caminho']);
+            } elseif (isset($has_card['icone']) && isset($has_card['caminho_icone'])) {
+                // Período de migração: alguns bancos mantêm as duas colunas
+                $push_card('icone', $ico['caminho']);
+            }
+
+            if (isset($has_card['is_demo'])) {
+                $push_card('is_demo', $card['is_demo'] ?? 0);
+            }
+
+            if ($insert_cols === []) {
+                throw new Exception('Tabela cards_informativos sem colunas reconhecidas para INSERT.');
+            }
+
+            $ph = implode(', ', array_fill(0, count($insert_cols), '?'));
+            $sql_ins = 'INSERT INTO cards_informativos (' . implode(', ', $insert_cols) . ') VALUES (' . $ph . ')';
+            $pdo->prepare($sql_ins)->execute($insert_vals);
         }
 
         if ($should_manage_transaction) {
