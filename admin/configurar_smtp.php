@@ -35,16 +35,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO config_global (chave, valor) VALUES (?, ?) ON DUPLICATE KEY UPDATE valor = ?");
             $stmt->execute([$chave, $valor, $valor]);
         }
+        $modulo_log = "PLATAFORMA_SMTP";
+        $detalhes_log = "Atualizou as configurações globais de SMTP (Fallback).";
     } else {
         // Salva na tabela configuracoes (Específico da prefeitura)
         foreach ($configs as $chave => $valor) {
             $stmt = $pdo->prepare("INSERT INTO configuracoes (chave, valor, id_prefeitura) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)");
             $stmt->execute([$chave, $valor, $id_prefeitura_alvo]);
         }
+        $modulo_log = "PREFEITURA_SMTP";
+        $detalhes_log = "Atualizou as configurações de SMTP para a Prefeitura ID: " . $id_prefeitura_alvo;
     }
 
-    registrar_log($pdo, 'CONFIG', 'SMTP', "Atualizou as configurações de SMTP para " . ($id_prefeitura_alvo === 0 ? "Global/Fallback" : "Prefeitura ID: $id_prefeitura_alvo"));
-    $mensagem_sucesso = "Configurações de SMTP salvas com sucesso!";
+    require_once 'functions_logs.php';
+    registrar_log($pdo, 'CONFIG', $modulo_log, $detalhes_log);
+
+    $_SESSION['sucesso_smtp'] = true;
+    header("Location: configurar_smtp.php");
+    exit;
 }
 
 // Busca configurações atuais
