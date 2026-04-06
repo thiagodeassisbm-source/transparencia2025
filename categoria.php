@@ -8,8 +8,9 @@ $categoria_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $categoria_slug = filter_input(INPUT_GET, 'categoria_slug', FILTER_DEFAULT);
 
 if (empty($categoria_id) && !empty($categoria_slug)) {
-    $stmt_slug = $pdo->prepare("SELECT id FROM categorias WHERE slug = ? LIMIT 1");
-    $stmt_slug->execute([$categoria_slug]);
+    // IMPORTANTE: Filtrar pelo id_prefeitura_ativa para pegar a categoria clonada corretamente
+    $stmt_slug = $pdo->prepare("SELECT id FROM categorias WHERE slug = ? AND id_prefeitura = ? LIMIT 1");
+    $stmt_slug->execute([$categoria_slug, $id_prefeitura_ativa]);
     $categoria_id = $stmt_slug->fetchColumn();
 }
 
