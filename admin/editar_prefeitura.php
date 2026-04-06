@@ -1,4 +1,5 @@
 <?php
+/** ARQUIVO ATUALIZADO EM 06/04/2026 - LARGURA TOTAL **/
 require_once 'auth_check.php';
 require_once '../conexao.php';
 require_once 'functions_logs.php';
@@ -11,207 +12,208 @@ if (!isset($_SESSION['is_superadmin']) || $_SESSION['is_superadmin'] !== 1) {
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
-    header("Location: super_dashboard.php");
+    header("Location: gerenciar_prefeituras.php");
     exit;
 }
 
-// Busca dados atuais
+// Busca dados da prefeitura
 $stmt = $pdo->prepare("SELECT * FROM prefeituras WHERE id = ?");
 $stmt->execute([$id]);
-$pref = $stmt->fetch();
+$prefeitura = $stmt->fetch();
 
-if (!$pref) {
-    die("Prefeitura não encontrada.");
+if (!$prefeitura) {
+    header("Location: gerenciar_prefeituras.php");
+    exit;
 }
 
-// Busca o usuário admin da prefeitura
-$stmt_user = $pdo->prepare("SELECT id, usuario FROM usuarios_admin WHERE id_prefeitura = ? AND is_superadmin = 0 LIMIT 1");
-$stmt_user->execute([$id]);
-$admin_data = $stmt_user->fetch();
-
-$erro = '';
-$sucesso = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_SPECIAL_CHARS);
-    $slug = filter_input(INPUT_POST, 'slug', FILTER_SANITIZE_SPECIAL_CHARS);
-    $responsavel_nome = filter_input(INPUT_POST, 'responsavel_nome', FILTER_SANITIZE_SPECIAL_CHARS);
-    $responsavel_contato = filter_input(INPUT_POST, 'responsavel_contato', FILTER_SANITIZE_SPECIAL_CHARS);
-    $dia_vencimento = filter_input(INPUT_POST, 'dia_vencimento', FILTER_VALIDATE_INT);
-    $valor_mensalidade = filter_input(INPUT_POST, 'valor_mensalidade', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-    $data_contratacao = filter_input(INPUT_POST, 'data_contratacao', FILTER_SANITIZE_SPECIAL_CHARS);
-    $data_contratacao = filter_input(INPUT_POST, 'data_contratacao', FILTER_SANITIZE_SPECIAL_CHARS);
-    $status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_SPECIAL_CHARS);
-    $dominio_customizado = filter_input(INPUT_POST, 'dominio_customizado', FILTER_SANITIZE_URL);
+// Processamento do Formulário
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
+    $nome = $_POST['nome'];
+    $slug = $_POST['slug'];
+    $dominio = $_POST['dominio_customizado'];
+    $status = $_POST['status'];
+    $contato_resp = $_POST['nome_responsavel'] ?? '';
+    $contato_whats = $_POST['contato_whatsapp'] ?? '';
+    $valor_mensal = $_POST['valor_mensalidade'] ?? 0;
 
     try {
-        $stmt_upd = $pdo->prepare("UPDATE prefeituras SET nome = ?, slug = ?, responsavel_nome = ?, responsavel_contato = ?, dia_vencimento = ?, valor_mensalidade = ?, data_contratacao = ?, status = ?, dominio_customizado = ? WHERE id = ?");
-        $stmt_upd->execute([$nome, $slug, $responsavel_nome, $responsavel_contato, $dia_vencimento, $valor_mensalidade, $data_contratacao, $status, $dominio_customizado, $id]);
+        $stmt_update = $pdo->prepare("
+            UPDATE prefeituras 
+            SET nome = ?, slug = ?, dominio_customizado = ?, status = ?, 
+                nome_responsavel = ?, contato_whatsapp = ?, valor_mensalidade = ?
+            WHERE id = ?
+        ");
+        $stmt_update->execute([$nome, $slug, $dominio, $status, $contato_resp, $contato_whats, $valor_mensal, $id]);
 
-        // Atualizar Usuário Admin se necessário
-        $new_admin_user = filter_input(INPUT_POST, 'admin_user', FILTER_SANITIZE_SPECIAL_CHARS);
-        $new_admin_pass = $_POST['admin_pass'] ?? '';
-
-        if ($admin_data) {
-            // Atualiza Username
-            if ($new_admin_user && $new_admin_user !== $admin_data['usuario']) {
-                $stmt_upd_user = $pdo->prepare("UPDATE usuarios_admin SET usuario = ? WHERE id = ?");
-                $stmt_upd_user->execute([$new_admin_user, $admin_data['id']]);
-            }
-            // Atualiza Senha (se preenchida)
-            if (!empty($new_admin_pass)) {
-                $hash = password_hash($new_admin_pass, PASSWORD_DEFAULT);
-                $stmt_upd_pass = $pdo->prepare("UPDATE usuarios_admin SET senha = ? WHERE id = ?");
-                $stmt_upd_pass->execute([$hash, $admin_data['id']]);
-            }
-        }
-
-        registrar_log($pdo, 'SUPERADMIN', 'EDITAR_PREFEITURA', "Dados da prefeitura $nome e acesso admin atualizados.");
-        $sucesso = "Dados atualizados com sucesso!";
+        registrar_log($pdo, $_SESSION['id_usuario'], $_SESSION['nome_usuario'], 'EDIÇÃO', 'PREFEITURAS', "Atualizou dados da prefeitura ID $id: $nome", 0);
         
-        // Recarrega dados
-        $stmt->execute([$id]);
-        $pref = $stmt->fetch();
+        $sucesso = "Dados atualizados com sucesso!";
+        // Atualiza os dados locais para exibir no form
+        $prefeitura = array_merge($prefeitura, [
+            'nome' => $nome, 'slug' => $slug, 'dominio_customizado' => $dominio, 
+            'status' => $status, 'nome_responsavel' => $contato_resp, 
+            'contato_whatsapp' => $contato_whats, 'valor_mensalidade' => $valor_mensal
+        ]);
     } catch (Exception $e) {
         $erro = "Erro ao atualizar: " . $e->getMessage();
     }
 }
 
-$page_title_for_header = 'Editar Prefeitura';
+$page_title_for_header = 'Gestão de Prefeitura SaaS';
 include 'admin_header.php';
 ?>
 
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-dark text-white p-4 rounded-top-4 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i> Editar Dados de Gestão</h5>
-                        <p class="mb-0 text-white-50 opacity-75"><?php echo htmlspecialchars($pref['nome']); ?></p>
-                    </div>
-                    <a href="super_dashboard.php" class="btn btn-outline-light btn-sm rounded-pill">Voltar</a>
+<div class="container-fluid py-4" style="padding-left: 30px; padding-right: 30px;">
+    <!-- Card Informativo Premium (Padrão e-SIC/Ouvidoria) -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="d-flex flex-column flex-md-row">
+                <div class="bg-primary p-4 d-flex align-items-center justify-content-center text-white" style="min-width: 110px;">
+                    <i class="bi bi-shield-lock display-5"></i>
                 </div>
-                <div class="card-body p-4">
-                    <?php if ($erro): ?><div class="alert alert-danger px-4 rounded-3"><?php echo $erro; ?></div><?php endif; ?>
-                    <?php if ($sucesso): ?><div class="alert alert-success px-4 rounded-3"><?php echo $sucesso; ?></div><?php endif; ?>
-
-                    <form method="POST" class="row g-4">
-                        <div class="col-12 py-2 border-bottom mb-2">
-                            <h6 class="text-primary fw-bold mb-0">1. Informações Cadastrais</h6>
+                <div class="p-4 flex-grow-1 bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-bold mb-1 text-primary">Configurações de Instância SaaS</h5>
+                            <p class="text-muted small mb-0">Gestão global de <strong><?php echo htmlspecialchars($prefeitura['nome']); ?></strong> (ID: <?php echo $id; ?>).</p>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">Nome de Identificação (SaaS)</label>
-                            <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($pref['nome']); ?>" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold text-muted">Slug (URL Amigável)</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light">/portal/</span>
-                                <input type="text" name="slug" class="form-control" value="<?php echo htmlspecialchars($pref['slug']); ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-bold text-muted">Domínio Customizado</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-globe"></i></span>
-                                <input type="text" name="dominio_customizado" class="form-control" value="<?php echo htmlspecialchars($pref['dominio_customizado'] ?? ''); ?>">
-                            </div>
-                            <small class="text-muted" style="font-size: 0.65rem;">Ex: transparencia.goiania.go.gov.br</small>
-                        </div>
-
-                        <!-- Guia Detalhado de Configuração Whitelabel -->
-                        <div class="col-12 mt-3">
-                            <div class="card border-primary-subtle shadow-sm">
-                                <div class="card-header bg-primary-subtle py-2">
-                                    <h6 class="mb-0 text-primary fw-bold small"><i class="bi bi-magic me-2"></i>Como Funciona o Domínio Próprio (Whitelabel)</h6>
-                                </div>
-                                <div class="card-body p-3">
-                                    <div class="row g-3 small">
-                                        <div class="col-md-4">
-                                            <p class="fw-bold text-dark mb-1"><span class="badge bg-primary me-1">1</span> O que escrever no campo?</p>
-                                            <p class="text-muted mb-0">Digite o endereço final que a cidade vai usar. <br>Exemplo: <code>transparencia.cidade.gov.br</code></p>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <p class="fw-bold text-dark mb-1"><span class="badge bg-primary me-1">2</span> Lado do Cliente (Eles fazem)</p>
-                                            <p class="text-muted mb-0">O técnico da prefeitura deve ir no painel de DNS (Registro.br) e criar um <strong>CNAME</strong> apontando para o <strong>endereço do nosso sistema</strong>.</p>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <p class="fw-bold text-dark mb-1"><span class="badge bg-primary me-1">3</span> Lado do Servidor (Você faz)</p>
-                                            <p class="text-muted mb-0">No seu painel de Hospedagem, adicione este domínio como um <strong>Alias</strong> ou <strong>Domínio Estacionado</strong> apontando para esta instalação.</p>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3 p-2 bg-light rounded text-center small text-primary">
-                                        <i class="bi bi-info-circle-fill me-1"></i> Com estes 3 passos, o servidor reconhecerá quem está chegando e mostrará o portal correto automaticamente!
-                                    </div>
-                                    <div class="mt-3 text-center">
-                                        <a href="tutorial_dns.php?id=<?php echo $pref['id']; ?>" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-bold shadow-sm" style="border-width: 2px;">
-                                            <i class="bi bi-book-half me-2"></i> Ver Tutorial Completo & Gerar Código .htaccess
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">Status de Acesso</label>
-                            <select name="status" class="form-select">
-                                <option value="ativo" <?php echo $pref['status'] == 'ativo' ? 'selected' : ''; ?>>Ativo</option>
-                                <option value="suspenso" <?php echo $pref['status'] == 'suspenso' ? 'selected' : ''; ?>>Suspenso (Bloqueado)</option>
-                                <option value="pendente_pagamento" <?php echo $pref['status'] == 'pendente_pagamento' ? 'selected' : ''; ?>>Aguardando Pagamento</option>
-                            </select>
-                        </div>
-
-                        <div class="col-12 py-2 border-bottom mt-4 mb-2">
-                            <h6 class="text-primary fw-bold mb-0">2. Financeiro & Contrato</h6>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">Nome do Responsável</label>
-                            <input type="text" name="responsavel_nome" class="form-control" value="<?php echo htmlspecialchars($pref['responsavel_nome']); ?>">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">Contato (WhatsApp)</label>
-                            <input type="text" name="responsavel_contato" class="form-control" value="<?php echo htmlspecialchars($pref['responsavel_contato']); ?>">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">Valor Mensalidade (R$)</label>
-                            <input type="number" step="0.01" name="valor_mensalidade" class="form-control" value="<?php echo $pref['valor_mensalidade']; ?>">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">Dia de Vencimento</label>
-                            <select name="dia_vencimento" class="form-select">
-                                <?php for($i=5; $i<=25; $i+=5): ?>
-                                    <option value="<?php echo $i; ?>" <?php echo $pref['dia_vencimento'] == $i ? 'selected' : ''; ?>>Dia <?php echo sprintf('%02d', $i); ?></option>
-                                <?php endfor; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">Data de Contratação</label>
-                            <input type="date" name="data_contratacao" class="form-control" value="<?php echo $pref['data_contratacao']; ?>">
-                        </div>
-
-                        <!-- SEÇÃO 3: ACESSO ADMIN -->
-                        <div class="col-12 py-2 border-bottom mt-4 mb-2">
-                            <h6 class="text-primary fw-bold mb-0">3. Acesso Administrativo da Prefeitura</h6>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted">Usuário Admin Local</label>
-                            <input type="text" name="admin_user" class="form-control" value="<?php echo htmlspecialchars($admin_data['usuario'] ?? ''); ?>" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted">Nova Senha (deixe em branco para manter)</label>
-                            <input type="password" name="admin_pass" class="form-control" placeholder="********">
-                        </div>
-
-                        <div class="col-12 mt-5 text-end">
-                            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow">
-                                <i class="bi bi-save me-2"></i> Salvar Alterações
-                            </button>
-                        </div>
-                    </form>
+                        <a href="gerenciar_prefeituras.php" class="btn btn-outline-secondary border-2 btn-sm rounded-pill px-4 fw-bold">
+                            <i class="bi bi-arrow-left me-2"></i> Voltar
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <?php if (isset($sucesso)): ?>
+        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 px-4 py-3">
+            <i class="bi bi-check-circle-fill me-2"></i> <?php echo $sucesso; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($erro)): ?>
+        <div class="alert alert-danger border-0 shadow-sm rounded-4 mb-4 px-4 py-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?php echo $erro; ?>
+        </div>
+    <?php endif; ?>
+
+    <form action="" method="POST">
+        <div class="row g-4 text-start">
+            <!-- Coluna Principal (Formulário) -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 py-3 ps-4">
+                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-card-list me-2 text-primary"></i> 1. Dados Principais do Cadastro</h6>
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary">Nome da Prefeitura (Exibição)</label>
+                                <input type="text" name="nome" class="form-control rounded-3 py-2" value="<?php echo htmlspecialchars($prefeitura['nome']); ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary">Slug (URL do Portal)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted small">/portal/</span>
+                                    <input type="text" name="slug" class="form-control rounded-end-3 py-2" value="<?php echo htmlspecialchars($prefeitura['slug']); ?>" required>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <label class="form-label small fw-bold text-secondary">Domínio Whitelabel (Customizado)</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text bg-white text-primary border-end-0"><i class="bi bi-globe2"></i></span>
+                                    <input type="text" name="dominio_customizado" class="form-control border-start-0 py-2" value="<?php echo htmlspecialchars($prefeitura['dominio_customizado']); ?>" placeholder="ex: portaldatransparencia.suacidade.go.gov.br">
+                                </div>
+                                
+                                <div class="bg-light border-0 rounded-4 p-4 mt-3">
+                                    <h6 class="small fw-bold text-dark mb-4 border-bottom pb-2"><i class="bi bi-info-circle me-2 text-primary"></i>Guia de Configuração de Domínio Próprio</h6>
+                                    <div class="row g-4 text-center">
+                                        <div class="col-md-4">
+                                            <div class="badge bg-primary text-white rounded-circle shadow-sm mb-2" style="width: 32px; height: 32px; line-height: 24px;">1</div>
+                                            <p class="mb-1 small fw-bold text-dark">Inserir Domínio</p>
+                                            <p class="text-muted small mb-0" style="font-size: 0.7rem;">Informe o URL final que o cliente deseja utilizar.</p>
+                                        </div>
+                                        <div class="col-md-4 border-start">
+                                            <div class="badge bg-primary text-white rounded-circle shadow-sm mb-2" style="width: 32px; height: 32px; line-height: 24px;">2</div>
+                                            <p class="mb-1 small fw-bold text-dark">Apontamento CNAME</p>
+                                            <p class="text-muted small mb-0" style="font-size: 0.7rem;">O técnico da cidade aponta o DNS para o nosso IP.</p>
+                                        </div>
+                                        <div class="col-md-4 border-start">
+                                            <div class="badge bg-primary text-white rounded-circle shadow-sm mb-2" style="width: 32px; height: 32px; line-height: 24px;">3</div>
+                                            <p class="mb-1 small fw-bold text-dark">Add no Servidor</p>
+                                            <p class="text-muted small mb-0" style="font-size: 0.7rem;">Adicione como 'Alias' ou 'Domínio Estacionado'.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Lateral (Informações de Gestão) -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 py-3 ps-4">
+                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-activity me-2 text-primary"></i> 2. Status do Canal</h6>
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <label class="form-label small fw-bold text-secondary">Disponibilidade</label>
+                        <select name="status" class="form-select rounded-3 py-2 mb-3">
+                            <option value="ativo" <?php echo $prefeitura['status'] == 'ativo' ? 'selected' : ''; ?>>Ativo (Visível)</option>
+                            <option value="inativo" <?php echo $prefeitura['status'] == 'inativo' ? 'selected' : ''; ?>>Suspenso / Inativo</option>
+                            <option value="manutencao" <?php echo $prefeitura['status'] == 'manutencao' ? 'selected' : ''; ?>>Manutenção Interna</option>
+                        </select>
+                        <p class="text-muted" style="font-size: 0.75rem; line-height: 1.4;">
+                            <i class="bi bi-info-circle-fill me-1 small"></i> Ao inativar, a prefeitura perde acesso ao painel e o portal público fica fora do ar.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white border-0 py-3 ps-4">
+                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-briefcase me-2 text-primary"></i> 3. Gestão & Comercial</h6>
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <div class="mb-3 text-start">
+                            <label class="form-label small fw-bold text-secondary">Responsável Contratual</label>
+                            <input type="text" name="nome_responsavel" class="form-control rounded-3 py-2 text-start" value="<?php echo htmlspecialchars($prefeitura['nome_responsavel'] ?? ''); ?>">
+                        </div>
+                        <div class="mb-3 text-start">
+                            <label class="form-label small fw-bold text-secondary">WhatsApp / Contato</label>
+                            <input type="text" name="contato_whatsapp" class="form-control rounded-3 py-2 text-start" value="<?php echo htmlspecialchars($prefeitura['contato_whatsapp'] ?? ''); ?>">
+                        </div>
+                        <div class="mb-0 text-start">
+                            <label class="form-label small fw-bold text-secondary">Fee Mensal (R$)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light small">R$</span>
+                                <input type="number" step="0.01" name="valor_mensalidade" class="form-control rounded-end-3 py-2 text-start" value="<?php echo htmlspecialchars($prefeitura['valor_mensalidade'] ?? 0); ?>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="col-12 mt-2 text-end pb-5">
+                <hr class="my-4 opacity-50">
+                <button type="submit" name="salvar" class="btn btn-primary rounded-pill px-5 py-3 shadow fw-bold border-0" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <i class="bi bi-save2 me-2"></i> SALVAR ALTERAÇÕES
+                </button>
+            </div>
+        </div>
+    </form>
 </div>
+
+<style>
+.form-control:focus, .form-select:focus {
+    border-color: #36c0d3;
+    box-shadow: 0 0 0 0.25rem rgba(54, 192, 211, 0.1);
+}
+.input-group-text { border-radius: 8px 0 0 8px !important; }
+.form-control { border-radius: 8px !important; }
+.input-group > .form-control { border-radius: 0 8px 8px 0 !important; }
+</style>
 
 <?php include 'admin_footer.php'; ?>

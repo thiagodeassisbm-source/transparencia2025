@@ -26,7 +26,26 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
              $ins_conf->execute([$conf['chave'], $conf['valor'], $id_destino]);
         }
 
-        // --- 2. Clona os Portais (Seções) e mapeia IDs ---
+        // --- 2. Clona as Categorias (Menu Lateral) ---
+        $stmt_cat = $pdo->prepare("SELECT * FROM categorias WHERE id_prefeitura = ?");
+        $stmt_cat->execute([$id_origem]);
+        $categorias_origem = $stmt_cat->fetchAll();
+
+        $map_categorias = []; // old_id => new_id
+        $ins_cat = $pdo->prepare("INSERT INTO categorias (id_prefeitura, nome, slug, icone, ordem) VALUES (?, ?, ?, ?, ?)");
+
+        foreach ($categorias_origem as $cat) {
+            $ins_cat->execute([
+                $id_destino,
+                $cat['nome'],
+                $cat['slug'],
+                $cat['icone'],
+                $cat['ordem']
+            ]);
+            $map_categorias[$cat['id']] = $pdo->lastInsertId();
+        }
+
+        // --- 3. Clona os Portais (Seções) e mapeia IDs ---
         $stmt_p = $pdo->prepare("SELECT * FROM portais WHERE id_prefeitura = ?");
         $stmt_p->execute([$id_origem]);
         $portais_origem = $stmt_p->fetchAll();
@@ -35,9 +54,12 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $ins_p = $pdo->prepare("INSERT INTO portais (id_prefeitura, id_categoria, nome, slug, ordem, is_demo) VALUES (?, ?, ?, ?, ?, 1)");
         
         foreach ($portais_origem as $p) {
+            // Mapeia a nova categoria
+            $nova_cat_id = isset($map_categorias[$p['id_categoria']]) ? $map_categorias[$p['id_categoria']] : null;
+
             $ins_p->execute([
                 $id_destino, 
-                $p['id_categoria'], 
+                $nova_cat_id, 
                 $p['nome'], 
                 $p['slug'], 
                 $p['ordem']
@@ -92,7 +114,7 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             }
         }
 
-        // --- 3. Clona TODOS os Cards da Home (Incluindo SIC, Ouvidoria, etc) ---
+        // --- 4. Clona TODOS os Cards da Home (Incluindo SIC, Ouvidoria, etc) ---
         $stmt_cards_all = $pdo->prepare("SELECT * FROM cards_informativos WHERE id_prefeitura = ?");
         $stmt_cards_all->execute([$id_origem]);
         $all_cards = $stmt_cards_all->fetchAll();
@@ -105,11 +127,14 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             if (!empty($card['id_secao']) && isset($map_portais[$card['id_secao']])) {
                 $nova_secao = $map_portais[$card['id_secao']];
             }
+
+            // Mapeia o ID da categoria
+            $nova_cat_id_card = isset($map_categorias[$card['id_categoria']]) ? $map_categorias[$card['id_categoria']] : null;
             
             $ins_card->execute([
                 $id_destino,
                 $nova_secao,
-                $card['id_categoria'],
+                $nova_cat_id_card,
                 $card['titulo'],
                 $card['subtitulo'],
                 $card['caminho_icone'],
