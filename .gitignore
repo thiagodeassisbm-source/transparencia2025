@@ -9,8 +9,9 @@ admin/uploads/
 
 # Backups e SQL
 backup/
-"banco de dados/"
+banco de dados/*
 *.sql
+!banco de dados/u315410518_transp2025_verificacao.sql
 
 # Arquivos temporários e de sistema
 tmp/
