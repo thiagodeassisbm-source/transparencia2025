@@ -32,14 +32,12 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $categorias_origem = $stmt_cat->fetchAll();
 
         $map_categorias = []; // old_id => new_id
-        $ins_cat = $pdo->prepare("INSERT INTO categorias (id_prefeitura, nome, slug, icone, ordem) VALUES (?, ?, ?, ?, ?)");
+        $ins_cat = $pdo->prepare("INSERT INTO categorias (id_prefeitura, nome, ordem) VALUES (?, ?, ?)");
 
         foreach ($categorias_origem as $cat) {
             $ins_cat->execute([
                 $id_destino,
                 $cat['nome'],
-                $cat['slug'],
-                $cat['icone'],
                 $cat['ordem']
             ]);
             $map_categorias[$cat['id']] = $pdo->lastInsertId();
@@ -51,7 +49,7 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $portais_origem = $stmt_p->fetchAll();
         
         $map_portais = []; // old_id => new_id
-        $ins_p = $pdo->prepare("INSERT INTO portais (id_prefeitura, id_categoria, nome, slug, ordem, is_demo) VALUES (?, ?, ?, ?, ?, 1)");
+        $ins_p = $pdo->prepare("INSERT INTO portais (id_prefeitura, id_categoria, nome, descricao, slug) VALUES (?, ?, ?, ?, ?)");
         
         foreach ($portais_origem as $p) {
             // Mapeia a nova categoria
@@ -61,8 +59,8 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
                 $id_destino, 
                 $nova_cat_id, 
                 $p['nome'], 
-                $p['slug'], 
-                $p['ordem']
+                $p['descricao'] ?? '', 
+                $p['slug']
             ]);
             $new_p_id = $pdo->lastInsertId();
             $map_portais[$p['id']] = $new_p_id;
@@ -94,7 +92,7 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             $stmt_r->execute([$p['id']]);
             $registros_origem = $stmt_r->fetchAll();
             
-            $ins_r = $pdo->prepare("INSERT INTO registros (id_portal, is_demo) VALUES (?, 1)");
+            $ins_r = $pdo->prepare("INSERT INTO registros (id_portal) VALUES (?)");
             
             foreach ($registros_origem as $r) {
                 $ins_r->execute([$new_p_id]);
@@ -119,7 +117,7 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $stmt_cards_all->execute([$id_origem]);
         $all_cards = $stmt_cards_all->fetchAll();
         
-        $ins_card = $pdo->prepare("INSERT INTO cards_informativos (id_prefeitura, id_secao, id_categoria, titulo, subtitulo, caminho_icone, tipo_icone, link_url, ordem, is_demo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
+        $ins_card = $pdo->prepare("INSERT INTO cards_informativos (id_prefeitura, id_secao, id_categoria, titulo, subtitulo, caminho_icone, tipo_icone, link_url, ordem) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         
         foreach ($all_cards as $card) {
             // Mapeia o ID da seção se o card estiver vinculado a uma seção clonada
