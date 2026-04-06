@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Exemplo para importação de RECEITAS no painel (Passo 1 → Mapeamento).
+
+  1) Em Gerenciar Tipos de XML, cadastre (ajuste aos nomes abaixo):
+     - Nome amigável: Receitas (ou outro)
+     - Tag contêiner (plural): dados
+     - Tag de registro (singular): receita
+
+  2) No Passo 2, relacione cada tag XML à coluna do portal:
+     natureza → Natureza da Receita
+     codigo → Código
+     descricao → Descrição
+     previsao → Previsão
+     arrecadacao_no_mes → Arrecadação do Mês
+     referencia → Referência
+
+  As tags filhas de <receita> devem coincidir com o que você mapear (nomes em minúsculas com _).
+-->
+<relatorios>
+  <dados>
+    <receita>
+      <natureza>1.1.1.2.50.0.1.01.00.000</natureza>
+      <codigo>1.1.1.2.50.0.1.01.00.000</codigo>
+      <descricao>Imposto sobre a Propriedade Predial e Territorial Urbana - Principal - Ordinário</descricao>
+      <referencia>Março/2026</referencia>
+      <previsao>123000000.00</previsao>
+      <arrecadacao_no_mes>9295286.67</arrecadacao_no_mes>
+    </receita>
+    <receita>
+      <natureza>1.1.1.2.50.0.1.02.00.000</natureza>
+      <codigo>1.1.1.2.50.0.1.02.00.000</codigo>
+      <descricao>Imposto sobre a Propriedade Predial e Territorial Urbana - Principal - Educação</descricao>
+      <referencia>Março/2026</referencia>
+      <previsao>51250000.00</previsao>
+      <arrecadacao_no_mes>3873036.24</arrecadacao_no_mes>
+    </receita>
+  </dados>
+</relatorios>

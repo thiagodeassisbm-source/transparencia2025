@@ -130,6 +130,7 @@ function isActive($pageName) {
                         <div class="collapse <?php echo $config_active ? 'show' : ''; ?>" id="collapseConfigGlobal">
                             <ul class="submenu">
                                 <li><a href="configurar_copyright.php" class="nav-link <?php echo isActive('configurar_copyright.php'); ?>">Copyright / Rodapé</a></li>
+                                <li><a href="configurar_smtp.php" class="nav-link <?php echo isActive('configurar_smtp.php'); ?>">Configuração SMTP</a></li>
                                 <li><a href="gerenciar_superadmins.php" class="nav-link <?php echo isActive('gerenciar_superadmins.php'); ?>">Usuários Superadmin</a></li>
                             </ul>
                         </div>

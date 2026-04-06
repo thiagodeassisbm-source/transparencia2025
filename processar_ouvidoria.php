@@ -47,6 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_manifestacao'])
             $status
         ]);
 
+        // --- ENVIO DE E-MAIL (NOVO) ---
+        require_once 'includes/functions_email.php';
+        $email_solicitante = $_POST['email'] ?? '';
+        if (!empty($email_solicitante)) {
+            enviar_email_protocolo($pdo, $email_solicitante, $nome_cidadao, $protocolo, 'Ouvidoria');
+        }
+        // ------------------------------
+
         // Redireciona de volta para a página principal da ouvidoria com o protocolo
         $slug_redir = $_POST['pref_slug'] ?? 'principal';
         header("Location: " . $base_url . "portal/" . $slug_redir . "/ouvidoria.php?protocolo=" . urlencode($protocolo));

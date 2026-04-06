@@ -37,6 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome_solicitante']))
             $status
         ]);
 
+        // --- ENVIO DE E-MAIL (NOVO) ---
+        require_once 'includes/functions_email.php';
+        $email_solicitante = $_POST['email'] ?? '';
+        $nome_solicitante = $_POST['nome_solicitante'] ?? '';
+        if (!empty($email_solicitante)) {
+            enviar_email_protocolo($pdo, $email_solicitante, $nome_solicitante, $protocolo, 'E-SIC');
+        }
+        // ------------------------------
+
         // Redireciona de volta para a página principal do SIC com a mensagem de sucesso
         $slug_redir = $_POST['pref_slug'] ?? 'principal';
         header("Location: " . $base_url . "portal/" . $slug_redir . "/sic.php?protocolo=" . urlencode($protocolo));
