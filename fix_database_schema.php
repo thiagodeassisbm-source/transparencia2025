@@ -58,8 +58,7 @@ try {
     echo "\n--- VERIFICAÇÃO DE OUTRAS TABELAS CRÍTICAS ---\n";
     $tabelas_criticas = ['categorias', 'configuracoes', 'ouvidoria_manifestacoes', 'sic_solicitacoes', 'secretarias', 'cargos', 'agentes_politicos'];
     foreach ($tabelas_criticas as $t) {
-        $st_check = $pdo->prepare("SHOW TABLES LIKE ?");
-        $st_check->execute([$t]);
+        $st_check = $pdo->query("SHOW TABLES LIKE '$t'");
         if ($st_check->fetch()) {
             $st_cols = $pdo->query("SHOW COLUMNS FROM $t");
             $c_list = $st_cols->fetchAll(PDO::FETCH_COLUMN);
