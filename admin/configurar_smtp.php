@@ -78,12 +78,12 @@ include 'admin_header.php';
                     <div class="row align-items-center">
                         <div class="col-md-<?php echo $id_prefeitura_alvo === 0 ? '12' : '8'; ?>">
                             <div class="badge bg-white bg-opacity-20 mb-3 px-3 py-2 rounded-pill">
-                                <i class="bi bi-shield-check me-1"></i> <?php echo $id_prefeitura_alvo === 0 ? 'Configuração Global (Fallback)' : 'Configuração da Prefeitura Local'; ?>
+                                <i class="bi bi-shield-lock me-1"></i> <?php echo $id_prefeitura_alvo === 0 ? 'Reserva Global (Fallback)' : 'Configuração da Prefeitura Local'; ?>
                             </div>
-                            <h2 class="fw-bold mb-3"><i class="bi bi-envelope-paper-heart me-2"></i> Como configurar o seu E-mail?</h2>
+                            <h2 class="fw-bold mb-3"><i class="bi bi-envelope-paper-heart me-2"></i> <?php echo $id_prefeitura_alvo === 0 ? 'Configurar E-mail de Reserva' : 'Como configurar o seu E-mail?'; ?></h2>
                             <p class="lead mb-4 opacity-75">
                                 <?php if ($id_prefeitura_alvo === 0): ?>
-                                    Estas são as credenciais <strong>globais</strong>. Elas serão usadas por qualquer prefeitura que NÃO configurar seu próprio SMTP.
+                                    Estas credenciais serão usadas como <strong>reserva automática</strong> para qualquer prefeitura que deixar o SMTP em branco. Garantindo que nenhum cidadão fique sem o protocolo.
                                 <?php else: ?>
                                     Ao configurar o SMTP da sua prefeitura, todas as notificações de Ouvidoria e SIC serão enviadas usando o seu domínio oficial, aumentando a credibilidade e evitando que as mensagens caiam no lixo eletrônico.
                                 <?php endif; ?>
