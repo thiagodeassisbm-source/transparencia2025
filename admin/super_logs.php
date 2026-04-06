@@ -8,16 +8,43 @@ if (!isset($_SESSION['is_superadmin']) || $_SESSION['is_superadmin'] !== 1) {
     exit;
 }
 
-// Busca logs de todas as prefeituras, incluindo o nome da prefeitura
-$stmt = $pdo->prepare("
+// Filtros básicos
+$filtro_pref = $_GET['pref'] ?? '';
+$filtro_data = $_GET['data'] ?? '';
+$filtro_acao = $_GET['acao'] ?? '';
+
+$sql = "
     SELECT l.*, p.nome as prefeitura_nome 
     FROM logs_sistema l
     LEFT JOIN prefeituras p ON l.id_prefeitura = p.id
-    ORDER BY l.horario DESC 
-    LIMIT 300
-");
-$stmt->execute();
+    WHERE 1=1
+";
+$params = [];
+
+if ($filtro_pref !== '') {
+    if ($filtro_pref === '0') {
+        $sql .= " AND (l.id_prefeitura IS NULL OR l.id_prefeitura = 0)";
+    } else {
+        $sql .= " AND l.id_prefeitura = ?";
+        $params[] = $filtro_pref;
+    }
+}
+if ($filtro_data) {
+    $sql .= " AND DATE(l.horario) = ?";
+    $params[] = $filtro_data;
+}
+if ($filtro_acao) {
+    $sql .= " AND l.acao = ?";
+    $params[] = $filtro_acao;
+}
+
+$sql .= " ORDER BY l.horario DESC LIMIT 500";
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Busca lista de prefeituras para o filtro
+$prefeituras = $pdo->query("SELECT id, nome FROM prefeituras ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
 
 $page_title_for_header = 'Auditoria Global de Operações';
 include 'admin_header.php';
@@ -27,10 +54,55 @@ include 'admin_header.php';
     <div class="row mb-4 align-items-center">
         <div class="col">
             <h4 class="mb-0 fw-bold"><i class="bi bi-activity text-primary me-2"></i> Monitoramento Global do SaaS</h4>
-            <p class="text-muted small mb-0 px-1">Acompanhamento em tempo real de todas as ações realizadas em todas as prefeituras e na plataforma central.</p>
+            <p class="text-muted small mb-0 px-1">Filtre e analise todas as ações realizadas no sistema.</p>
         </div>
         <div class="col-auto">
-             <button onclick="window.location.reload()" class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm"><i class="bi bi-arrow-clockwise me-2"></i> Atualizar Agora</button>
+             <button onclick="window.location.reload()" class="btn btn-outline-secondary btn-sm rounded-pill px-4"><i class="bi bi-arrow-clockwise me-2"></i> Atualizar</button>
+        </div>
+    </div>
+
+    <!-- Barra de Filtros Avançada -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light bg-gradient">
+        <div class="card-body p-4">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted"><i class="bi bi-building me-1"></i> Filtrar por Prefeitura</label>
+                    <select name="pref" class="form-select border-0 shadow-sm rounded-3">
+                        <option value="">Todas as Instâncias</option>
+                        <option value="0" <?php echo $filtro_pref === '0' ? 'selected' : ''; ?>>PLATAFORMA CENTRAL</option>
+                        <hr>
+                        <?php foreach($prefeituras as $p): ?>
+                            <option value="<?php echo $p['id']; ?>" <?php echo $filtro_pref == $p['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($p['nome']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted"><i class="bi bi-calendar3 me-1"></i> Data Específica</label>
+                    <input type="date" name="data" class="form-select border-0 shadow-sm rounded-3" value="<?php echo $filtro_data; ?>">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted"><i class="bi bi-funnel me-1"></i> Tipo de Ação</label>
+                    <select name="acao" class="form-select border-0 shadow-sm rounded-3">
+                        <option value="">Todas as Ações</option>
+                        <option value="ADIÇÃO" <?php echo $filtro_acao == 'ADIÇÃO' ? 'selected' : ''; ?>>ADIÇÃO</option>
+                        <option value="EDIÇÃO" <?php echo $filtro_acao == 'EDIÇÃO' ? 'selected' : ''; ?>>EDIÇÃO</option>
+                        <option value="EXCLUSÃO" <?php echo $filtro_acao == 'EXCLUSÃO' ? 'selected' : ''; ?>>EXCLUSÃO</option>
+                        <option value="LOGIN" <?php echo $filtro_acao == 'LOGIN' ? 'selected' : ''; ?>>LOGIN</option>
+                        <option value="LOGOUT" <?php echo $filtro_acao == 'LOGOUT' ? 'selected' : ''; ?>>LOGOUT</option>
+                        <option value="CONFIG" <?php echo $filtro_acao == 'CONFIG' ? 'selected' : ''; ?>>CONFIGURAÇÃO</option>
+                    </select>
+                </div>
+                <div class="col-md-5 d-flex gap-2 justify-content-end">
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill shadow fw-bold">
+                        <i class="bi bi-search me-2"></i> Aplicar Filtros
+                    </button>
+                    <a href="super_logs.php" class="btn btn-white border px-4 py-2 rounded-pill shadow-sm fw-bold">
+                        <i class="bi bi-x-lg me-2"></i> Limpar
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -52,8 +124,8 @@ include 'admin_header.php';
                     <?php if (empty($logs)): ?>
                     <tr>
                         <td colspan="7" class="text-center py-5">
-                            <i class="bi bi-inbox-fill display-4 text-light"></i>
-                            <p class="mt-2 text-muted">Nenhum rastro encontrado nas últimas atividades.</p>
+                            <div class="opacity-25 mb-3"><i class="bi bi-search" style="font-size: 3rem;"></i></div>
+                            <p class="mt-2 text-muted fw-bold">Nenhuma atividade encontrada para os filtros selecionados.</p>
                         </td>
                     </tr>
                     <?php endif; ?>
@@ -114,6 +186,7 @@ include 'admin_header.php';
 </div>
 
 <style>
+.btn-white { background: #fff; color: #333; }
 .avatar-circle-sm {
     width: 25px;
     height: 25px;
@@ -135,7 +208,6 @@ include 'admin_header.php';
     padding: 1.2rem 0.75rem;
 }
 .bg-primary-subtle { background-color: rgba(13, 110, 253, 0.08) !important; color: #0d6efd !important; }
-.bg-light-subtle { background-color: #f8f9fa !important; }
 .fw-600 { font-weight: 600; }
 .transition-all { transition: all 0.2s ease; }
 .hover-light:hover { background-color: #fcfcfc !important; }
