@@ -176,7 +176,14 @@ body {
     flex-direction: column;
     height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden; /* Evita scroll lateral na página inteira */
     min-width: 0;
+}
+
+/* Ajuste para tabelas não forçarem scroll desnecessário */
+.table td {
+    white-space: normal !important; /* Permite quebra de linha */
+    word-break: break-word;
 }
 
 /* Topbar Styling */

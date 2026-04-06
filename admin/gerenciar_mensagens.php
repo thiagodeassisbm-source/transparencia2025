@@ -49,26 +49,26 @@ include 'admin_header.php';
                     </thead>
                     <tbody>
                         <?php foreach ($mensagens as $m): ?>
-                        <tr>
+                        <tr class="transition-all hover-light">
                             <td class="ps-4">
                                 <?php if ($m['id_prefeitura']): ?>
-                                    <span class="badge bg-info-subtle text-info rounded-pill px-3">
-                                        <i class="bi bi-building me-1"></i> <?php echo htmlspecialchars($m['prefeitura_nome']); ?>
-                                    </span>
+                                    <div class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-3 py-2 small">
+                                        <i class="bi bi-building me-1"></i> <?php echo htmlspecialchars($m['prefeitura_nome'] ?? ''); ?>
+                                    </div>
                                 <?php else: ?>
-                                    <span class="badge bg-primary rounded-pill px-3">
-                                        <i class="bi bi-globe me-1"></i> Todas as Prefeituras
-                                    </span>
+                                    <div class="badge bg-primary rounded-pill px-3 py-2 small">
+                                        <i class="bi bi-globe me-1"></i> Global / Todos os Portais
+                                    </div>
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <div class="fw-bold text-dark"><?php echo htmlspecialchars($m['titulo']); ?></div>
-                                <div class="text-muted small text-truncate" style="max-width: 300px;"><?php echo htmlspecialchars($m['mensagem']); ?></div>
+                                <div class="fw-bold text-dark text-truncate" style="max-width: 400px;"><?php echo htmlspecialchars($m['titulo'] ?? ''); ?></div>
+                                <div class="text-muted small text-truncate" style="max-width: 400px;"><?php echo htmlspecialchars($m['mensagem'] ?? ''); ?></div>
                             </td>
                             <td class="text-center">
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <div class="bg-light rounded-pill px-3 py-1 border small">
-                                        <i class="bi bi-eye-fill text-primary me-1"></i> <strong><?php echo $m['total_vistas']; ?></strong> visualizações
+                                <div class="d-flex align-items-center justify-content-center flex-wrap gap-2">
+                                    <div class="bg-light rounded-pill px-3 py-1 border small text-muted">
+                                        <i class="bi bi-eye-fill text-primary me-1"></i> <strong><?php echo $m['total_vistas']; ?></strong>
                                     </div>
                                     <?php if ($m['ativa']): ?>
                                         <span class="ms-2 badge bg-success-subtle text-success small">Ativa</span>

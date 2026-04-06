@@ -423,7 +423,14 @@ $accent_color = "#3b82f6";  // Blue 500
             </div>
             <hr class="footer-hr">
             <div class="text-center small">
-                &copy; <?php echo get_config_global($pdo, 'copyright_ano', date('Y')); ?> - Desenvolvido por <a href="<?php echo get_config_global($pdo, 'copyright_dev_site', 'https://www.upgyn.com.br'); ?>" target="_blank" class="fw-bold text-decoration-none" style="color: #60a5fa;"><?php echo get_config_global($pdo, 'copyright_dev_nome', 'UpGyn'); ?></a> | <?php echo get_config_global($pdo, 'copyright_texto', 'Todos os Direitos Reservados'); ?>.
+                <?php 
+                // Função de fallback caso get_config_global não esteja carregada por algum motivo de cache/sessão
+                $copyright_ano = function_exists('get_config_global') ? get_config_global($pdo, 'copyright_ano', date('Y')) : date('Y');
+                $copyright_dev_site = function_exists('get_config_global') ? get_config_global($pdo, 'copyright_dev_site', 'https://www.upgyn.com.br') : 'https://www.upgyn.com.br';
+                $copyright_dev_nome = function_exists('get_config_global') ? get_config_global($pdo, 'copyright_dev_nome', 'UpGyn') : 'UpGyn';
+                $copyright_texto = function_exists('get_config_global') ? get_config_global($pdo, 'copyright_texto', 'Todos os Direitos Reservados') : 'Todos os Direitos Reservados';
+                ?>
+                &copy; <?php echo $copyright_ano; ?> - Desenvolvido por <a href="<?php echo $copyright_dev_site; ?>" target="_blank" class="fw-bold text-decoration-none" style="color: #60a5fa;"><?php echo $copyright_dev_nome; ?></a> | <?php echo $copyright_texto; ?>.
             </div>
         </div>
     </footer>
