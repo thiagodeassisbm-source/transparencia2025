@@ -1,8 +1,7 @@
 <?php
 /**
- * Debug objetivo da clonagem (prefeitura demo): fingerprint de arquivos, BD, OPcache, logs.
- * Deve ficar em admin/clone_debug.php (mesmo nível que cadastrar_prefeitura.php) para deploy simples.
- * Uso: superadmin em debug_clone_ambiente.php; log detalhado com ?debug_clone=1 ou arquivo admin/.clone_debug
+ * Usado por cadastrar_prefeitura.php e functions_demo.php (log/trace).
+ * A página debug_clone_ambiente.php tem estas funções embutidas e não depende deste arquivo.
  */
 
 if (function_exists('clone_debug_base_dir')) {
