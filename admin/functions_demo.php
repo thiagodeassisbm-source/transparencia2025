@@ -24,6 +24,18 @@ function demo_colunas_tabela(PDO $pdo, string $tabela): array {
 }
 
 /**
+ * Retorna o nome real da coluna no banco (case-insensitive) ou null.
+ */
+function demo_col_nome(array $cols, string $logical): ?string {
+    foreach ($cols as $c) {
+        if (strcasecmp((string) $c, $logical) === 0) {
+            return (string) $c;
+        }
+    }
+    return null;
+}
+
+/**
  * Monta valores de ícone a partir de uma linha de cards (compatível com schema antigo ou novo).
  */
 function demo_card_valores_icone(array $card): array {
@@ -71,9 +83,10 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         foreach ($categorias_origem as $cat) {
             $insert_cols = [];
             $insert_vals = [];
-            $push_cat = function (string $col, $val) use (&$insert_cols, &$insert_vals, $cols_cat) {
-                if (in_array($col, $cols_cat, true)) {
-                    $insert_cols[] = $col;
+            $push_cat = function (string $logical, $val) use (&$insert_cols, &$insert_vals, $cols_cat) {
+                $real = demo_col_nome($cols_cat, $logical);
+                if ($real !== null) {
+                    $insert_cols[] = $real;
                     $insert_vals[] = $val;
                 }
             };
@@ -81,19 +94,18 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             $push_cat('id_prefeitura', $id_destino);
             $push_cat('nome', $cat['nome']);
             $push_cat('ordem', $cat['ordem']);
-            if (in_array('slug', $cols_cat, true)) {
-                $push_cat('slug', $cat['slug'] ?? null);
-            }
-            if (in_array('icone', $cols_cat, true)) {
-                $push_cat('icone', $cat['icone'] ?? '');
-            }
+            $push_cat('slug', $cat['slug'] ?? null);
+            // Não clonar coluna "icone" em categorias: muitos bancos não têm; o menu público não depende disso.
 
             if ($insert_cols === []) {
                 throw new Exception('Tabela categorias sem colunas reconhecidas para INSERT.');
             }
 
             $ph = implode(', ', array_fill(0, count($insert_cols), '?'));
-            $sql_cat = 'INSERT INTO categorias (' . implode(', ', $insert_cols) . ') VALUES (' . $ph . ')';
+            $quoted = array_map(static function ($c) {
+                return '`' . str_replace('`', '``', $c) . '`';
+            }, $insert_cols);
+            $sql_cat = 'INSERT INTO categorias (' . implode(', ', $quoted) . ') VALUES (' . $ph . ')';
             $pdo->prepare($sql_cat)->execute($insert_vals);
             $map_categorias[$cat['id']] = $pdo->lastInsertId();
         }
@@ -112,9 +124,10 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
 
             $insert_cols = [];
             $insert_vals = [];
-            $push_p = function (string $col, $val) use (&$insert_cols, &$insert_vals, $cols_portais) {
-                if (in_array($col, $cols_portais, true)) {
-                    $insert_cols[] = $col;
+            $push_p = function (string $logical, $val) use (&$insert_cols, &$insert_vals, $cols_portais) {
+                $real = demo_col_nome($cols_portais, $logical);
+                if ($real !== null) {
+                    $insert_cols[] = $real;
                     $insert_vals[] = $val;
                 }
             };
@@ -124,16 +137,17 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             $push_p('nome', $p['nome']);
             $push_p('descricao', $p['descricao'] ?? '');
             $push_p('slug', $p['slug']);
-            if (in_array('ordem', $cols_portais, true)) {
-                $push_p('ordem', $p['ordem'] ?? 0);
-            }
+            $push_p('ordem', $p['ordem'] ?? 0);
 
             if ($insert_cols === []) {
                 throw new Exception('Tabela portais sem colunas reconhecidas para INSERT.');
             }
 
             $ph = implode(', ', array_fill(0, count($insert_cols), '?'));
-            $sql_p = 'INSERT INTO portais (' . implode(', ', $insert_cols) . ') VALUES (' . $ph . ')';
+            $quoted = array_map(static function ($c) {
+                return '`' . str_replace('`', '``', $c) . '`';
+            }, $insert_cols);
+            $sql_p = 'INSERT INTO portais (' . implode(', ', $quoted) . ') VALUES (' . $ph . ')';
             $pdo->prepare($sql_p)->execute($insert_vals);
             $new_p_id = $pdo->lastInsertId();
             $map_portais[$p['id']] = $new_p_id;
@@ -191,9 +205,9 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $all_cards = $stmt_cards_all->fetchAll();
 
         $cols_cards = demo_colunas_tabela($pdo, 'cards_informativos');
-        $cards_tem_caminho = in_array('caminho_icone', $cols_cards, true);
-        $cards_tem_tipo = in_array('tipo_icone', $cols_cards, true);
-        $cards_tem_icone_legado = in_array('icone', $cols_cards, true);
+        $nom_caminho = demo_col_nome($cols_cards, 'caminho_icone');
+        $nom_tipo = demo_col_nome($cols_cards, 'tipo_icone');
+        $nom_icone_leg = demo_col_nome($cols_cards, 'icone');
 
         foreach ($all_cards as $card) {
             $nova_secao = null;
@@ -207,9 +221,10 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
 
             $insert_cols = [];
             $insert_vals = [];
-            $push_card = function (string $col, $val) use (&$insert_cols, &$insert_vals, $cols_cards) {
-                if (in_array($col, $cols_cards, true)) {
-                    $insert_cols[] = $col;
+            $push_card = function (string $logical, $val) use (&$insert_cols, &$insert_vals, $cols_cards) {
+                $real = demo_col_nome($cols_cards, $logical);
+                if ($real !== null) {
+                    $insert_cols[] = $real;
                     $insert_vals[] = $val;
                 }
             };
@@ -222,19 +237,22 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             $push_card('link_url', $card['link_url']);
             $push_card('ordem', $card['ordem']);
 
-            // Schema moderno: só caminho_icone/tipo_icone — nunca incluir "icone" no INSERT junto
-            if ($cards_tem_caminho) {
-                $push_card('caminho_icone', $ico['caminho']);
-                if ($cards_tem_tipo) {
-                    $push_card('tipo_icone', $ico['tipo']);
+            if ($nom_caminho !== null) {
+                $insert_cols[] = $nom_caminho;
+                $insert_vals[] = $ico['caminho'];
+                if ($nom_tipo !== null) {
+                    $insert_cols[] = $nom_tipo;
+                    $insert_vals[] = $ico['tipo'];
                 }
-            } elseif ($cards_tem_icone_legado) {
-                // Tabela antiga com coluna única "icone"
-                $push_card('icone', $ico['caminho']);
+            } elseif ($nom_icone_leg !== null) {
+                $insert_cols[] = $nom_icone_leg;
+                $insert_vals[] = $ico['caminho'];
             }
 
-            if (in_array('is_demo', $cols_cards, true)) {
-                $push_card('is_demo', $card['is_demo'] ?? 0);
+            $nom_demo = demo_col_nome($cols_cards, 'is_demo');
+            if ($nom_demo !== null) {
+                $insert_cols[] = $nom_demo;
+                $insert_vals[] = $card['is_demo'] ?? 0;
             }
 
             if ($insert_cols === []) {
@@ -242,7 +260,10 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             }
 
             $ph = implode(', ', array_fill(0, count($insert_cols), '?'));
-            $sql_ins = 'INSERT INTO cards_informativos (' . implode(', ', $insert_cols) . ') VALUES (' . $ph . ')';
+            $quoted = array_map(static function ($c) {
+                return '`' . str_replace('`', '``', $c) . '`';
+            }, $insert_cols);
+            $sql_ins = 'INSERT INTO cards_informativos (' . implode(', ', $quoted) . ') VALUES (' . $ph . ')';
             $pdo->prepare($sql_ins)->execute($insert_vals);
         }
 
