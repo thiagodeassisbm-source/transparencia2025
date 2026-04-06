@@ -194,10 +194,30 @@ include 'admin_header.php';
                                 </div>
                             </div>
 
-                            <div class="col-12 mt-5 text-end">
+                            <div class="col-12 mt-5 text-end d-flex gap-3 flex-wrap justify-content-end">
+                                <button type="button" id="btnTestarConexao" class="btn btn-outline-secondary btn-lg rounded-pill px-5 py-3 fw-bold transition-all hover-lift w-100 w-md-auto border-2">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none" id="loaderTeste"></span>
+                                    <i class="bi bi-send-check me-2"></i> Testar Conexão
+                                </button>
+                                
                                 <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow transition-all hover-lift w-100 w-md-auto">
                                     <i class="bi bi-save2 me-2"></i> Salvar Minhas Configurações
                                 </button>
+                            </div>
+
+                            <!-- Área de Resultado do Teste (Invisível no Início) -->
+                            <div class="col-12 mt-4 d-none" id="alertResultadoTeste">
+                                <div class="alert alert-dismissible fade show border-0 shadow-sm rounded-4 p-4" role="alert">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-4 d-none d-md-block fs-1" id="iconResultadoTeste"></div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1" id="tituloResultadoTeste"></h5>
+                                            <p class="mb-0" id="mensagemResultadoTeste"></p>
+                                            <div class="mt-2 small opacity-75 d-none" id="sugestaoResultadoTeste"></div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn-close" onclick="document.getElementById('alertResultadoTeste').classList.add('d-none')"></button>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -206,6 +226,69 @@ include 'admin_header.php';
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('btnTestarConexao').addEventListener('click', function() {
+    const btn = this;
+    const loader = document.getElementById('loaderTeste');
+    const alertBox = document.getElementById('alertResultadoTeste');
+    const alertInner = alertBox.querySelector('.alert');
+    const titulo = document.getElementById('tituloResultadoTeste');
+    const mensagem = document.getElementById('mensagemResultadoTeste');
+    const sugestao = document.getElementById('sugestaoResultadoTeste');
+    const icon = document.getElementById('iconResultadoTeste');
+    
+    // Coletar dados do formulário
+    const formData = new FormData();
+    formData.append('smtp_host', document.getElementById('smtp_host').value);
+    formData.append('smtp_port', document.getElementById('smtp_port').value);
+    formData.append('smtp_user', document.getElementById('smtp_user').value);
+    formData.append('smtp_pass', document.getElementById('smtp_pass').value);
+    formData.append('smtp_secure', document.getElementById('smtp_secure').value);
+    formData.append('smtp_from_email', document.getElementById('smtp_from_email').value);
+    formData.append('smtp_from_name', document.getElementById('smtp_from_name').value);
+
+    // Iniciar loading
+    btn.disabled = true;
+    loader.classList.remove('d-none');
+    alertBox.classList.add('d-none');
+
+    fetch('ajax_test_smtp.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alertBox.classList.remove('d-none');
+        alertInner.className = 'alert alert-dismissible fade show border-0 shadow-sm rounded-4 p-4 ' + (data.status === 'success' ? 'alert-success' : 'alert-danger');
+        
+        if (data.status === 'success') {
+            titulo.innerText = 'Teste Bem-sucedido!';
+            mensagem.innerHTML = data.message;
+            sugestao.classList.add('d-none');
+            icon.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
+        } else {
+            titulo.innerText = 'Teste com Falhas';
+            mensagem.innerText = data.message;
+            sugestao.classList.remove('d-none');
+            sugestao.innerHTML = '<strong>Sugestão:</strong> ' + (data.suggestion || 'Verifique se não há erros de digitação.');
+            icon.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-danger"></i>';
+            console.error('Debug SMTP:', data.debug);
+        }
+    })
+    .catch(error => {
+        alertBox.classList.remove('d-none');
+        alertInner.className = 'alert alert-dismissible fade show border-0 shadow-sm rounded-4 p-4 alert-warning';
+        titulo.innerText = 'Erro de Processamento';
+        mensagem.innerText = 'Ocorreu um erro ao tentar processar o teste. Verifique sua rede.';
+        icon.innerHTML = '<i class="bi bi-bug-fill text-warning"></i>';
+    })
+    .finally(() => {
+        btn.disabled = false;
+        loader.classList.add('d-none');
+    });
+});
+</script>
 
 <style>
 .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
