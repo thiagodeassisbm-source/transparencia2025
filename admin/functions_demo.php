@@ -2,17 +2,25 @@
 // /admin/functions_demo.php
 
 /**
- * Lista nomes de colunas da tabela (cache por conexão/instância da função).
+ * Lista nomes de colunas da tabela (cache por BD + tabela; evita colisão entre conexões).
  */
 function demo_colunas_tabela(PDO $pdo, string $tabela): array {
     static $cache = [];
-    if (isset($cache[$tabela])) {
-        return $cache[$tabela];
+    $db = $pdo->query('SELECT DATABASE()')->fetchColumn();
+    $cacheKey = ($db !== false ? (string) $db : '_') . '|' . $tabela;
+    if (isset($cache[$cacheKey])) {
+        return $cache[$cacheKey];
     }
     $safe = str_replace('`', '``', $tabela);
     $stmt = $pdo->query("SHOW COLUMNS FROM `{$safe}`");
-    $cache[$tabela] = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    return $cache[$tabela];
+    $cols = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        if (!empty($row['Field'])) {
+            $cols[] = $row['Field'];
+        }
+    }
+    $cache[$cacheKey] = $cols;
+    return $cols;
 }
 
 /**
@@ -59,13 +67,12 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
 
         $map_categorias = []; // old_id => new_id
         $cols_cat = demo_colunas_tabela($pdo, 'categorias');
-        $has_cat = array_flip($cols_cat);
 
         foreach ($categorias_origem as $cat) {
             $insert_cols = [];
             $insert_vals = [];
-            $push_cat = function (string $col, $val) use (&$insert_cols, &$insert_vals, $has_cat) {
-                if (isset($has_cat[$col])) {
+            $push_cat = function (string $col, $val) use (&$insert_cols, &$insert_vals, $cols_cat) {
+                if (in_array($col, $cols_cat, true)) {
                     $insert_cols[] = $col;
                     $insert_vals[] = $val;
                 }
@@ -74,10 +81,10 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             $push_cat('id_prefeitura', $id_destino);
             $push_cat('nome', $cat['nome']);
             $push_cat('ordem', $cat['ordem']);
-            if (isset($has_cat['slug'])) {
+            if (in_array('slug', $cols_cat, true)) {
                 $push_cat('slug', $cat['slug'] ?? null);
             }
-            if (isset($has_cat['icone'])) {
+            if (in_array('icone', $cols_cat, true)) {
                 $push_cat('icone', $cat['icone'] ?? '');
             }
 
@@ -98,7 +105,6 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         
         $map_portais = []; // old_id => new_id
         $cols_portais = demo_colunas_tabela($pdo, 'portais');
-        $has_p = array_flip($cols_portais);
         
         foreach ($portais_origem as $p) {
             // Mapeia a nova categoria
@@ -106,8 +112,8 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
 
             $insert_cols = [];
             $insert_vals = [];
-            $push_p = function (string $col, $val) use (&$insert_cols, &$insert_vals, $has_p) {
-                if (isset($has_p[$col])) {
+            $push_p = function (string $col, $val) use (&$insert_cols, &$insert_vals, $cols_portais) {
+                if (in_array($col, $cols_portais, true)) {
                     $insert_cols[] = $col;
                     $insert_vals[] = $val;
                 }
@@ -118,7 +124,7 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             $push_p('nome', $p['nome']);
             $push_p('descricao', $p['descricao'] ?? '');
             $push_p('slug', $p['slug']);
-            if (isset($has_p['ordem'])) {
+            if (in_array('ordem', $cols_portais, true)) {
                 $push_p('ordem', $p['ordem'] ?? 0);
             }
 
@@ -185,7 +191,9 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
         $all_cards = $stmt_cards_all->fetchAll();
 
         $cols_cards = demo_colunas_tabela($pdo, 'cards_informativos');
-        $has_card = array_flip($cols_cards);
+        $cards_tem_caminho = in_array('caminho_icone', $cols_cards, true);
+        $cards_tem_tipo = in_array('tipo_icone', $cols_cards, true);
+        $cards_tem_icone_legado = in_array('icone', $cols_cards, true);
 
         foreach ($all_cards as $card) {
             $nova_secao = null;
@@ -199,8 +207,8 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
 
             $insert_cols = [];
             $insert_vals = [];
-            $push_card = function (string $col, $val) use (&$insert_cols, &$insert_vals, $has_card) {
-                if (isset($has_card[$col])) {
+            $push_card = function (string $col, $val) use (&$insert_cols, &$insert_vals, $cols_cards) {
+                if (in_array($col, $cols_cards, true)) {
                     $insert_cols[] = $col;
                     $insert_vals[] = $val;
                 }
@@ -214,20 +222,18 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             $push_card('link_url', $card['link_url']);
             $push_card('ordem', $card['ordem']);
 
-            if (isset($has_card['caminho_icone'])) {
+            // Schema moderno: só caminho_icone/tipo_icone — nunca incluir "icone" no INSERT junto
+            if ($cards_tem_caminho) {
                 $push_card('caminho_icone', $ico['caminho']);
-            }
-            if (isset($has_card['tipo_icone'])) {
-                $push_card('tipo_icone', $ico['tipo']);
-            }
-            if (isset($has_card['icone']) && !isset($has_card['caminho_icone'])) {
-                $push_card('icone', $ico['caminho']);
-            } elseif (isset($has_card['icone']) && isset($has_card['caminho_icone'])) {
-                // Período de migração: alguns bancos mantêm as duas colunas
+                if ($cards_tem_tipo) {
+                    $push_card('tipo_icone', $ico['tipo']);
+                }
+            } elseif ($cards_tem_icone_legado) {
+                // Tabela antiga com coluna única "icone"
                 $push_card('icone', $ico['caminho']);
             }
 
-            if (isset($has_card['is_demo'])) {
+            if (in_array('is_demo', $cols_cards, true)) {
                 $push_card('is_demo', $card['is_demo'] ?? 0);
             }
 
