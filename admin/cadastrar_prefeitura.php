@@ -2,7 +2,19 @@
 require_once 'auth_check.php';
 require_once '../conexao.php';
 require_once 'functions_logs.php';
-require_once __DIR__ . '/clone_debug.php';
+if (file_exists(__DIR__ . '/clone_debug.php')) {
+    require_once __DIR__ . '/clone_debug.php';
+} else {
+    // Fallback básico se o arquivo sumir/não subir pelo git
+    if (!function_exists('clone_debug_log')) {
+        function clone_debug_log($m) {}
+        function clone_debug_verbose() { return false; }
+        function clone_debug_write_last_result($p, $a) {}
+        function clone_debug_html_banner() { return ''; }
+        function clone_debug_file_fingerprint($p) { return ['exists' => false]; }
+        function clone_debug_functions_demo_path() { return ''; }
+    }
+}
 require_once 'functions_demo.php'; // Adiciona motor de clonagem demo
 
 // Bloqueia se não for superadmin

@@ -1,7 +1,14 @@
 <?php
 // /admin/functions_demo.php
 
-require_once __DIR__ . '/clone_debug.php';
+if (file_exists(__DIR__ . '/clone_debug.php')) {
+    require_once __DIR__ . '/clone_debug.php';
+} else {
+    if (!function_exists('clone_debug_log')) {
+        function clone_debug_log($m) {}
+        function clone_debug_verbose() { return false; }
+    }
+}
 
 /**
  * Lista nomes de colunas da tabela (cache por BD + tabela; evita colisão entre conexões).
