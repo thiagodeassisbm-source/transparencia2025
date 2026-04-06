@@ -5,7 +5,7 @@
  */
 require_once 'auth_check.php';
 require_once '../conexao.php';
-require_once 'includes/clone_debug.php';
+require_once __DIR__ . '/clone_debug.php';
 
 if (!isset($_SESSION['is_superadmin']) || (int) $_SESSION['is_superadmin'] !== 1) {
     header('Location: dashboard.php');

@@ -1,7 +1,7 @@
 <?php
 // /admin/functions_demo.php
 
-require_once __DIR__ . '/includes/clone_debug.php';
+require_once __DIR__ . '/clone_debug.php';
 
 /**
  * Lista nomes de colunas da tabela (cache por BD + tabela; evita colisão entre conexões).

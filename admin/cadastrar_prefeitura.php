@@ -2,7 +2,7 @@
 require_once 'auth_check.php';
 require_once '../conexao.php';
 require_once 'functions_logs.php';
-require_once 'includes/clone_debug.php';
+require_once __DIR__ . '/clone_debug.php';
 require_once 'functions_demo.php'; // Adiciona motor de clonagem demo
 
 // Bloqueia se não for superadmin
