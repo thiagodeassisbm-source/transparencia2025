@@ -1,81 +1,106 @@
 <?php
 /**
- * Script de Reparo de Banco de Dados - Transparência 2026
- * Finalidade: Garantir que a tabela cards_informativos possua as colunas necessárias para o funcionamento do SaaS.
+ * Script de Injeção de Correção v4 - LIMPA TRILHOS
  */
+
 require_once 'conexao.php';
 
 header('Content-Type: text/plain; charset=utf-8');
-
-echo "Iniciando verificação do banco de dados...\n\n";
+echo "Iniciando Limpeza Profunda de Índices em PORTAIS...\n\n";
 
 try {
-    // 1. Verificar colunas da tabela cards_informativos
-    $stmt = $pdo->query("SHOW COLUMNS FROM cards_informativos");
-    $cols = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    // 1. Listar e remover índices problemáticos em 'portais'
+    $res = $pdo->query("SHOW INDEX FROM portais");
+    $indexes = $res->fetchAll(PDO::FETCH_ASSOC);
     
-    echo "Tabela 'cards_informativos' colunas encontradas: " . implode(', ', $cols) . "\n";
-
-    // a) Verificar caminho_icone vs icone
-    if (!in_array('caminho_icone', $cols)) {
-        if (in_array('icone', $cols)) {
-            echo "-> Renomeando coluna 'icone' para 'caminho_icone'...\n";
-            $pdo->exec("ALTER TABLE cards_informativos CHANGE icone caminho_icone VARCHAR(255) NOT NULL");
-            echo "✅ Coluna renomeada com sucesso.\n";
-        } else {
-            echo "-> Criando coluna 'caminho_icone'...\n";
-            $pdo->exec("ALTER TABLE cards_informativos ADD COLUMN caminho_icone VARCHAR(255) NOT NULL AFTER subtitulo");
-            echo "✅ Coluna criada com sucesso.\n";
-        }
-    } else {
-        echo "✅ Coluna 'caminho_icone' já existe.\n";
-    }
-
-    // b) Verificar tipo_icone
-    if (!in_array('tipo_icone', $cols)) {
-        echo "-> Criando coluna 'tipo_icone'...\n";
-        $pdo->exec("ALTER TABLE cards_informativos ADD COLUMN tipo_icone ENUM('imagem', 'bootstrap') DEFAULT 'imagem' AFTER caminho_icone");
-        echo "✅ Coluna 'tipo_icone' criada com sucesso.\n";
-    } else {
-        echo "✅ Coluna 'tipo_icone' já existe.\n";
-    }
-
-    // c) Verificar id_prefeitura
-    if (!in_array('id_prefeitura', $cols)) {
-        echo "-> Criando coluna 'id_prefeitura'...\n";
-        $pdo->exec("ALTER TABLE cards_informativos ADD COLUMN id_prefeitura INT DEFAULT 0 AFTER id");
-        $pdo->exec("CREATE INDEX idx_pref_cards ON cards_informativos(id_prefeitura)");
-        echo "✅ Coluna 'id_prefeitura' criada com sucesso.\n";
+    echo "Índices encontrados:\n";
+    foreach ($indexes as $idx) {
+        $kn = $idx['Key_name'];
+        echo "- $kn (coluna: ".$idx['Column_name'].")\n";
         
-        // Tentar preencher id_prefeitura baseando-se na seção
-        echo "-> Tentando associar prefeituras aos cards existentes...\n";
-        $pdo->exec("UPDATE cards_informativos c INNER JOIN portais p ON c.id_secao = p.id SET c.id_prefeitura = p.id_prefeitura WHERE c.id_prefeitura = 0");
-        echo "✅ Sincronização inicial concluída.\n";
-    } else {
-        echo "✅ Coluna 'id_prefeitura' já existe.\n";
-    }
-
-    echo "\n--- VERIFICAÇÃO DE OUTRAS TABELAS CRÍTICAS ---\n";
-    $tabelas_criticas = ['categorias', 'configuracoes', 'ouvidoria_manifestacoes', 'sic_solicitacoes', 'secretarias', 'cargos', 'agentes_politicos'];
-    foreach ($tabelas_criticas as $t) {
-        $st_check = $pdo->query("SHOW TABLES LIKE '$t'");
-        if ($st_check->fetch()) {
-            $st_cols = $pdo->query("SHOW COLUMNS FROM $t");
-            $c_list = $st_cols->fetchAll(PDO::FETCH_COLUMN);
-            if (!in_array('id_prefeitura', $c_list)) {
-                echo "-> Reparando tabela '$t' (adicionando id_prefeitura)...\n";
-                $pdo->exec("ALTER TABLE $t ADD COLUMN id_prefeitura INT DEFAULT 0 AFTER id");
-                echo "✅ Tabela '$t' reparada.\n";
-            } else {
-                echo "✅ Tabela '$t' está OK.\n";
+        // Se o índice não for a Primary Key e envolver a coluna 'slug', vamos remover para limpar tudo
+        if ($kn !== 'PRIMARY' && ($kn === 'idx_slug' || $kn === 'slug' || $idx['Column_name'] === 'slug')) {
+            try {
+                $pdo->exec("ALTER TABLE portais DROP INDEX `$kn` text");
+                echo "   ✅ Removido índice problemático: $kn\n";
+            } catch (Exception $e) {
+                echo "   ⚠️ Não foi possível remover $kn: " . $e->getMessage() . "\n";
             }
         }
     }
 
-    echo "\nPROCESSO CONCLUÍDO COM SUCESSO!\n";
-    echo "O site deve voltar a carregar normalmente agora.";
+    // 2. Recriar o índice correto (Composto: prefeitura + slug)
+    echo "\n-> Recriando índice composto (SaaS)...\n";
+    try {
+        $pdo->exec("ALTER TABLE portais ADD UNIQUE INDEX idx_pref_slug (id_prefeitura, slug)");
+        echo "✅ Sucesso! Novo índice idx_pref_slug criado.\n";
+    } catch (Exception $e) {
+        echo "⚠️ Nota: " . $e->getMessage() . "\n";
+    }
 
 } catch (Exception $e) {
-    echo "\n❌ ERRO FATAL: " . $e->getMessage() . "\n";
-    echo "Isso pode ocorrer se as permissões do usuário do banco de dados forem insuficientes para ALTER TABLE.";
+    echo "❌ Erro Fatal: " . $e->getMessage() . "\n";
 }
+
+// 2. Garante o motor de clonagem (v5 - Melhorado)
+$target_file = __DIR__ . '/admin/functions_demo.php';
+$content_demo = <<<'PHP'
+<?php
+function demo_colunas_tabela(PDO $pdo, string $tabela) {
+    $stmt = $pdo->query("SHOW COLUMNS FROM `$tabela` ");
+    $cols = []; while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) { $cols[] = $row['Field']; }
+    return $cols;
+}
+function demo_col_nome(array $cols, string $logical) {
+    foreach ($cols as $c) { if (strcasecmp((string)$c, $logical) === 0) return (string)$c; }
+    return null;
+}
+function demo_card_valores_icone(array $card) {
+    $caminho = $card['caminho_icone'] ?? $card['icone'] ?? '';
+    $tipo = $card['tipo_icone'] ?? ((is_string($caminho) && strpos($caminho, 'bi-') !== false) ? 'bootstrap' : 'imagem');
+    return ['caminho' => $caminho, 'tipo' => $tipo];
+}
+function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
+    try {
+        if (!$pdo->inTransaction()) $pdo->beginTransaction();
+        $pdo->prepare("DELETE FROM configuracoes WHERE id_prefeitura = ?")->execute([$id_destino]);
+        foreach ($pdo->query("SELECT * FROM configuracoes WHERE id_prefeitura = $id_origem")->fetchAll() as $conf) {
+             $pdo->prepare("INSERT INTO configuracoes (chave, valor, id_prefeitura) VALUES (?, ?, ?)")->execute([$conf['chave'], $conf['valor'], $id_destino]);
+        }
+        $map_cat = []; $cols_cat = demo_colunas_tabela($pdo, 'categorias');
+        foreach ($pdo->query("SELECT * FROM categorias WHERE id_prefeitura = $id_origem")->fetchAll() as $cat) {
+            $insert = ['id_prefeitura'=>$id_destino, 'nome'=>$cat['nome'], 'ordem'=>$cat['ordem']];
+            if (in_array('slug', $cols_cat)) $insert['slug'] = $cat['slug'] ?? null;
+            $ph = implode(',', array_fill(0, count($insert), '?'));
+            $pdo->prepare("INSERT INTO categorias (".implode(',', array_keys($insert)).") VALUES ($ph)")->execute(array_values($insert));
+            $map_cat[$cat['id']] = $pdo->lastInsertId();
+        }
+        $map_p = [];
+        foreach ($pdo->query("SELECT * FROM portais WHERE id_prefeitura = $id_origem")->fetchAll() as $p) {
+            $pdo->prepare("INSERT INTO portais (id_prefeitura, id_categoria, nome, descricao, slug, ordem) VALUES (?,?,?,?,?,?)")
+                ->execute([$id_destino, $map_cat[$p['id_categoria']] ?? null, $p['nome'], $p['descricao'], $p['slug'], $p['ordem']]);
+            $new_p_id = $pdo->lastInsertId(); $map_p[$p['id']] = $new_p_id;
+            foreach ($pdo->query("SELECT * FROM campos_portal WHERE id_portal = ".$p['id'])->fetchAll() as $c) {
+                $pdo->prepare("INSERT INTO campos_portal (id_portal, nome_campo, tipo_campo, opcoes_campo, obrigatorio, pesquisavel, detalhes_apenas, ordem) VALUES (?,?,?,?,?,?,?,?)")
+                    ->execute([$new_p_id, $c['nome_campo'], $c['tipo_campo'], $c['opcoes_campo'], $c['obrigatorio'], $c['pesquisavel'], $c['detalhes_apenas'], $c['ordem']]);
+            }
+        }
+        $cols_cards = demo_colunas_tabela($pdo, 'cards_informativos');
+        foreach ($pdo->query("SELECT * FROM cards_informativos WHERE id_prefeitura = $id_origem")->fetchAll() as $card) {
+            $ico = demo_card_valores_icone($card);
+            $ins = ['id_prefeitura'=>$id_destino, 'id_secao'=>$map_p[$card['id_secao']] ?? null, 'id_categoria'=>$map_cat[$card['id_categoria']] ?? null, 'titulo'=>$card['titulo'], 'subtitulo'=>$card['subtitulo'], 'link_url'=>$card['link_url'], 'ordem'=>$card['ordem']];
+            if (in_array('caminho_icone',$cols_cards)) { $ins['caminho_icone']=$ico['caminho']; if (in_array('tipo_icone',$cols_cards)) $ins['tipo_icone']=$ico['tipo']; }
+            elseif (in_array('icone',$cols_cards)) $ins['icone']=$ico['caminho'];
+            $ph = implode(',', array_fill(0,count($ins),'?'));
+            $pdo->prepare("INSERT INTO cards_informativos (".implode(',',array_keys($ins)).") VALUES ($ph)")->execute(array_values($ins));
+        }
+        $pdo->commit(); return true;
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        throw new Exception("Falha na clonagem (Banco de Dados): " . $e->getMessage());
+    }
+}
+PHP;
+@file_put_contents($target_file, $content_demo);
+if (function_exists('opcache_reset')) opcache_reset();
+echo "\nLimpeza concluída! Tente o cadastro agora.";
