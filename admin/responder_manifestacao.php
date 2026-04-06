@@ -8,21 +8,30 @@ if (!$manifestacao_id) { header("Location: ouvidoria_inbox.php"); exit; }
 
 // Processa o formulário de resposta
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_resposta'])) {
+    require_once '../includes/functions_email.php';
     $novo_status = $_POST['status'];
     $nova_resposta = $_POST['resposta'];
     
     $pref_id = $_SESSION['id_prefeitura'];
     $stmt = $pdo->prepare("UPDATE ouvidoria_manifestacoes SET status = ?, resposta = ?, data_resposta = NOW() WHERE id = ? AND id_prefeitura = ?");
     $stmt->execute([$novo_status, $nova_resposta, $manifestacao_id, $pref_id]);
-    $st_proto = $pdo->prepare('SELECT protocolo FROM ouvidoria_manifestacoes WHERE id = ? AND id_prefeitura = ?');
-    $st_proto->execute([$manifestacao_id, $pref_id]);
-    $proto = $st_proto->fetchColumn();
+    
+    // Busca informações para o e-mail e log
+    $st_info = $pdo->prepare('SELECT protocolo, email, nome_cidadao FROM ouvidoria_manifestacoes WHERE id = ? AND id_prefeitura = ?');
+    $st_info->execute([$manifestacao_id, $pref_id]);
+    $man = $st_info->fetch(PDO::FETCH_ASSOC);
+
     registrar_log(
         $pdo,
         'EDIÇÃO',
         'ouvidoria_manifestacoes',
-        'Atualizou resposta/status ouvidoria — protocolo ' . ($proto ?: '#' . $manifestacao_id) . " (status: $novo_status)."
+        'Atualizou resposta/status ouvidoria — protocolo ' . ($man['protocolo'] ?: '#' . $manifestacao_id) . " (status: $novo_status)."
     );
+
+    // DISPARA E-MAIL SE FOR RESPOSTA OU FINALIZAÇÃO
+    if (($novo_status === 'Respondida' || $novo_status === 'Finalizada') && !empty($man['email'])) {
+        enviar_email_resposta($pdo, $man['email'], $man['nome_cidadao'], $man['protocolo'], 'Ouvidoria Municipal', $pref_id);
+    }
 
     $_SESSION['mensagem_sucesso'] = "Manifestação respondida com sucesso!";
     header("Location: ouvidoria_inbox.php");

@@ -97,3 +97,85 @@ function enviar_email_protocolo($pdo, $email_destinatario, $nome_destinatario, $
         return false;
     }
 }
+
+/**
+ * Envia aviso de que a solicitação foi respondida pela prefeitura
+ */
+function enviar_email_resposta($pdo, $email_destinatario, $nome_destinatario, $protocolo, $tipo_servico, $id_prefeitura = 0) {
+    if (empty($email_destinatario)) return false;
+
+    // 1. TENTA BUSCAR CONFIGURAÇÃO ESPECÍFICA DA PREFEITURA
+    $config = [];
+    if ($id_prefeitura > 0) {
+        $stmt = $pdo->prepare("SELECT chave, valor FROM configuracoes WHERE id_prefeitura = ? AND chave LIKE 'smtp_%'");
+        $stmt->execute([$id_prefeitura]);
+        $config = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
+
+    // 2. SE NÃO ENCONTROU NA PREFEITURA, BUSCA NO GLOBAL
+    if (empty($config['smtp_host'])) {
+        $stmt_global = $pdo->query("SELECT chave, valor FROM config_global WHERE chave LIKE 'smtp_%'");
+        $config = $stmt_global->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
+
+    $host = $config['smtp_host'] ?? '';
+    if (empty($host)) return false;
+
+    $user = $config['smtp_user'] ?? '';
+    $pass = $config['smtp_pass'] ?? '';
+    $from_email = $config['smtp_from_email'] ?? $user;
+    $from_name = $config['smtp_from_name'] ?? 'Prefeitura Municipal';
+
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = $host;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $user;
+        $mail->Password   = $pass;
+        $mail->SMTPSecure = $config['smtp_secure'] ?? 'tls';
+        $mail->Port       = $config['smtp_port'] ?? 587;
+        $mail->CharSet    = 'UTF-8';
+
+        $mail->setFrom($from_email, $from_name);
+        $mail->addAddress($email_destinatario, $nome_destinatario);
+
+        $mail->isHTML(true);
+        $mail->Subject = "Resposta Disponível - Protocolo {$protocolo}";
+        
+        $body = "
+        <div style='font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;'>
+            <div style='background-color: #10b981; color: #ffffff; padding: 20px; text-align: center;'>
+                <h2 style='margin: 0;'>Sua solicitação foi respondida!</h2>
+            </div>
+            <div style='padding: 30px;'>
+                <p>Olá, <strong>{$nome_destinatario}</strong>,</p>
+                <p>Informamos que a Prefeitura enviou uma resposta oficial para a sua solicitação de <strong>" . strtoupper($tipo_servico) . "</strong>.</p>
+                
+                <div style='background-color: #f0fdf4; border-left: 5px solid #10b981; padding: 20px; margin: 25px 0;'>
+                    <p style='margin: 0; font-size: 14px;'>Número do Protocolo:</p>
+                    <strong style='font-size: 20px; color: #065f46;'>{$protocolo}</strong>
+                </div>
+
+                <p><strong>Como visualizar a resposta?</strong></p>
+                <p>Para ler o conteúdo completo da resposta, acesse o portal da transparência e utilize a ferramenta de <strong>Consulta de Protocolo</strong> com o número acima.</p>
+                
+                <div style='text-align: center; margin-top: 30px;'>
+                    <a href='http://{$_SERVER['HTTP_HOST']}/' style='background-color: #10b981; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Acessar o Portal</a>
+                </div>
+
+                <p style='margin-top: 30px; font-size: 14px; color: #555;'>Esta é uma mensagem automática, por favor não responda a este e-mail.</p>
+            </div>
+            <div style='background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 12px; color: #999;'>
+                &copy; " . date('Y') . " " . htmlspecialchars($from_name) . " | Portal da Transparência
+            </div>
+        </div>";
+
+        $mail->Body = $body;
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
+}

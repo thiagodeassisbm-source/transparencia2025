@@ -11,21 +11,30 @@ if (!$solicitacao_id) {
 
 // Processa o formulário de resposta quando enviado
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_resposta'])) {
+    require_once '../includes/functions_email.php';
     $novo_status = $_POST['status'];
     $nova_resposta = $_POST['resposta'];
     
     $pref_id = $_SESSION['id_prefeitura'];
     $stmt = $pdo->prepare("UPDATE sic_solicitacoes SET status = ?, resposta = ?, data_resposta = NOW() WHERE id = ? AND id_prefeitura = ?");
     $stmt->execute([$novo_status, $nova_resposta, $solicitacao_id, $pref_id]);
-    $st_proto = $pdo->prepare('SELECT protocolo FROM sic_solicitacoes WHERE id = ? AND id_prefeitura = ?');
-    $st_proto->execute([$solicitacao_id, $pref_id]);
-    $proto = $st_proto->fetchColumn();
+    
+    // Busca dados para o log e e-mail
+    $st_info = $pdo->prepare('SELECT protocolo, email, nome_solicitante FROM sic_solicitacoes WHERE id = ? AND id_prefeitura = ?');
+    $st_info->execute([$solicitacao_id, $pref_id]);
+    $sol = $st_info->fetch(PDO::FETCH_ASSOC);
+    
     registrar_log(
         $pdo,
         'EDIÇÃO',
         'sic_solicitacoes',
-        'Atualizou resposta/status e-SIC — protocolo ' . ($proto ?: '#' . $solicitacao_id) . " (status: $novo_status)."
+        'Atualizou resposta/status e-SIC — protocolo ' . ($sol['protocolo'] ?: '#' . $solicitacao_id) . " (status: $novo_status)."
     );
+
+    // DISPARA E-MAIL SE FOR RESPOSTA OU FINALIZAÇÃO
+    if (($novo_status === 'Respondida' || $novo_status === 'Finalizada') && !empty($sol['email'])) {
+        enviar_email_resposta($pdo, $sol['email'], $sol['nome_solicitante'], $sol['protocolo'], 'e-SIC (Acesso à Informação)', $pref_id);
+    }
 
     $_SESSION['mensagem_sucesso'] = "Solicitação respondida com sucesso!";
     header("Location: sic_inbox.php");
