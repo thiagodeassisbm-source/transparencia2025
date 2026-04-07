@@ -250,25 +250,63 @@ if (!isset($_SESSION['is_superadmin']) || (int) $_SESSION['is_superadmin'] !== 1
     header('Location: dashboard.php'); exit;
 }
 
+$tmp = clone_debug_tmp_dir();
+$logFile = $tmp . '/clone_debug.log';
+$lastJson = $tmp . '/clone_last_result.json';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['set_verbose'])) $_SESSION['clone_debug_verbose'] = (int)$_POST['set_verbose'];
-    if (isset($_POST['clear_log'])) @unlink(clone_debug_tmp_dir().'/clone_debug.log');
+    if (isset($_POST['clear_log'])) @unlink($logFile);
     header('Location: debug_clone_ambiente.php'); exit;
 }
 
 $page_title_for_header = 'Debug — Clonagem';
 include 'admin_header.php';
-$snap = clone_debug_snapshot_runtime($pdo);
+$snap = clone_debug_snapshot_runtime($pdo, true);
+
+$tables = ['categorias', 'portais', 'cards_informativos', 'campos_portal'];
+$describe = [];
+foreach ($tables as $t) {
+    try {
+        $st = $pdo->query('SHOW COLUMNS FROM `' . str_replace('`', '``', $t) . '`');
+        $describe[$t] = ['ok' => true, 'rows' => $st ? $st->fetchAll(PDO::FETCH_ASSOC) : []];
+    } catch (Throwable $e) { $describe[$t] = ['ok' => false, 'error' => $e->getMessage()]; }
+}
+
+$all_ok = true; $health_errors = [];
+if (!$snap['functions_demo']['exists']) { $all_ok = false; $health_errors[] = "functions_demo.php ausente."; }
+foreach ($describe as $tbl => $info) { if (!$info['ok']) { $all_ok = false; $health_errors[] = "Erro em $tbl: ".$info['error']; } }
 ?>
 <div class="container-fluid py-4">
-    <h4><i class="bi bi-bug me-2"></i>Diagnóstico de Clonagem</h4>
-    <div class="card mb-4"><div class="card-body font-monospace small">
-        <pre><?php echo htmlspecialchars(json_encode($snap, JSON_PRETTY_PRINT)); ?></pre>
+    <div class="row justify-content-center"><div class="col-lg-11">
+    <h4 class="fw-bold mb-3"><i class="bi bi-bug me-2"></i>Diagnóstico de Clonagem</h4>
+
+    <div class="card border-0 shadow-sm mb-4 <?php echo $all_ok ? 'border-start border-success border-4' : 'border-start border-danger border-4'; ?>">
+        <div class="card-body p-4"><div class="d-flex align-items-center">
+            <div class="flex-shrink-0"><?php echo $all_ok ? '<i class="bi bi-check-circle-fill text-success fs-1"></i>' : '<i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>'; ?></div>
+            <div class="ms-4">
+                <h5 class="mb-1 fw-bold">Ambiente de Clonagem</h5>
+                <p class="<?php echo $all_ok ? 'text-success' : 'text-danger'; ?> mb-0 fw-bold">
+                    <?php echo $all_ok ? 'Tudo certo! O sistema está pronto.' : 'Problemas detectados: ' . implode(', ', $health_errors); ?>
+                </p>
+            </div>
+        </div></div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-header bg-dark text-white text-uppercase small fw-bold">Fatos Técnicos</div><div class="card-body font-monospace small bg-light">
+        <pre class="mb-0"><?php echo htmlspecialchars(json_encode($snap, JSON_PRETTY_PRINT)); ?></pre>
     </div></div>
-    <form method="post">
-        <input type="hidden" name="set_verbose" value="<?php echo @$_SESSION['clone_debug_verbose'] ? '0' : '1'; ?>">
-        <button type="submit" class="btn btn-primary">Alternar Verbose</button>
-    </form>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-header">Controles</div><div class="card-body">
+        <form method="post" class="d-inline">
+            <input type="hidden" name="set_verbose" value="<?php echo @$_SESSION['clone_debug_verbose'] ? '0' : '1'; ?>">
+            <button type="submit" class="btn btn-sm <?php echo @$_SESSION['clone_debug_verbose'] ? 'btn-warning' : 'btn-outline-primary'; ?>">Alternar Log Detalhado</button>
+        </form>
+        <form method="post" class="d-inline ms-2" onsubmit="return confirm('Limpar?');">
+            <input type="hidden" name="clear_log" value="1"><button type="submit" class="btn btn-sm btn-outline-danger">Limpar Logs</button>
+        </form>
+    </div></div>
+    </div></div>
 </div>
 <?php include 'admin_footer.php'; ?>
 PHP;

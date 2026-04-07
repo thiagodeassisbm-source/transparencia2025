@@ -68,6 +68,72 @@ $flagExists = is_file($flagFile);
             <h4 class="fw-bold mb-3"><i class="bi bi-bug me-2"></i>Debug — clonagem de prefeitura (fatos, não suposições)</h4>
             <p class="text-muted small">Use isto para provar qual código está em disco, qual banco está conectado e qual SQL/colunas o PHP enxerga.</p>
 
+            <?php
+            // Lógica de Resumo de Saúde do Sistema
+            $all_ok = true;
+            $health_errors = [];
+
+            if (!$snap['functions_demo']['exists']) {
+                $all_ok = false;
+                $health_errors[] = "O motor de clonagem (<code>functions_demo.php</code>) não foi encontrado no servidor.";
+            }
+
+            foreach ($describe as $tbl => $info) {
+                if (!$info['ok']) {
+                    $all_ok = false;
+                    $health_errors[] = "Erro na tabela <strong>$tbl</strong>: " . $info['error'];
+                }
+            }
+
+            // Verifica se as colunas essenciais para o multi-tenant existem
+            $critical_cols = [
+                'categorias' => 'id_prefeitura',
+                'portais' => 'id_prefeitura',
+                'cards_informativos' => 'id_prefeitura'
+            ];
+
+            foreach ($critical_cols as $tbl => $col) {
+                if (isset($describe[$tbl]['rows'])) {
+                    $found_col = false;
+                    foreach ($describe[$tbl]['rows'] as $r) {
+                        if (strtolower($r['Field']) === strtolower($col)) { $found_col = true; break; }
+                    }
+                    if (!$found_col) {
+                        $all_ok = false;
+                        $health_errors[] = "A coluna crítica <code>$col</code> está faltando na tabela <code>$tbl</code>. Isso quebrará o isolamento de dados!";
+                    }
+                }
+            }
+            ?>
+
+            <!-- CARD DE STATUS RESUMIDO -->
+            <div class="card border-0 shadow-sm mb-4 <?php echo $all_ok ? 'border-start border-success border-4' : 'border-start border-danger border-4'; ?>">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <?php if ($all_ok): ?>
+                                <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                            <?php else: ?>
+                                <i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="ms-4">
+                            <h5 class="mb-1 fw-bold">Status do Ambiente de Clonagem</h5>
+                            <?php if ($all_ok): ?>
+                                <p class="text-success mb-0 fw-medium">Tudo certo! O servidor está pronto para realizar integrações e clonagens sem erros técnicos previstos.</p>
+                            <?php else: ?>
+                                <p class="text-danger mb-0 fw-bold">Foram detectados problemas que podem impedir o funcionamento correto:</p>
+                                <ul class="mb-0 mt-2 small">
+                                    <?php foreach ($health_errors as $err): ?>
+                                        <li class="mb-1"><?php echo $err; ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-dark text-white">Arquivos PHP (fingerprint)</div>
                 <div class="card-body small font-monospace">
