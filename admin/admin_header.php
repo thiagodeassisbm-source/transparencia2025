@@ -19,7 +19,6 @@ try {
         $pdo->exec("
             DELETE FROM cards_informativos 
             WHERE titulo IN ('Teste Lista de Creche', 'Acesso Link', 'Testes', 'Vacinação da Covid-19', 'Informações Institucionais')
-              AND id_secao IS NULL
         ");
     }
 } catch(Exception $e) {}
