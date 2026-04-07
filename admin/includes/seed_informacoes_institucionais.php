@@ -77,28 +77,8 @@ function ensure_informacoes_institucionais(PDO $pdo, int $prefId, int $perfilId)
                 $prefId,
             ]);
             $mudou = true;
+    $mudou = true;
         }
-    }
-
-    // Card de capa "Informações Institucionais" (link para a categoria no portal — id_secao NULL)
-    $chk_capa = $pdo->prepare(
-        'SELECT id FROM cards_informativos WHERE id_prefeitura = ? AND id_categoria = ? AND id_secao IS NULL AND titulo = ?'
-    );
-    $chk_capa->execute([$prefId, $id_cat, $nome_cat]);
-    if (!$chk_capa->fetchColumn()) {
-        $pdo->prepare(
-            'INSERT INTO cards_informativos (id_categoria, id_secao, link_url, titulo, subtitulo, caminho_icone, tipo_icone, ordem, id_prefeitura)
-             VALUES (?, NULL, ?, ?, ?, ?, ?, -1, ?)'
-        )->execute([
-            $id_cat,
-            'index.php?categoria_id=' . $id_cat,
-            $nome_cat,
-            'Acesse perguntas frequentes, estrutura organizacional e demais conteúdos.',
-            'bi-bank',
-            'bootstrap',
-            $prefId,
-        ]);
-        $mudou = true;
     }
 
     return $mudou;
