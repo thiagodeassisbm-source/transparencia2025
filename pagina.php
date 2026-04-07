@@ -22,8 +22,10 @@ if ($pagina) {
     $page_title = $pagina['titulo'];
 } else {
     $page_title = "Erro 404";
-    $pagina['titulo'] = "Página Não Encontrada";
-    $pagina['conteudo'] = "<p>O conteúdo que você está tentando acessar não existe ou foi movido.</p><a href='index.php' class='btn btn-primary'>Voltar para a página inicial</a>";
+    $pagina = [
+        'titulo'   => "Página Não Encontrada",
+        'conteudo' => "<p>O conteúdo que você está tentando acessar não existe ou foi movido.</p><a href='index.php' class='btn btn-primary'>Voltar para a página inicial</a>",
+    ];
 }
 ?>
 <!DOCTYPE html>
