@@ -37,7 +37,7 @@ if ($nome_completo_boas_vindas === '') {
 
 // Define um título padrão para a página
 $page_title_for_header = $page_title_for_header ?? 'Painel Administrativo';
-$super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php', 'gerenciar_prefeituras.php', 'switch_pref.php', 'alterar_status_pref.php', 'gerenciar_landing_recursos.php', 'editar_landing_recurso.php', 'gerenciar_mensagens.php', 'enviar_mensagem.php', 'configurar_copyright.php', 'configurar_smtp.php', 'gerenciar_superadmins.php', 'editar_usuario.php', 'debug_clone_ambiente.php'];
+$super_pages = ['super_dashboard.php', 'super_logs.php', 'cadastrar_prefeitura.php', 'editar_prefeitura.php', 'gerenciar_prefeituras.php', 'switch_pref.php', 'alterar_status_pref.php', 'gerenciar_landing_recursos.php', 'editar_landing_recurso.php', 'gerenciar_mensagens.php', 'enviar_mensagem.php', 'configurar_copyright.php', 'configurar_smtp.php', 'configurar_templates_email.php', 'gerenciar_superadmins.php', 'editar_usuario.php', 'debug_clone_ambiente.php'];
 $is_super_context = in_array(basename($_SERVER['PHP_SELF']), $super_pages) && isset($_SESSION['is_superadmin']) && $_SESSION['is_superadmin'] === 1;
 
 // Função para verificar se a página atual é a ativa
@@ -155,6 +155,7 @@ function isActive($pageName) {
                             <ul class="submenu">
                                 <li><a href="configurar_copyright.php" class="nav-link <?php echo isActive('configurar_copyright.php'); ?>">Copyright / Rodapé</a></li>
                                 <li><a href="configurar_smtp.php" class="nav-link <?php echo isActive('configurar_smtp.php'); ?>">Configuração SMTP</a></li>
+                                <li><a href="configurar_templates_email.php" class="nav-link <?php echo isActive('configurar_templates_email.php'); ?>">Templates de E-mail</a></li>
                                 <li><a href="gerenciar_superadmins.php" class="nav-link <?php echo isActive('gerenciar_superadmins.php'); ?>">Usuários Superadmin</a></li>
                             </ul>
                         </div>
@@ -288,7 +289,7 @@ function isActive($pageName) {
 
                     <?php if (tem_permissao('configuracoes', 'ver') || tem_permissao('prefeitura', 'ver') || $_SESSION['admin_user_perfil'] === 'admin'): ?>
                     <li>
-                        <?php $prefeitura_active = isActive(['informacoes_prefeitura.php', 'configurar_copyright.php', 'configurar_smtp.php']); ?>
+                        <?php $prefeitura_active = isActive(['informacoes_prefeitura.php', 'configurar_copyright.php', 'configurar_smtp.php', 'configurar_templates_email.php']); ?>
                         <a href="#collapsePrefeitura" class="nav-link has-submenu <?php echo $prefeitura_active ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" role="button">
                             <span><i class="bi bi-building"></i> Prefeitura</span>
                             <i class="bi bi-chevron-down submenu-arrow"></i>
@@ -297,6 +298,7 @@ function isActive($pageName) {
                             <ul class="submenu">
                                 <li><a href="informacoes_prefeitura.php" class="nav-link <?php echo isActive('informacoes_prefeitura.php'); ?>">Identidade & Cores</a></li>
                                 <li><a href="configurar_smtp.php" class="nav-link <?php echo isActive('configurar_smtp.php'); ?>">E-mail (SMTP)</a></li>
+                                <li><a href="configurar_templates_email.php" class="nav-link <?php echo isActive('configurar_templates_email.php'); ?>">Templates de E-mail</a></li>
                                 <li><a href="configurar_copyright.php" class="nav-link <?php echo isActive('configurar_copyright.php'); ?>">Rodapé & Copyright</a></li>
                             </ul>
                         </div>
