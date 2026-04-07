@@ -339,6 +339,14 @@ function isActive($pageName) {
                     </li>
                     <?php endif; ?>
                 </ul>
+
+                <ul class="mt-4">
+                    <li>
+                        <a href="logout.php" class="nav-link text-danger fw-bold">
+                            <i class="bi bi-box-arrow-left"></i> Sair do Painel
+                        </a>
+                    </li>
+                </ul>
             <?php endif; ?>
         </nav>
     </aside>
