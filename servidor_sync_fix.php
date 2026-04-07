@@ -135,11 +135,153 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
 }
 PHP;
 
+$target_file_debug_ui = __DIR__ . '/admin/debug_clone_ambiente.php';
+$target_file_debug_lib = __DIR__ . '/admin/clone_debug.php';
+
+$content_debug_lib = <<<'PHP'
+<?php
+/**
+ * Usado por cadastrar_prefeitura.php e functions_demo.php (log/trace).
+ */
+
+if (function_exists('clone_debug_base_dir')) {
+    return;
+}
+
+function clone_debug_base_dir(): string
+{
+    return __DIR__;
+}
+
+function clone_debug_tmp_dir(): string
+{
+    $d = clone_debug_base_dir() . '/tmp';
+    if (!is_dir($d)) {
+        @mkdir($d, 0755, true);
+    }
+    return $d;
+}
+
+function clone_debug_functions_demo_path(): string
+{
+    return clone_debug_base_dir() . '/functions_demo.php';
+}
+
+function clone_debug_file_fingerprint(string $absPath): array
+{
+    $out = [
+        'path' => $absPath,
+        'exists' => false,
+        'readable' => false,
+        'mtime' => null,
+        'size' => null,
+        'md5' => null,
+    ];
+    if (!file_exists($absPath)) return $out;
+    $out['exists'] = true;
+    $out['readable'] = is_readable($absPath);
+    if ($out['readable']) {
+        $mt = @filemtime($absPath);
+        $out['mtime'] = $mt ? date('c', $mt) : null;
+        $out['size'] = @filesize($absPath);
+        $out['md5'] = @md5_file($absPath);
+    }
+    return $out;
+}
+
+function clone_debug_verbose(): bool
+{
+    if (session_status() === PHP_SESSION_ACTIVE && (int) ($_SESSION['clone_debug_verbose'] ?? 0) === 1) return true;
+    return is_file(clone_debug_base_dir() . '/.clone_debug');
+}
+
+function clone_debug_log(string $line): void
+{
+    if (!clone_debug_verbose()) return;
+    $file = clone_debug_tmp_dir() . '/clone_debug.log';
+    $ts = date('Y-m-d H:i:s');
+    @file_put_contents($file, '[' . $ts . '] ' . $line . "\n", FILE_APPEND | LOCK_EX);
+}
+
+function clone_debug_opcache_hint(): array
+{
+    if (!function_exists('opcache_get_status')) return ['available' => false];
+    $st = @opcache_get_status(false);
+    return ['available' => true, 'enabled' => !empty($st['opcache_enabled']), 'full' => $st];
+}
+
+function clone_debug_snapshot_runtime(?PDO $pdo = null, bool $includeOpcache = false): array
+{
+    $db = null;
+    if ($pdo) { try { $db = $pdo->query('SELECT DATABASE()')->fetchColumn(); } catch(Throwable $e){}}
+    $oc = clone_debug_opcache_hint();
+    return [
+        'written_at' => date('c'),
+        'database' => $db,
+        'functions_demo' => clone_debug_file_fingerprint(clone_debug_functions_demo_path()),
+        'cadastrar_prefeitura' => clone_debug_file_fingerprint(clone_debug_base_dir() . '/cadastrar_prefeitura.php'),
+        'opcache' => ['available' => $oc['available'], 'enabled' => $oc['enabled'] ?? null],
+    ];
+}
+
+function clone_debug_write_last_result(?PDO $pdo, array $payload): void
+{
+    $path = clone_debug_tmp_dir() . '/clone_last_result.json';
+    $payload['snapshot'] = clone_debug_snapshot_runtime($pdo);
+    @file_put_contents($path, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+}
+
+function clone_debug_html_banner(): string
+{
+    $f = clone_debug_file_fingerprint(clone_debug_functions_demo_path());
+    if (!$f['exists']) return '<div class="alert alert-danger small">clone_debug: functions_demo.php não encontrado</div>';
+    return '<div class="alert alert-warning small font-monospace mb-3"><strong>Debug clonagem ativo</strong><br>'
+        . 'MD5: ' . htmlspecialchars((string)$f['md5']) . ' · <a href="debug_clone_ambiente.php" class="alert-link">Diagnóstico completo</a></div>';
+}
+PHP;
+
+$content_debug_ui = <<<'PHP'
+<?php
+require_once 'auth_check.php';
+require_once '../conexao.php';
+require_once 'clone_debug.php';
+
+if (!isset($_SESSION['is_superadmin']) || (int) $_SESSION['is_superadmin'] !== 1) {
+    header('Location: dashboard.php'); exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['set_verbose'])) $_SESSION['clone_debug_verbose'] = (int)$_POST['set_verbose'];
+    if (isset($_POST['clear_log'])) @unlink(clone_debug_tmp_dir().'/clone_debug.log');
+    header('Location: debug_clone_ambiente.php'); exit;
+}
+
+$page_title_for_header = 'Debug — Clonagem';
+include 'admin_header.php';
+$snap = clone_debug_snapshot_runtime($pdo);
+?>
+<div class="container-fluid py-4">
+    <h4><i class="bi bi-bug me-2"></i>Diagnóstico de Clonagem</h4>
+    <div class="card mb-4"><div class="card-body font-monospace small">
+        <pre><?php echo htmlspecialchars(json_encode($snap, JSON_PRETTY_PRINT)); ?></pre>
+    </div></div>
+    <form method="post">
+        <input type="hidden" name="set_verbose" value="<?php echo @$_SESSION['clone_debug_verbose'] ? '0' : '1'; ?>">
+        <button type="submit" class="btn btn-primary">Alternar Verbose</button>
+    </form>
+</div>
+<?php include 'admin_footer.php'; ?>
+PHP;
+
 if (@file_put_contents($target_file, $content_demo)) {
-    echo "✅ admin/functions_demo.php atualizado forçadamente!\n";
-} else {
-    echo "❌ Erro: Não foi possível gravar no arquivo. Permissão negada pelo servidor.\n";
+    echo "✅ admin/functions_demo.php atualizado!\n";
+}
+if (@file_put_contents($target_file_debug_lib, $content_debug_lib)) {
+    echo "✅ admin/clone_debug.php atualizado!\n";
+}
+if (@file_put_contents($target_file_debug_ui, $content_debug_ui)) {
+    echo "✅ admin/debug_clone_ambiente.php atualizado!\n";
 }
 
 if (function_exists('opcache_reset')) opcache_reset();
-echo "\nOPcache limpo. Sincronização concluída!";
+echo "\nSincronização concluída!";
