@@ -44,7 +44,7 @@ include 'admin_header.php';
 
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
-        <div class="col-lg-7">
+        <div class="col-lg-11">
             
             <?php if ($mensagem_sucesso): ?>
                 <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4" role="alert">
@@ -58,25 +58,25 @@ include 'admin_header.php';
                     <div class="bg-primary bg-opacity-10 p-3 rounded-circle d-inline-flex mb-3">
                         <i class="bi bi-c-circle fs-3 text-primary"></i>
                     </div>
-                    <h4 class="fw-bold mb-1">Copyright Global</h4>
+                    <h4 class="fw-bold mb-1 border-bottom d-inline-block pb-2 px-3">Copyright Global</h4>
                     <p class="text-muted small">Gerencie as informações que aparecem no rodapé de todo o sistema.</p>
                 </div>
                 <div class="card-body p-4 p-md-5 pt-2">
                     <form method="POST">
-                        <div class="row g-4">
-                            <div class="col-md-4">
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-2">
                                 <label class="form-label small fw-bold text-muted">Ano Corrente</label>
-                                <input type="text" name="copyright_ano" class="form-control form-control-lg bg-light border-0 rounded-3" value="<?php echo htmlspecialchars($copyright_ano); ?>" required>
+                                <input type="text" name="copyright_ano" class="form-control form-control-lg bg-light border-0 rounded-3 text-center" value="<?php echo htmlspecialchars($copyright_ano); ?>" required>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-5">
                                 <label class="form-label small fw-bold text-muted">Desenvolvido por (Nome)</label>
                                 <input type="text" name="copyright_dev_nome" class="form-control form-control-lg bg-light border-0 rounded-3" value="<?php echo htmlspecialchars($copyright_dev_nome); ?>" required>
                             </div>
-                            <div class="col-12">
+                            <div class="col-md-5">
                                 <label class="form-label small fw-bold text-muted">Site do Desenvolvedor (URL)</label>
                                 <input type="url" name="copyright_dev_site" class="form-control form-control-lg bg-light border-0 rounded-3" value="<?php echo htmlspecialchars($copyright_dev_site); ?>" required>
                             </div>
-                            <div class="col-12">
+                            <div class="col-md-12">
                                 <label class="form-label small fw-bold text-muted">Texto Adicional (Direitos)</label>
                                 <input type="text" name="copyright_texto" class="form-control form-control-lg bg-light border-0 rounded-3" value="<?php echo htmlspecialchars($copyright_texto); ?>" required>
                             </div>
@@ -93,9 +93,9 @@ include 'admin_header.php';
                                 </div>
                             </div>
 
-                            <div class="col-12 mt-4 text-center">
-                                <button type="submit" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-lg">
-                                    <i class="bi bi-save me-2"></i> Salvar Alterações
+                            <div class="col-12 mt-4 text-center pb-4">
+                                <button type="submit" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-lg" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                                    <i class="bi bi-cloud-upload me-2 text-white"></i> SALVAR CONFIGURAÇÕES DE RODAPÉ
                                 </button>
                             </div>
                         </div>
