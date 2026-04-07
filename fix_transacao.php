@@ -1,51 +1,8 @@
 <?php
 /**
- * Script de Injeção de Correção v5 - LIMPA TRILHOS FINAL (Corrigido)
+ * Script de Injeção de Correção v6 - FINAL
  */
 
-require_once 'conexao.php';
-
-header('Content-Type: text/plain; charset=utf-8');
-echo "Iniciando Limpeza Profunda de Índices v5...\n\n";
-
-function limpa_indices_tabela($pdo, $tabela) {
-    echo "\n-> Verificando índices na tabela '$tabela'...\n";
-    try {
-        $res = $pdo->query("SHOW INDEX FROM $tabela");
-        $indexes = $res->fetchAll(PDO::FETCH_ASSOC);
-        
-        foreach ($indexes as $idx) {
-            $kn = $idx['Key_name'];
-            // Remove qualquer índice que tente forçar slug único global
-            if ($kn !== 'PRIMARY' && strpos($kn, 'slug') !== false) {
-                // Não remove se for o nosso índice composto oficial correto
-                if ($kn === 'idx_pref_slug_oficial') continue;
-
-                try {
-                    $pdo->exec("ALTER TABLE $tabela DROP INDEX `$kn`");
-                    echo "   ✅ Índice '$kn' removido.\n";
-                } catch (Exception $e) {
-                    echo "   ⚠️ Falha ao remover '$kn': " . $e->getMessage() . "\n";
-                }
-            }
-        }
-
-        // Recria o índice composto (SaaS)
-        try {
-            $pdo->exec("ALTER TABLE $tabela ADD UNIQUE INDEX idx_pref_slug_oficial (id_prefeitura, slug)");
-            echo "   ✅ Índice composto 'idx_pref_slug_oficial' criado para $tabela.\n";
-        } catch (Exception $e) {
-             echo "   ℹ️ Índice composto já existia ou não aplicável.\n";
-        }
-    } catch (Exception $e) {
-        echo "   ⚠️ Tabela $tabela: " . $e->getMessage() . "\n";
-    }
-}
-
-limpa_indices_tabela($pdo, 'portais');
-limpa_indices_tabela($pdo, 'categorias');
-
-// 2. Garante o motor de clonagem (v5 - Sem erros de "text")
 $target_file = __DIR__ . '/admin/functions_demo.php';
 $content_demo = <<<'PHP'
 <?php
@@ -64,8 +21,13 @@ function demo_card_valores_icone(array $card) {
     return ['caminho' => $caminho, 'tipo' => $tipo];
 }
 function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
+    // Registra se a transação foi iniciada aqui ou pelo chamador
+    $iniciou_transacao = false;
     try {
-        if (!$pdo->inTransaction()) $pdo->beginTransaction();
+        if (!$pdo->inTransaction()) {
+            $pdo->beginTransaction();
+            $iniciou_transacao = true;
+        }
         $pdo->prepare("DELETE FROM configuracoes WHERE id_prefeitura = ?")->execute([$id_destino]);
         foreach ($pdo->query("SELECT * FROM configuracoes WHERE id_prefeitura = $id_origem")->fetchAll() as $conf) {
              $pdo->prepare("INSERT INTO configuracoes (chave, valor, id_prefeitura) VALUES (?, ?, ?)")->execute([$conf['chave'], $conf['valor'], $id_destino]);
@@ -97,13 +59,21 @@ function clonar_dados_demonstrativos($pdo, $id_origem, $id_destino) {
             $ph = implode(',', array_fill(0,count($ins),'?'));
             $pdo->prepare("INSERT INTO cards_informativos (".implode(',',array_keys($ins)).") VALUES ($ph)")->execute(array_values($ins));
         }
-        $pdo->commit(); return true;
+        
+        // Só faz commit se iniciou a transação AQUI
+        if ($iniciou_transacao) {
+            $pdo->commit(); 
+        }
+        return true;
     } catch (Exception $e) {
-        if ($pdo->inTransaction()) $pdo->rollBack();
+        // Só faz rollback se iniciou a transação AQUI
+        if ($iniciou_transacao && $pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         throw new Exception("Falha na clonagem: " . $e->getMessage());
     }
 }
 PHP;
 @file_put_contents($target_file, $content_demo);
 if (function_exists('opcache_reset')) opcache_reset();
-echo "\nTODOS os scripts de índice atualizados. Motor de clonagem forçado para v5.\nPronto para tentar o cadastro novamente.";
+echo "✅ functions_demo.php atualizado: Controle de transação (commit) corrigido!";
