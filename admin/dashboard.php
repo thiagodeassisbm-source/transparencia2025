@@ -9,28 +9,6 @@ if ($pref_id > 0 && ensure_informacoes_institucionais($pdo, $pref_id, $perfil_id
     unset($_SESSION['permissoes_sessao']);
 }
 
-// --- ROTINA DE LIMPEZA DE BAGUNÇA (DUPLICADOS / TESTES) ---
-if (isset($_GET['limpar_bagunca'])) {
-    // 1. Remove os cartões e cadastros clonados duplicados (mantém sempre o mais antigo/original)
-    $pdo->exec("
-        DELETE c1 FROM cards_informativos c1
-        INNER JOIN cards_informativos c2 
-        WHERE c1.id > c2.id 
-          AND c1.id_categoria = c2.id_categoria 
-          AND c1.titulo = c2.titulo 
-          AND c1.id_prefeitura = c2.id_prefeitura
-    ");
-    
-    // 2. Tira fora explicitamente todos os cards de 'Testes' que estavam poluindo a origem
-    $pdo->exec("
-        DELETE FROM cards_informativos 
-        WHERE titulo IN ('Teste Lista de Creche', 'Acesso Link', 'Testes', 'Vacinação da Covid-19')
-    ");
-
-    echo "<script>alert('Varredura Completa: Sistema limpo e despoluído com sucesso!'); window.location='dashboard.php';</script>";
-    exit;
-}
-
 // --- BUSCA DE DADOS PARA OS CARDS NUMÉRICOS ---
 
 $total_secoes = $pdo->prepare("SELECT COUNT(id) FROM portais WHERE id_prefeitura = ?");

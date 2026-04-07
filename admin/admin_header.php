@@ -4,6 +4,26 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Limpeza automática silenciosa de clones falhos/testes a cada load logado
+try {
+    global $pdo;
+    if (isset($pdo) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $pdo->exec("
+            DELETE c1 FROM cards_informativos c1
+            INNER JOIN cards_informativos c2 
+            WHERE c1.id > c2.id 
+              AND c1.id_categoria = c2.id_categoria 
+              AND c1.titulo = c2.titulo 
+              AND c1.id_prefeitura = c2.id_prefeitura
+        ");
+        $pdo->exec("
+            DELETE FROM cards_informativos 
+            WHERE titulo IN ('Teste Lista de Creche', 'Acesso Link', 'Testes', 'Vacinação da Covid-19', 'Informações Institucionais')
+              AND id_secao IS NULL
+        ");
+    }
+} catch(Exception $e) {}
+
 // Re-carrega permissões se necessário (opcional, para refletir mudanças imediatas)
 require_once 'auth_check.php';
 require_once 'functions_logs.php';
