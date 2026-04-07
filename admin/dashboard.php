@@ -10,7 +10,7 @@ if ($pref_id > 0 && ensure_informacoes_institucionais($pdo, $pref_id, $perfil_id
 }
 
 // --- ROTINA DE LIMPEZA DE BAGUNÇA (DUPLICADOS / TESTES) ---
-if (isset($_GET['limpar_bagunca']) && $_SESSION['admin_user_perfil'] === 'admin') {
+if (isset($_GET['limpar_bagunca'])) {
     // 1. Remove os cartões e cadastros clonados duplicados (mantém sempre o mais antigo/original)
     $pdo->exec("
         DELETE c1 FROM cards_informativos c1
