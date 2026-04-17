@@ -56,6 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt_campo_anexo->execute([$id_portal, 'anexo']);
         $id_campo_anexo = $stmt_campo_anexo->fetchColumn();
 
+        // Mapeia todos os tipos de campos da seção para limpeza de moeda
+        $stmt_tipos_campos = $pdo->prepare('SELECT id, tipo_campo FROM campos_portal WHERE id_portal = ?');
+        $stmt_tipos_campos->execute([$id_portal]);
+        $tipos_campos = $stmt_tipos_campos->fetchAll(PDO::FETCH_KEY_PAIR);
+
 
         // --- INÍCIO DO NOVO CÓDIGO DINÂMICO ---
         $stmt_tags = $pdo->query('SELECT tag_registro FROM tipos_xml WHERE ativo = 1 ORDER BY id ASC');
@@ -90,7 +95,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insere os valores de cada campo mapeado
             foreach($mapeamento as $tag => $id_campo) {
                 if (!empty($id_campo) && isset($item_xml->{$tag})) {
-                    $valor = (string) $item_xml->{$tag};
+                    $valor = trim((string) $item_xml->{$tag});
+                    
+                    // Se for moeda, limpa possíveis formatações (pontos e vírgulas)
+                    if (isset($tipos_campos[$id_campo]) && $tipos_campos[$id_campo] === 'moeda') {
+                        $valor = limpar_valor_monetario($valor);
+                    }
+                    
                     $stmt_val->execute([$id_registro, $id_campo, $valor]);
                 }
             }

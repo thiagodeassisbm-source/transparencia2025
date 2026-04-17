@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
     $resp_nome = $_POST['responsavel_nome'] ?? '';
     $resp_contato = $_POST['responsavel_contato'] ?? '';
     $dia_venc = (int)($_POST['dia_vencimento'] ?? 10);
-    $valor_mensal = $_POST['valor_mensalidade'] ?? 0;
+    $valor_mensal = limpar_valor_monetario($_POST['valor_mensalidade'] ?? 0);
     $data_contratacao = $_POST['data_contratacao'] ?? date('Y-m-d');
 
     try {
@@ -178,7 +178,7 @@ include 'admin_header.php';
                                     <label class="form-label small fw-bold text-muted">Fee Mensal (R$)</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light">R$</span>
-                                        <input type="number" step="0.01" name="valor_mensalidade" class="form-control" value="<?php echo htmlspecialchars((string)($prefeitura['valor_mensalidade'] ?? 0)); ?>" required>
+                                        <input type="text" name="valor_mensalidade" class="form-control money-mask" value="<?php echo htmlspecialchars((string)($prefeitura['valor_mensalidade'] ?? 0)); ?>" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">

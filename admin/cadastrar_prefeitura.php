@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $responsavel_nome = filter_input(INPUT_POST, 'responsavel_nome', FILTER_SANITIZE_SPECIAL_CHARS);
     $responsavel_contato = filter_input(INPUT_POST, 'responsavel_contato', FILTER_SANITIZE_SPECIAL_CHARS);
     $dia_vencimento = filter_input(INPUT_POST, 'dia_vencimento', FILTER_VALIDATE_INT);
-    $valor_mensalidade = filter_input(INPUT_POST, 'valor_mensalidade', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    $valor_mensalidade = limpar_valor_monetario($_POST['valor_mensalidade'] ?? '');
     $data_contratacao = filter_input(INPUT_POST, 'data_contratacao', FILTER_SANITIZE_SPECIAL_CHARS);
     $dominio_customizado = filter_input(INPUT_POST, 'dominio_customizado', FILTER_SANITIZE_URL);
     
@@ -218,7 +218,7 @@ $clone_debug_on = clone_debug_verbose();
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Valor da Mensalidade (R$)</label>
-                            <input type="number" step="0.01" name="valor_mensalidade" class="form-control" value="<?php echo htmlspecialchars($valor_mensalidade); ?>" placeholder="0.00" required>
+                            <input type="text" name="valor_mensalidade" class="form-control money-mask" value="<?php echo htmlspecialchars($valor_mensalidade); ?>" placeholder="0,00" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-muted">Dia de Vencimento</label>

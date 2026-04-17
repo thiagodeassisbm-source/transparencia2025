@@ -28,6 +28,21 @@ if (!tem_permissao('form_' . $portal_id, 'editar')) {
 $tipos_documento = $pdo->query("SELECT id, nome FROM tipos_documento ORDER BY nome ASC")->fetchAll();
 $categorias = $pdo->query("SELECT id, nome FROM categorias ORDER BY ordem ASC")->fetchAll();
 
+// Busca dados da seção e seus campos
+$stmt_secao = $pdo->prepare("SELECT nome FROM portais WHERE id = ?");
+$stmt_secao->execute([$portal_id]);
+$secao = $stmt_secao->fetch();
+
+$stmt_campos = $pdo->prepare("SELECT id, nome_campo, tipo_campo, opcoes_campo FROM campos_portal WHERE id_portal = ? ORDER BY ordem, nome_campo");
+$stmt_campos->execute([$portal_id]);
+$campos_dinamicos = $stmt_campos->fetchAll();
+
+// Mapeia os tipos de campo para facilitar o processamento no POST
+$tipos_por_id = [];
+foreach ($campos_dinamicos as $cp) {
+    $tipos_por_id[$cp['id']] = $cp['tipo_campo'];
+}
+
 // Processa o formulário de atualização
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pdo->beginTransaction();
@@ -58,7 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         foreach ($valores_post as $id_campo => $valor) {
             if (isset($valor) && $valor !== '') {
-                $stmt_insert_val->execute([$registro_id, $id_campo, trim($valor)]);
+                $valor_final = trim($valor);
+                // Se for moeda, limpa a máscara para salvar no banco
+                if (isset($tipos_por_id[$id_campo]) && $tipos_por_id[$id_campo] === 'moeda') {
+                    $valor_final = limpar_valor_monetario($valor_final);
+                }
+                $stmt_insert_val->execute([$registro_id, $id_campo, $valor_final]);
             }
         }
         
@@ -98,18 +118,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Busca os dados para preencher o formulário
-$stmt_secao = $pdo->prepare("SELECT nome FROM portais WHERE id = ?");
-$stmt_secao->execute([$portal_id]);
-$secao = $stmt_secao->fetch();
-
 $stmt_registro_atual = $pdo->prepare("SELECT * FROM registros WHERE id = ?");
 $stmt_registro_atual->execute([$registro_id]);
 $registro_atual = $stmt_registro_atual->fetch();
-
-$stmt_campos = $pdo->prepare("SELECT id, nome_campo, tipo_campo, opcoes_campo FROM campos_portal WHERE id_portal = ? ORDER BY ordem, nome_campo");
-$stmt_campos->execute([$portal_id]);
-$campos_dinamicos = $stmt_campos->fetchAll();
 
 $stmt_valores = $pdo->prepare("SELECT id_campo, valor FROM valores_registros WHERE id_registro = ?");
 $stmt_valores->execute([$registro_id]);
@@ -233,11 +244,14 @@ include 'admin_header.php';
                                         <textarea class="form-control" id="campo_<?php echo $campo['id']; ?>" name="valores[<?php echo $campo['id']; ?>]" rows="3"><?php echo htmlspecialchars($valor_atual); ?></textarea>
                                     <?php else: 
                                         $tipo_input = 'text';
+                                        $extra_class = '';
                                         if ($campo['tipo_campo'] == 'data') $tipo_input = 'date';
-                                        if ($campo['tipo_campo'] == 'numero' || $campo['tipo_campo'] == 'moeda') $tipo_input = 'number';
+                                        if ($campo['tipo_campo'] == 'numero') $tipo_input = 'number';
+                                        if ($campo['tipo_campo'] == 'moeda') $extra_class = 'money-mask';
+                                        
                                         $step = ($campo['tipo_campo'] == 'moeda') ? '0.01' : 'any';
                                     ?>
-                                        <input type="<?php echo $tipo_input; ?>" <?php if($tipo_input == 'number') echo "step='$step'"; ?> class="form-control" id="campo_<?php echo $campo['id']; ?>" name="valores[<?php echo $campo['id']; ?>]" value="<?php echo htmlspecialchars($valor_atual); ?>">
+                                        <input type="<?php echo $tipo_input; ?>" <?php if($tipo_input == 'number') echo "step='$step'"; ?> class="form-control <?php echo $extra_class; ?>" id="campo_<?php echo $campo['id']; ?>" name="valores[<?php echo $campo['id']; ?>]" value="<?php echo htmlspecialchars($valor_atual); ?>">
                                     <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>
