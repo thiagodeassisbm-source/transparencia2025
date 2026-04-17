@@ -95,12 +95,12 @@ include 'admin_header.php';
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-primary text-white">
                     <tr>
-                        <th class="ps-4" style="width: 100px;">Horário</th>
+                        <th class="ps-4 text-nowrap" style="width: 120px;">Horário</th>
                         <th style="width: 15rem;">Usuário</th>
                         <th style="width: 120px;">Ação</th>
                         <th style="width: 180px;">Módulo/Tabela</th>
                         <th>O que foi feito / Detalhes</th>
-                        <th style="width: 120px;">IP</th>
+                        <th class="text-nowrap" style="width: 150px;">IP</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,7 +114,7 @@ include 'admin_header.php';
                     <?php endif; ?>
                     <?php foreach ($logs as $log): ?>
                     <tr>
-                        <td class="ps-4">
+                        <td class="ps-4 text-nowrap">
                             <div class="text-dark fw-bold"><?php echo date('H:i:s', strtotime($log['horario'])); ?></div>
                             <div class="text-muted small"><?php echo date('d/m/Y', strtotime($log['horario'])); ?></div>
                         </td>
@@ -142,7 +142,7 @@ include 'admin_header.php';
                         <td class="small text-muted">
                             <?php echo nl2br(htmlspecialchars($log['detalhes'])); ?>
                         </td>
-                        <td class="small font-monospace">
+                        <td class="small font-monospace text-nowrap">
                             <?php echo $log['ip_endereco']; ?>
                         </td>
                     </tr>

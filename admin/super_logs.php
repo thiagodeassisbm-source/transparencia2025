@@ -111,13 +111,13 @@ include 'admin_header.php';
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-dark text-white border-0">
                     <tr>
-                        <th class="ps-4" style="width: 100px;">Horário</th>
-                        <th style="width: 200px;">Prefeitura</th>
-                        <th style="width: 200px;">Usuário</th>
-                        <th style="width: 130px;">Ação</th>
-                        <th style="width: 200px;">Módulo/Tabela</th>
+                        <th class="ps-4 text-nowrap" style="width: 120px;">Horário</th>
+                        <th class="text-nowrap" style="width: 250px;">Prefeitura</th>
+                        <th class="text-nowrap" style="width: 200px;">Usuário</th>
+                        <th class="text-nowrap" style="width: 130px;">Ação</th>
+                        <th class="text-nowrap" style="width: 200px;">Módulo/Tabela</th>
                         <th>O que foi feito / Detalhes</th>
-                        <th style="width: 130px;">IP</th>
+                        <th class="text-nowrap" style="width: 150px;">IP</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -131,7 +131,7 @@ include 'admin_header.php';
                     <?php endif; ?>
                     <?php foreach ($logs as $log): ?>
                     <tr class="transition-all hover-light">
-                        <td class="ps-4 py-3">
+                        <td class="ps-4 py-3 text-nowrap">
                             <div class="text-dark fw-bold" style="font-size: 13px;"><?php echo date('H:i:s', strtotime($log['horario'])); ?></div>
                             <div class="text-muted" style="font-size: 11px;"><?php echo date('d/m/Y', strtotime($log['horario'])); ?></div>
                         </td>
@@ -174,7 +174,7 @@ include 'admin_header.php';
                         <td class="text-wrap" style="min-width: 300px;">
                             <p class="mb-0 text-dark small" style="line-height: 1.5;"><?php echo nl2br(htmlspecialchars($log['detalhes'])); ?></p>
                         </td>
-                        <td class="small font-monospace text-muted py-2" style="font-size: 11px;">
+                        <td class="small font-monospace text-muted py-2 text-nowrap" style="font-size: 11px;">
                             <i class="bi bi-pc-display me-1 opacity-75"></i> <?php echo $log['ip_endereco']; ?>
                         </td>
                     </tr>
