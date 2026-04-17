@@ -88,3 +88,17 @@ function registrar_log($pdo, $acao, $tabela, $detalhes) {
         error_log('Erro ao registrar log: ' . $e->getMessage());
     }
 }
+
+/**
+ * Converte um valor formatado (ex: 1.234,56) para o formato decimal do banco (1234.56)
+ */
+if (!function_exists('limpar_valor_monetario')) {
+    function limpar_valor_monetario($valor) {
+        if (empty($valor)) return 0;
+        // Remove pontos de milhar
+        $valor = str_replace('.', '', $valor);
+        // Substitui a vírgula decimal por ponto
+        $valor = str_replace(',', '.', $valor);
+        return (float) $valor;
+    }
+}
