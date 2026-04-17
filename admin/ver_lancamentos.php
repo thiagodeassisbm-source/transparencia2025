@@ -172,6 +172,8 @@ include 'admin_header.php';
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
     }
+    .text-nowrap-custom { white-space: nowrap; }
+    .fw-medium { font-weight: 500; }
 </style>
 
 <div class="container-fluid container-custom-padding py-2">
@@ -249,14 +251,20 @@ include 'admin_header.php';
                                     $valores_deste_registro = $valores_dinamicos[$registro['id']] ?? [];
                                     foreach ($campos_dinamicos as $campo) {
                                         $valor = $valores_deste_registro[$campo['id']] ?? '';
+                                        $nome_baixa = mb_strtolower($campo['nome_campo']);
+                                        
                                         if ($campo['tipo_campo'] === 'anexo' && !empty($valor)) {
                                             echo '<td><a href="../' . htmlspecialchars($valor) . '" target="_blank" class="btn-anexo"><i class="bi bi-file-earmark-pdf"></i> Ver</a></td>';
                                         } elseif ($campo['tipo_campo'] === 'data' && !empty($valor)) {
                                             $data_objeto = date_create($valor);
                                             $valor_formatado = $data_objeto ? date_format($data_objeto, 'd/m/Y') : $valor;
                                             echo '<td>' . htmlspecialchars($valor_formatado) . '</td>';
+                                        } elseif ($campo['tipo_campo'] === 'moeda' || $nome_baixa === 'valor') {
+                                            $fmt = is_numeric($valor) ? 'R$ ' . number_format((float)$valor, 2, ',', '.') : htmlspecialchars($valor);
+                                            echo '<td class="text-nowrap-custom fw-bold text-dark">' . $fmt . '</td>';
                                         } else {
-                                            echo '<td>' . htmlspecialchars(mb_strimwidth((string) $valor, 0, 120, '…', 'UTF-8')) . '</td>';
+                                            $limit = ($nome_baixa === 'motivo' || $nome_baixa === 'descricao') ? 60 : 120;
+                                            echo '<td>' . htmlspecialchars(mb_strimwidth((string) $valor, 0, $limit, '…', 'UTF-8')) . '</td>';
                                         }
                                     }
                                     ?>

@@ -89,7 +89,9 @@ if (!empty($registros_ids)) {
     <link rel="stylesheet" href="<?php echo $base_url; ?>css/style.css?v=<?php echo time(); ?>">
     <style>
         .table-custom tbody tr:hover { background-color: #f8f9fa; cursor: pointer; }
-        .table-custom thead th { border-bottom: 2px solid #dee2e6; }
+        .table-custom thead th { border-bottom: 2px solid #dee2e6; white-space: nowrap; padding: 12px 15px; }
+        .table-custom td { padding: 12px 15px; vertical-align: middle; }
+        .text-nowrap-custom { white-space: nowrap; }
     </style>
 </head>
 <body class="bg-light">
@@ -174,19 +176,32 @@ include 'header_publico.php';
                                         $id_registro_atual = $linha['id_registro_para_link'];
                                         unset($linha['id_registro_para_link']);
                                         ?>
-                                        <?php foreach ($linha as $coluna_index => $valor): ?>
-                                            <td>
+                                        <?php foreach ($linha as $coluna_index => $valor): 
+                                            $campo_obj = $campos_tabela[$coluna_index];
+                                            $tipo_atual = $campo_obj['tipo_campo'];
+                                            $nome_atual = mb_strtolower($campo_obj['nome_campo']);
+                                            $td_class = ($tipo_atual == 'moeda' || $nome_atual == 'valor') ? 'text-nowrap-custom fw-bold' : '';
+                                        ?>
+                                            <td class="<?php echo $td_class; ?>">
                                                 <?php
-                                                $tipo_do_campo_atual = $campos_tabela[$coluna_index]['tipo_campo'];
-                                                if ($tipo_do_campo_atual == 'anexo') {
+                                                if ($tipo_atual == 'anexo') {
                                                     if (!empty($valor)) echo '<i class="bi bi-paperclip text-primary"></i> Sim'; else echo '-';
-                                                } elseif ($tipo_do_campo_atual == 'data' && !empty($valor)) {
+                                                } elseif ($tipo_atual == 'data' && !empty($valor)) {
                                                     $data_objeto = date_create($valor);
                                                     echo ($data_objeto) ? date_format($data_objeto, 'd/m/Y') : htmlspecialchars($valor);
-                                                } elseif ($tipo_do_campo_atual == 'moeda' && !empty($valor)) {
-                                                    echo 'R$ ' . number_format($valor, 2, ',', '.');
+                                                } elseif ($tipo_atual == 'moeda' || $nome_atual == 'valor') {
+                                                    if (is_numeric($valor) || (!empty($valor) && $tipo_atual == 'moeda')) {
+                                                        echo 'R$ ' . number_format((float)$valor, 2, ',', '.');
+                                                    } else {
+                                                        echo htmlspecialchars($valor);
+                                                    }
                                                 } else {
-                                                    echo htmlspecialchars(mb_strtoupper($valor));
+                                                    // Trunca campos longos como 'Motivo', 'Descrição', etc.
+                                                    if ($nome_atual == 'motivo' || $nome_atual == 'descricao' || $nome_atual == 'observação') {
+                                                        echo htmlspecialchars(mb_strimwidth(mb_strtoupper($valor), 0, 80, "..."));
+                                                    } else {
+                                                        echo htmlspecialchars(mb_strtoupper($valor));
+                                                    }
                                                 }
                                                 ?>
                                             </td>

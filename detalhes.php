@@ -90,11 +90,16 @@ include 'header_publico.php';
                                     <div class="detail-label"><?php echo htmlspecialchars($detalhe['nome_campo']); ?></div>
                                     <div class="detail-value">
                                         <?php
+                                        $nome_baixa = mb_strtolower($detalhe['nome_campo']);
                                         if ($detalhe['tipo_campo'] === 'data' && !empty($detalhe['valor'])) {
                                             $d = date_create($detalhe['valor']);
                                             echo ($d) ? date_format($d, 'd/m/Y') : htmlspecialchars($detalhe['valor']);
-                                        } elseif ($detalhe['tipo_campo'] === 'moeda' && !empty($detalhe['valor'])) {
-                                            echo 'R$ ' . number_format($detalhe['valor'], 2, ',', '.');
+                                        } elseif ($detalhe['tipo_campo'] === 'moeda' || $nome_baixa === 'valor') {
+                                            if (is_numeric($detalhe['valor'])) {
+                                                echo 'R$ ' . number_format((float)$detalhe['valor'], 2, ',', '.');
+                                            } else {
+                                                echo htmlspecialchars($detalhe['valor']);
+                                            }
                                         } else {
                                             echo nl2br(htmlspecialchars($detalhe['valor']));
                                         }
