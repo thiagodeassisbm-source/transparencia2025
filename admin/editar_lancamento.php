@@ -74,8 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($valores_post as $id_campo => $valor) {
             if (isset($valor) && $valor !== '') {
                 $valor_final = trim($valor);
-                // Se for moeda, limpa a máscara para salvar no banco
-                if (isset($tipos_por_id[$id_campo]) && $tipos_por_id[$id_campo] === 'moeda') {
+                // Se for moeda ou número, limpa a máscara para salvar no banco
+                if (isset($tipos_por_id[$id_campo]) && ($tipos_por_id[$id_campo] === 'moeda' || $tipos_por_id[$id_campo] === 'numero')) {
                     $valor_final = limpar_valor_monetario($valor_final);
                 }
                 $stmt_insert_val->execute([$registro_id, $id_campo, $valor_final]);
@@ -246,12 +246,15 @@ include 'admin_header.php';
                                         $tipo_input = 'text';
                                         $extra_class = '';
                                         if ($campo['tipo_campo'] == 'data') $tipo_input = 'date';
-                                        if ($campo['tipo_campo'] == 'numero') $tipo_input = 'number';
-                                        if ($campo['tipo_campo'] == 'moeda') $extra_class = 'money-mask';
                                         
-                                        $step = ($campo['tipo_campo'] == 'moeda') ? '0.01' : 'any';
+                                        // Ambos recebem máscara, pois 'numero' no portal geralmente é um valor decimal/monetário
+                                        if ($campo['tipo_campo'] == 'moeda' || $campo['tipo_campo'] == 'numero') {
+                                            $extra_class = 'money-mask';
+                                        }
+                                        
+                                        $step = ($campo['tipo_campo'] == 'moeda' || $campo['tipo_campo'] == 'numero') ? '0.01' : 'any';
                                     ?>
-                                        <input type="<?php echo $tipo_input; ?>" <?php if($tipo_input == 'number') echo "step='$step'"; ?> class="form-control <?php echo $extra_class; ?>" id="campo_<?php echo $campo['id']; ?>" name="valores[<?php echo $campo['id']; ?>]" value="<?php echo htmlspecialchars($valor_atual); ?>">
+                                        <input type="<?php echo $tipo_input; ?>" class="form-control <?php echo $extra_class; ?>" id="campo_<?php echo $campo['id']; ?>" name="valores[<?php echo $campo['id']; ?>]" value="<?php echo htmlspecialchars($valor_atual); ?>">
                                     <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>

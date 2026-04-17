@@ -97,8 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!empty($id_campo) && isset($item_xml->{$tag})) {
                     $valor = trim((string) $item_xml->{$tag});
                     
-                    // Se for moeda, limpa possíveis formatações (pontos e vírgulas)
-                    if (isset($tipos_campos[$id_campo]) && $tipos_campos[$id_campo] === 'moeda') {
+                    // Se for moeda ou número, limpa possíveis formatações (pontos e vírgulas)
+                    if (isset($tipos_campos[$id_campo]) && ($tipos_campos[$id_campo] === 'moeda' || $tipos_campos[$id_campo] === 'numero')) {
                         $valor = limpar_valor_monetario($valor);
                     }
                     
