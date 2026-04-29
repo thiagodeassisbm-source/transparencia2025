@@ -136,12 +136,12 @@ include 'admin_header.php';
             <?php foreach ($logs_por_modulo as $modulo_nome => $info): 
                 $modulo_id = md5($modulo_nome);
             ?>
-                <div class="card border-0 shadow-sm card-modulo-full overflow-hidden" 
-                     data-bs-toggle="collapse" 
-                     data-bs-target="#collapse_<?php echo $modulo_id; ?>" 
-                     aria-expanded="false" 
-                     style="cursor: pointer; transition: all 0.2s ease-in-out;">
-                    <div class="card-body p-3">
+                <div class="card border-0 shadow-sm card-modulo-full overflow-hidden">
+                    <div class="card-body p-3" 
+                         data-bs-toggle="collapse" 
+                         data-bs-target="#collapse_<?php echo $modulo_id; ?>" 
+                         aria-expanded="false" 
+                         style="cursor: pointer; transition: all 0.2s ease-in-out;">
                         <div class="row align-items-center">
                             <!-- Avatar/Ícone -->
                             <div class="col-auto">
