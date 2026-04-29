@@ -6,6 +6,8 @@ require_once 'functions_logs.php';
 // Filtros básicos
 $filtro_acao = $_GET['acao'] ?? '';
 $filtro_usuario = $_GET['usuario'] ?? '';
+$data_inicio = $_GET['data_inicio'] ?? '';
+$data_fim = $_GET['data_fim'] ?? '';
 
 $sql = "SELECT * FROM logs_sistema WHERE 1=1";
 $params = [];
@@ -17,6 +19,14 @@ if ($filtro_acao) {
 if ($filtro_usuario) {
     $sql .= " AND usuario_id = ?";
     $params[] = $filtro_usuario;
+}
+if ($data_inicio) {
+    $sql .= " AND DATE(horario) >= ?";
+    $params[] = $data_inicio;
+}
+if ($data_fim) {
+    $sql .= " AND DATE(horario) <= ?";
+    $params[] = $data_fim;
 }
 
 // Filtro SaaS: Apenas logs da própria prefeitura e esconde logs de gestão global
@@ -60,7 +70,7 @@ include 'admin_header.php';
     <div class="card shadow-sm border-0 mb-4 bg-light">
         <div class="card-body p-3">
             <form class="row g-2 align-items-end" method="GET">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label small fw-bold">Filtrar por Usuário</label>
                     <select name="usuario" class="form-select form-select-sm border-0 shadow-sm">
                         <option value="">Todos os Usuários</option>
@@ -71,7 +81,7 @@ include 'admin_header.php';
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <label class="form-label small fw-bold">Filtrar por Ação</label>
                     <select name="acao" class="form-select form-select-sm border-0 shadow-sm">
                         <option value="">Todas as Ações</option>
@@ -82,8 +92,16 @@ include 'admin_header.php';
                         <option value="LOGOUT" <?php echo $filtro_acao == 'LOGOUT' ? 'selected' : ''; ?>>LOGOUT</option>
                     </select>
                 </div>
-                <div class="col-md-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary btn-sm flex-fill rounded-pill shadow-sm"><i class="bi bi-funnel"></i> Aplicar Filtros</button>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Data Início</label>
+                    <input type="date" name="data_inicio" value="<?php echo $data_inicio; ?>" class="form-control form-control-sm border-0 shadow-sm">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Data Fim</label>
+                    <input type="date" name="data_fim" value="<?php echo $data_fim; ?>" class="form-control form-control-sm border-0 shadow-sm">
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm flex-fill rounded-pill shadow-sm"><i class="bi bi-funnel"></i> Aplicar</button>
                     <a href="logs_gerais.php" class="btn btn-outline-secondary btn-sm flex-fill rounded-pill"><i class="bi bi-x-circle"></i> Limpar</a>
                 </div>
             </form>
