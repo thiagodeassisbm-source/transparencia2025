@@ -172,14 +172,33 @@ include 'admin_header.php';
                     <div class="collapse" id="collapse_<?php echo $modulo_id; ?>" data-bs-parent="#cardsLogs">
                         <div class="border-top bg-light">
                             <!-- Filtro Interno do Card -->
-                            <div class="px-4 py-2 bg-white border-bottom d-flex align-items-center gap-3">
-                                <span class="small fw-bold text-muted text-uppercase" style="font-size: 0.65rem;"><i class="bi bi-funnel"></i> Filtro Interno:</span>
+                            <?php 
+                                // Pegar usuários únicos deste módulo para o select interno
+                                $usuarios_modulo = array_unique(array_column($info['logs'], 'usuario_nome'));
+                                sort($usuarios_modulo);
+                            ?>
+                            <div class="px-3 py-2 bg-white border-bottom d-flex align-items-center flex-wrap gap-3">
+                                <span class="small fw-bold text-muted text-uppercase" style="font-size: 0.6rem;"><i class="bi bi-funnel"></i> Filtros Internos:</span>
+                                
                                 <div class="d-flex align-items-center gap-2">
-                                    <input type="date" id="start_<?php echo $modulo_id; ?>" class="form-control form-control-sm border-0 bg-light shadow-none" style="font-size: 0.75rem;" onchange="filtrarTabelaLocal('<?php echo $modulo_id; ?>')">
-                                    <span class="text-muted small">até</span>
-                                    <input type="date" id="end_<?php echo $modulo_id; ?>" class="form-control form-control-sm border-0 bg-light shadow-none" style="font-size: 0.75rem;" onchange="filtrarTabelaLocal('<?php echo $modulo_id; ?>')">
-                                    <button class="btn btn-link btn-sm text-muted p-0 ms-2" onclick="limparFiltroLocal('<?php echo $modulo_id; ?>')" title="Limpar Filtro Interno"><i class="bi bi-trash"></i></button>
+                                    <label class="small text-muted" style="font-size: 0.7rem;">Período:</label>
+                                    <input type="date" id="start_<?php echo $modulo_id; ?>" class="form-control form-control-sm border-0 bg-light shadow-none" style="font-size: 0.75rem; width: 130px;" onchange="filtrarTabelaLocal('<?php echo $modulo_id; ?>')">
+                                    <span class="text-muted small">à</span>
+                                    <input type="date" id="end_<?php echo $modulo_id; ?>" class="form-control form-control-sm border-0 bg-light shadow-none" style="font-size: 0.75rem; width: 130px;" onchange="filtrarTabelaLocal('<?php echo $modulo_id; ?>')">
                                 </div>
+
+                                <div class="d-flex align-items-center gap-2 border-start ps-3">
+                                    <label class="small text-muted" style="font-size: 0.7rem;">Usuário:</label>
+                                    <select id="user_<?php echo $modulo_id; ?>" class="form-select form-select-sm border-0 bg-light shadow-none" style="font-size: 0.75rem; width: 160px;" onchange="filtrarTabelaLocal('<?php echo $modulo_id; ?>')">
+                                        <option value="">Todos</option>
+                                        <?php foreach($usuarios_modulo as $u_nome): ?>
+                                            <option value="<?php echo htmlspecialchars($u_nome); ?>"><?php echo htmlspecialchars($u_nome); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <button class="btn btn-outline-secondary btn-sm border-0 py-0" onclick="limparFiltroLocal('<?php echo $modulo_id; ?>')" title="Limpar Filtros"><i class="bi bi-trash"></i></button>
+
                                 <div class="ms-auto small text-muted" id="count_<?php echo $modulo_id; ?>">
                                     Mostrando todos os registros
                                 </div>
@@ -199,8 +218,9 @@ include 'admin_header.php';
                                     <tbody>
                                         <?php foreach ($info['logs'] as $log): 
                                             $data_iso = date('Y-m-d', strtotime($log['horario']));
+                                            $u_nome = $log['usuario_nome'] ?? 'A';
                                         ?>
-                                        <tr class="log-row" data-date="<?php echo $data_iso; ?>">
+                                        <tr class="log-row" data-date="<?php echo $data_iso; ?>" data-user="<?php echo htmlspecialchars($u_nome); ?>">
                                             <td class="ps-4 py-3">
                                                 <div class="fw-bold text-dark"><?php echo date('H:i:s', strtotime($log['horario'])); ?></div>
                                                 <div class="text-muted" style="font-size: 0.75rem;"><?php echo date('d/m/Y', strtotime($log['horario'])); ?></div>
@@ -208,10 +228,10 @@ include 'admin_header.php';
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="avatar-user-sm me-2">
-                                                        <?php echo strtoupper(substr($log['usuario_nome'] ?? 'A', 0, 1)); ?>
+                                                        <?php echo strtoupper(substr($u_nome, 0, 1)); ?>
                                                     </div>
                                                     <div>
-                                                        <div class="fw-bold text-dark small"><?php echo htmlspecialchars($log['usuario_nome']); ?></div>
+                                                        <div class="fw-bold text-dark small"><?php echo htmlspecialchars($u_nome); ?></div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -292,6 +312,7 @@ include 'admin_header.php';
 function filtrarTabelaLocal(moduloId) {
     const start = document.getElementById('start_' + moduloId).value;
     const end = document.getElementById('end_' + moduloId).value;
+    const user = document.getElementById('user_' + moduloId).value;
     const table = document.getElementById('table_' + moduloId);
     const rows = table.querySelectorAll('.log-row');
     const msgElement = document.getElementById('count_' + moduloId);
@@ -300,16 +321,18 @@ function filtrarTabelaLocal(moduloId) {
     
     rows.forEach(row => {
         const rowDate = row.getAttribute('data-date');
+        const rowUser = row.getAttribute('data-user');
         let show = true;
         
         if (start && rowDate < start) show = false;
         if (end && rowDate > end) show = false;
+        if (user && rowUser !== user) show = false;
         
         row.style.display = show ? '' : 'none';
         if (show) visibleCount++;
     });
     
-    if (!start && !end) {
+    if (!start && !end && !user) {
         msgElement.innerHTML = 'Mostrando todos os registros';
     } else {
         msgElement.innerHTML = `<span class="badge bg-primary">${visibleCount}</span> resultados filtrados`;
@@ -319,6 +342,7 @@ function filtrarTabelaLocal(moduloId) {
 function limparFiltroLocal(moduloId) {
     document.getElementById('start_' + moduloId).value = '';
     document.getElementById('end_' + moduloId).value = '';
+    document.getElementById('user_' + moduloId).value = '';
     filtrarTabelaLocal(moduloId);
 }
 </script>
