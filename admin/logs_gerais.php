@@ -171,8 +171,22 @@ include 'admin_header.php';
                     <!-- Detalhes Expandidos (Dentro do Card overflow para animação suave) -->
                     <div class="collapse" id="collapse_<?php echo $modulo_id; ?>" data-bs-parent="#cardsLogs">
                         <div class="border-top bg-light">
+                            <!-- Filtro Interno do Card -->
+                            <div class="px-4 py-2 bg-white border-bottom d-flex align-items-center gap-3">
+                                <span class="small fw-bold text-muted text-uppercase" style="font-size: 0.65rem;"><i class="bi bi-funnel"></i> Filtro Interno:</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="date" id="start_<?php echo $modulo_id; ?>" class="form-control form-control-sm border-0 bg-light shadow-none" style="font-size: 0.75rem;" onchange="filtrarTabelaLocal('<?php echo $modulo_id; ?>')">
+                                    <span class="text-muted small">até</span>
+                                    <input type="date" id="end_<?php echo $modulo_id; ?>" class="form-control form-control-sm border-0 bg-light shadow-none" style="font-size: 0.75rem;" onchange="filtrarTabelaLocal('<?php echo $modulo_id; ?>')">
+                                    <button class="btn btn-link btn-sm text-muted p-0 ms-2" onclick="limparFiltroLocal('<?php echo $modulo_id; ?>')" title="Limpar Filtro Interno"><i class="bi bi-trash"></i></button>
+                                </div>
+                                <div class="ms-auto small text-muted" id="count_<?php echo $modulo_id; ?>">
+                                    Mostrando todos os registros
+                                </div>
+                            </div>
+
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0 table-sm-custom">
+                                <table class="table table-hover align-middle mb-0 table-sm-custom" id="table_<?php echo $modulo_id; ?>">
                                     <thead class="bg-white text-muted border-bottom">
                                         <tr>
                                             <th class="ps-4">Horário / Data</th>
@@ -183,8 +197,10 @@ include 'admin_header.php';
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($info['logs'] as $log): ?>
-                                        <tr>
+                                        <?php foreach ($info['logs'] as $log): 
+                                            $data_iso = date('Y-m-d', strtotime($log['horario']));
+                                        ?>
+                                        <tr class="log-row" data-date="<?php echo $data_iso; ?>">
                                             <td class="ps-4 py-3">
                                                 <div class="fw-bold text-dark"><?php echo date('H:i:s', strtotime($log['horario'])); ?></div>
                                                 <div class="text-muted" style="font-size: 0.75rem;"><?php echo date('d/m/Y', strtotime($log['horario'])); ?></div>
@@ -271,3 +287,38 @@ include 'admin_header.php';
 </style>
 
 <?php include 'admin_footer.php'; ?>
+
+<script>
+function filtrarTabelaLocal(moduloId) {
+    const start = document.getElementById('start_' + moduloId).value;
+    const end = document.getElementById('end_' + moduloId).value;
+    const table = document.getElementById('table_' + moduloId);
+    const rows = table.querySelectorAll('.log-row');
+    const msgElement = document.getElementById('count_' + moduloId);
+    
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const rowDate = row.getAttribute('data-date');
+        let show = true;
+        
+        if (start && rowDate < start) show = false;
+        if (end && rowDate > end) show = false;
+        
+        row.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+    });
+    
+    if (!start && !end) {
+        msgElement.innerHTML = 'Mostrando todos os registros';
+    } else {
+        msgElement.innerHTML = `<span class="badge bg-primary">${visibleCount}</span> resultados filtrados`;
+    }
+}
+
+function limparFiltroLocal(moduloId) {
+    document.getElementById('start_' + moduloId).value = '';
+    document.getElementById('end_' + moduloId).value = '';
+    filtrarTabelaLocal(moduloId);
+}
+</script>
